@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>The source code</title>
+  <link href="../resources/prettify/prettify.css" type="text/css" rel="stylesheet" />
+  <script type="text/javascript" src="../resources/prettify/prettify.js"></script>
+  <style type="text/css">
+    .highlight { display: block; background-color: #ddd; }
+  </style>
+  <script type="text/javascript">
+    function highlight() {
+      document.getElementById(location.hash.replace(/#/, "")).className = "highlight";
+    }
+  </script>
+</head>
+<body onload="prettyPrint(); highlight();">
+  <pre class="prettyprint lang-js"><span id='Ext-chart-series-sprite-Series'>/**
+</span> * Base class for all series sprites.
+ * Defines attributes common to all series sprites, like data in x/y directions and its min/max values,
+ * and configs, like the {@link Ext.chart.series.Series} instance that manages the sprite.
+ *
+ */
+Ext.define('Ext.chart.series.sprite.Series', {
+    extend: 'Ext.draw.sprite.Sprite',
+    mixins: {
+        markerHolder: 'Ext.chart.MarkerHolder'
+    },
+
+    inheritableStatics: {
+<span id='Ext-chart-series-sprite-Series-static-property-def'>        def: {
+</span>            processors: {
+<span id='Ext-chart-series-sprite-Series-cfg-dataMinX'>                /**
+</span>                 * @cfg {Number} [dataMinX=0] Data minimum on the x-axis.
+                 */
+                dataMinX: 'number',
+
+<span id='Ext-chart-series-sprite-Series-cfg-dataMaxX'>                /**
+</span>                 * @cfg {Number} [dataMaxX=1] Data maximum on the x-axis.
+                 */
+                dataMaxX: 'number',
+
+<span id='Ext-chart-series-sprite-Series-cfg-dataMinY'>                /**
+</span>                 * @cfg {Number} [dataMinY=0] Data minimum on the y-axis.
+                 */
+                dataMinY: 'number',
+
+<span id='Ext-chart-series-sprite-Series-cfg-dataMaxY'>                /**
+</span>                 * @cfg {Number} [dataMaxY=1] Data maximum on the y-axis.
+                 */
+                dataMaxY: 'number',
+
+<span id='Ext-chart-series-sprite-Series-cfg-rangeX'>                /**
+</span>                 * @cfg {Array} [rangeX=null] Data range derived from all the series bound to the x-axis.
+                 */
+                rangeX: 'data',
+<span id='Ext-chart-series-sprite-Series-cfg-rangeY'>                /**
+</span>                 * @cfg {Array} [rangeY=null] Data range derived from all the series bound to the y-axis.
+                 */
+                rangeY: 'data',
+
+<span id='Ext-chart-series-sprite-Series-cfg-dataX'>                /**
+</span>                 * @cfg {Object} [dataX=null] Data items on the x-axis.
+                 */
+                dataX: 'data',
+
+<span id='Ext-chart-series-sprite-Series-cfg-dataY'>                /**
+</span>                 * @cfg {Object} [dataY=null] Data items on the y-axis.
+                 */
+                dataY: 'data'
+            },
+
+            defaults: {
+                dataMinX: 0,
+                dataMaxX: 1,
+                dataMinY: 0,
+                dataMaxY: 1,
+                rangeX: null,
+                rangeY: null,
+                dataX: null,
+                dataY: null
+            },
+
+            triggers: {
+                dataX: 'bbox',
+                dataY: 'bbox',
+                dataMinX: 'bbox',
+                dataMaxX: 'bbox',
+                dataMinY: 'bbox',
+                dataMaxY: 'bbox'
+            }
+        }
+    },
+
+    config: {
+<span id='Ext-chart-series-sprite-Series-cfg-store'>        /**
+</span>         * @private
+         * @cfg {Object} store The store that is passed to the renderer.
+         */
+        store: null,
+
+<span id='Ext-chart-series-sprite-Series-cfg-series'>        series: null,
+</span>
+<span id='Ext-chart-series-sprite-Series-cfg-field'>        /**
+</span>         * @cfg {String} field The store field used by the series.
+         */
+        field: null
+    }
+});</pre>
+</body>
+</html>

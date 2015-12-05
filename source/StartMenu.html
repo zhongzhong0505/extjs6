@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>The source code</title>
+  <link href="../resources/prettify/prettify.css" type="text/css" rel="stylesheet" />
+  <script type="text/javascript" src="../resources/prettify/prettify.js"></script>
+  <style type="text/css">
+    .highlight { display: block; background-color: #ddd; }
+  </style>
+  <script type="text/javascript">
+    function highlight() {
+      document.getElementById(location.hash.replace(/#/, "")).className = "highlight";
+    }
+  </script>
+</head>
+<body onload="prettyPrint(); highlight();">
+  <pre class="prettyprint lang-js"><span id='Ext-ux-desktop-StartMenu'>/**
+</span> * Ext JS Library
+ * Copyright(c) 2006-2014 Sencha Inc.
+ * licensing@sencha.com
+ * http://www.sencha.com/license
+ * @class Ext.ux.desktop.StartMenu
+ */
+Ext.define('Ext.ux.desktop.StartMenu', {
+    extend: 'Ext.menu.Menu',
+
+<span id='Ext-ux-desktop-StartMenu-cfg-baseCls'>    // We want header styling like a Panel
+</span>    baseCls: Ext.baseCSSPrefix + 'panel',
+
+<span id='Ext-ux-desktop-StartMenu-cfg-cls'>    // Special styling within
+</span>    cls: 'x-menu ux-start-menu',
+<span id='Ext-ux-desktop-StartMenu-cfg-bodyCls'>    bodyCls: 'ux-start-menu-body',
+</span>
+<span id='Ext-ux-desktop-StartMenu-cfg-defaultAlign'>    defaultAlign: 'bl-tl',
+</span>
+<span id='Ext-ux-desktop-StartMenu-cfg-iconCls'>    iconCls: 'user',
+</span>
+<span id='Ext-ux-desktop-StartMenu-cfg-bodyBorder'>    bodyBorder: true,
+</span>
+<span id='Ext-ux-desktop-StartMenu-cfg-width'>    width: 300,
+</span>
+<span id='Ext-ux-desktop-StartMenu-method-initComponent'>    initComponent: function() {
+</span>        var me = this;
+
+        me.layout.align = 'stretch';
+
+        me.items = me.menu;
+
+        me.callParent();
+
+        me.toolbar = new Ext.toolbar.Toolbar(Ext.apply({
+            dock: 'right',
+            cls: 'ux-start-menu-toolbar',
+            vertical: true,
+            width: 100,
+            layout: {
+                align: 'stretch'
+            }
+        }, me.toolConfig));
+
+        me.addDocked(me.toolbar);
+
+        delete me.toolItems;
+    },
+
+<span id='Ext-ux-desktop-StartMenu-method-addMenuItem'>    addMenuItem: function() {
+</span>        var cmp = this.menu;
+        cmp.add.apply(cmp, arguments);
+    },
+
+<span id='Ext-ux-desktop-StartMenu-method-addToolItem'>    addToolItem: function() {
+</span>        var cmp = this.toolbar;
+        cmp.add.apply(cmp, arguments);
+    }
+}); // StartMenu
+</pre>
+</body>
+</html>

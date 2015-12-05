@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>The source code</title>
+  <link href="../resources/prettify/prettify.css" type="text/css" rel="stylesheet" />
+  <script type="text/javascript" src="../resources/prettify/prettify.js"></script>
+  <style type="text/css">
+    .highlight { display: block; background-color: #ddd; }
+  </style>
+  <script type="text/javascript">
+    function highlight() {
+      document.getElementById(location.hash.replace(/#/, "")).className = "highlight";
+    }
+  </script>
+</head>
+<body onload="prettyPrint(); highlight();">
+  <pre class="prettyprint lang-js"><span id='Ext-ux-grid-plugin-AutoSelector'>/**
+</span> * This plugin ensures that its associated grid or tree always has a selection record. The
+ * only exception is, of course, when there are no records in the store.
+ * @since 6.0.2
+ */
+Ext.define('Ext.ux.grid.plugin.AutoSelector', {
+    extend: 'Ext.plugin.Abstract',
+
+    alias: 'plugin.gridautoselector',
+
+    config: {
+<span id='Ext-ux-grid-plugin-AutoSelector-cfg-store'>        store: null
+</span>    },
+
+<span id='Ext-ux-grid-plugin-AutoSelector-method-init'>    init: function (grid) {
+</span>        //&lt;debug&gt;
+        if (!grid.isXType('tablepanel')) {
+            Ext.raise('The gridautoselector plugin is designed only for grids and trees');
+        }
+        //&lt;/debug&gt;
+
+        var me = this;
+
+        me.grid = grid;
+
+        me.watchGrid();
+
+        grid.on({
+            reconfigure: me.watchGrid,
+            scope: me
+        });
+    },
+
+<span id='Ext-ux-grid-plugin-AutoSelector-method-destroy'>    destroy: function () {
+</span>        this.setStore(null);
+        this.grid = null;
+
+        this.callParent();
+    },
+
+<span id='Ext-ux-grid-plugin-AutoSelector-method-ensureSelection'>    ensureSelection: function () {
+</span>        var grid = this.grid,
+            store = grid.getStore(),
+            selection;
+
+        if (store.getCount()) {
+            selection = grid.getSelection();
+
+            if (!selection || !selection.length) {
+                grid.getSelectionModel().select(0);
+            }
+        }
+    },
+
+<span id='Ext-ux-grid-plugin-AutoSelector-method-watchGrid'>    watchGrid: function () {
+</span>        this.setStore(this.grid.getStore());
+        this.ensureSelection();
+    },
+
+<span id='Ext-ux-grid-plugin-AutoSelector-method-updateStore'>    updateStore: function (store) {
+</span>        var me = this;
+
+        Ext.destroy(me.storeListeners);
+
+        me.storeListeners = store &amp;&amp; store.on({
+                // We could go from 0 records to 1+ records... now we can select one!
+                add: me.ensureSelection,
+                // We might remove the selected record...
+                remove: me.ensureSelection,
+
+                destroyable: true,
+                scope: me
+            });
+    }
+});
+</pre>
+</body>
+</html>

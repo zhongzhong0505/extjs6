@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>The source code</title>
+  <link href="../resources/prettify/prettify.css" type="text/css" rel="stylesheet" />
+  <script type="text/javascript" src="../resources/prettify/prettify.js"></script>
+  <style type="text/css">
+    .highlight { display: block; background-color: #ddd; }
+  </style>
+  <script type="text/javascript">
+    function highlight() {
+      document.getElementById(location.hash.replace(/#/, "")).className = "highlight";
+    }
+  </script>
+</head>
+<body onload="prettyPrint(); highlight();">
+  <pre class="prettyprint lang-js"><span id='Ext-grid-header-Container'>/**
+</span> * @class Ext.grid.header.Container
+ */
+
+<span id='Ext-grid-header-Container-css_var-S-grid-header-background-color'>/**
+</span> * @var {color}
+ * The background-color of grid headers
+ */
+$grid-header-background-color: dynamic(#ddd);
+
+<span id='Ext-grid-header-Container-css_var-S-grid-header-background-gradient'>/**
+</span> * @var {string/list}
+ * The background-gradient of grid headers.  Can be either the name of a predefined gradient
+ * or a list of color stops. Used as the `$type` parameter for {@link Global_CSS#background-gradient}.
+ */
+$grid-header-background-gradient: dynamic('grid-header');
+
+<span id='Ext-grid-header-Container-css_var-S-grid-header-border-color'>/**
+</span> * @var {color}
+ * The border-color of grid headers
+ */
+$grid-header-border-color: dynamic(#333);
+
+<span id='Ext-grid-header-Container-css_var-S-grid-header-border-width'>/**
+</span> * @var {number}
+ * The border-width of grid headers
+ */
+$grid-header-border-width: dynamic(1px);
+
+<span id='Ext-grid-header-Container-css_var-S-grid-header-border-style'>/**
+</span> * @var {string}
+ * The border-style of grid headers
+ */
+$grid-header-border-style: dynamic(solid);
+
+<span id='Ext-grid-header-Container-css_var-S-grid-header-over-background-color'>/**
+</span> * @var {color}
+ * The background-color of grid headers when the cursor is over the header
+ */
+$grid-header-over-background-color: dynamic(#eee);
+
+<span id='Ext-grid-header-Container-css_var-S-grid-header-over-background-gradient'>/**
+</span> * @var {string/list}
+ * The background-gradient of grid headers when the cursor is over the header.  Can be
+ * either the name of a predefined gradient or a list of color stops. Used as the `$type`
+ * parameter for {@link Global_CSS#background-gradient}.
+ */
+$grid-header-over-background-gradient: dynamic('grid-header-over');
+
+<span id='Ext-grid-header-Container-css_var-S-grid-header-sorted-background-color'>/**
+</span> * @var {color}
+ * The background-color of grid headers when sorted
+ */
+$grid-header-sorted-background-color: dynamic($grid-header-over-background-color);
+
+<span id='Ext-grid-header-Container-css_var-S-grid-header-sorted-background-gradient'>/**
+</span> * @var {string/list}
+ * The background-gradient of grid headers when sorted.  Can be either the name of a
+ * predefined gradient or a list of color stops. Used as the `$type`
+ * parameter for {@link Global_CSS#background-gradient}.
+ */
+$grid-header-sorted-background-gradient: dynamic($grid-header-over-background-gradient);
+
+<span id='Ext-grid-header-Container-css_var-S-grid-header-open-background-color'>/**
+</span> * @var {color}
+ * The background-color of a grid header when its menu is open
+ */
+$grid-header-open-background-color: dynamic(transparent);
+
+<span id='Ext-grid-header-Container-css_var-S-grid-header-padding'>/**
+</span> * @var {number/list}
+ * The padding to apply to grid headers
+ */
+$grid-header-padding: dynamic(5px);
+
+<span id='Ext-grid-header-Container-css_var-S-grid-header-trigger-height'>/**
+</span> * @var {number}
+ * The height of grid header triggers
+ */
+$grid-header-trigger-height: dynamic(22px);
+
+<span id='Ext-grid-header-Container-css_var-S-grid-header-trigger-width'>/**
+</span> * @var {number}
+ * The width of grid header triggers
+ */
+$grid-header-trigger-width: dynamic(14px);
+
+<span id='Ext-grid-header-Container-css_var-S-grid-header-trigger-background-image'>/**
+</span> * @var {string}
+ * The background-image of grid header triggers
+ */
+$grid-header-trigger-background-image: dynamic('grid/hd-pop');
+
+<span id='Ext-grid-header-Container-css_var-S-grid-header-trigger-glyph-font-size'>/**
+</span> * @var {string/list}
+ * Glyph for the grid header trigger icon when {@link Global_CSS#$enable-font-icons} is `true`.
+ */
+$grid-header-trigger-glyph-font-size: dynamic(16px);
+
+<span id='Ext-grid-header-Container-css_var-S-grid-header-trigger-glyph'>/**
+</span> * @var {string/list}
+ * Glyph for the grid header trigger icon when {@link Global_CSS#$enable-font-icons} is `true`.
+ */
+$grid-header-trigger-glyph: dynamic($fa-var-caret-down $grid-header-trigger-glyph-font-size $font-icon-font-family);
+
+<span id='Ext-grid-header-Container-css_var-S-grid-header-trigger-glyph-color'>/**
+</span> * @var {color}
+ * The color to use for the grid header trigger icon when {@link Global_CSS#$enable-font-icons} is `true`.
+ */
+$grid-header-trigger-glyph-color: dynamic($color);
+
+<span id='Ext-grid-header-Container-css_var-S-grid-header-sort-icon-width'>/**
+</span> * @var {number}
+ * The width of the grid header sort icon
+ */
+$grid-header-sort-icon-width: dynamic(9px);
+
+<span id='Ext-grid-header-Container-css_var-S-grid-header-trigger-cursor'>/**
+</span> * @var {string}
+ * The type of cursor to display when the cursor is over a grid header trigger
+ */
+$grid-header-trigger-cursor: dynamic(pointer);
+
+<span id='Ext-grid-header-Container-css_var-S-grid-header-trigger-spacing'>/**
+</span> * @var {number}
+ * The amount of space between the header trigger and text
+ */
+$grid-header-trigger-spacing: dynamic(1px);
+
+<span id='Ext-grid-header-Container-css_var-S-grid-header-trigger-background-position'>/**
+</span> * @var {list}
+ * The background-position of the header trigger
+ */
+$grid-header-trigger-background-position: dynamic(0 center);
+
+<span id='Ext-grid-header-Container-css_var-S-grid-header-trigger-background-color'>/**
+</span> * @var {color}
+ * The background-color of the header trigger
+ */
+$grid-header-trigger-background-color: dynamic(transparent);
+
+<span id='Ext-grid-header-Container-css_var-S-grid-header-trigger-background-color-open'>/**
+</span> * @var {color}
+ * The background-color of the header trigger when the menu is open
+ */
+$grid-header-trigger-background-color-open: dynamic(transparent);
+
+<span id='Ext-grid-header-Container-css_var-S-grid-header-sort-icon-spacing'>/**
+</span> * @var {number}
+ * The space between the grid header sort icon and the grid header text
+ */
+$grid-header-sort-icon-spacing: dynamic(3px);
+
+// private
+$grid-header-sort-icon-position: dynamic(right center);
+
+<span id='Ext-grid-header-Container-css_var-S-grid-header-sort-glyph-font-size'>/**
+</span> * @var {string/list}
+ * Glyph for the grid header sort icon when {@link Global_CSS#$enable-font-icons} is `true`.
+ */
+$grid-header-sort-glyph-font-size: dynamic(14px);
+
+<span id='Ext-grid-header-Container-css_var-S-grid-header-sort-glyph-color'>/**
+</span> * @var {color}
+ * The color to use for the grid header sort icon when {@link Global_CSS#$enable-font-icons} is `true`.
+ */
+$grid-header-sort-glyph-color: dynamic($color);
+
+<span id='Ext-grid-header-Container-css_var-S-grid-header-sort-asc-glyph'>/**
+</span> * @var {string/list}
+ * Glyph for the grid header &quot;sort ascending&quot; icon when {@link Global_CSS#$enable-font-icons} is `true`.
+ */
+$grid-header-sort-asc-glyph: dynamic($fa-var-long-arrow-up $grid-header-sort-glyph-font-size $font-icon-font-family);
+
+<span id='Ext-grid-header-Container-css_var-S-grid-header-sort-desc-glyph'>/**
+</span> * @var {string/list}
+ * Glyph for the grid header &quot;sort descending&quot; icon when {@link Global_CSS#$enable-font-icons} is `true`.
+ */
+$grid-header-sort-desc-glyph: dynamic($fa-var-long-arrow-down $grid-header-sort-glyph-font-size $font-icon-font-family);
+
+<span id='Ext-grid-header-Container-css_var-S-grid-header-menu-glyph-font-size'>/**
+</span> * @var {string/list}
+ * Glyph for the grid header menu icons when {@link Global_CSS#$enable-font-icons} is `true`.
+ */
+$grid-header-menu-glyph-font-size: dynamic(16px);
+
+<span id='Ext-grid-header-Container-css_var-S-grid-header-menu-glyph-color'>/**
+</span> * @var {color}
+ * The color to use for the grid header menu icons when {@link Global_CSS#$enable-font-icons} is `true`.
+ */
+$grid-header-menu-glyph-color: dynamic($menu-glyph-color);
+
+<span id='Ext-grid-header-Container-css_var-S-grid-header-menu-sort-asc-glyph'>/**
+</span> * @var {string/list}
+ * Glyph for the grid header menu &quot;sort ascending&quot; icon when {@link Global_CSS#$enable-font-icons} is `true`.
+ */
+$grid-header-menu-sort-asc-glyph: dynamic($ext-var-sort-up $grid-header-menu-glyph-font-size ExtJS);
+
+<span id='Ext-grid-header-Container-css_var-S-grid-header-menu-sort-desc-glyph'>/**
+</span> * @var {string/list}
+ * Glyph for the grid header menu &quot;sort descending&quot; icon when {@link Global_CSS#$enable-font-icons} is `true`.
+ */
+$grid-header-menu-sort-desc-glyph: dynamic($ext-var-sort-down $grid-header-menu-glyph-font-size ExtJS);
+
+<span id='Ext-grid-header-Container-css_var-S-grid-header-menu-columns-glyph'>/**
+</span> * @var {string/list}
+ * Glyph for the grid header menu &quot;columns&quot; icon when {@link Global_CSS#$enable-font-icons} is `true`.
+ */
+$grid-header-menu-columns-glyph: dynamic($ext-var-columns $grid-header-menu-glyph-font-size ExtJS);
+</pre>
+</body>
+</html>

@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>The source code</title>
+  <link href="../resources/prettify/prettify.css" type="text/css" rel="stylesheet" />
+  <script type="text/javascript" src="../resources/prettify/prettify.js"></script>
+  <style type="text/css">
+    .highlight { display: block; background-color: #ddd; }
+  </style>
+  <script type="text/javascript">
+    function highlight() {
+      document.getElementById(location.hash.replace(/#/, "")).className = "highlight";
+    }
+  </script>
+</head>
+<body onload="prettyPrint(); highlight();">
+  <pre class="prettyprint lang-js"><span id='Ext-chart-Legend'>/**
+</span> * @class Ext.chart.Legend
+ */
+Ext.define('Ext.chart.Legend', {
+    xtype: 'legend',
+    extend: 'Ext.chart.LegendBase',
+    config: {
+<span id='Ext-chart-Legend-cfg-baseCls'>        baseCls: Ext.baseCSSPrefix + 'legend',
+</span><span id='Ext-chart-Legend-cfg-padding'>        // TODO: not used.
+</span>        padding: 5,
+
+<span id='Ext-chart-Legend-cfg-rect'>        /**
+</span>         * @cfg {Array}
+         * The rect of the legend related to its container.
+         */
+        rect: null,
+
+<span id='Ext-chart-Legend-cfg-disableSelection'>        // TODO: not used.
+</span>        disableSelection: true,
+
+<span id='Ext-chart-Legend-cfg-toggleable'>        /**
+</span>         * @cfg {Boolean} toggleable
+         * `true` to allow series items to have their visibility
+         * toggled by interaction with the legend items.
+         */
+        toggleable: true
+    },
+
+<span id='Ext-chart-Legend-method-toggleItem'>    toggleItem: function (index) {
+</span>        if (!this.getToggleable()) {
+            return;
+        }
+        var store = this.getStore(),
+            disabledCount = 0, disabled,
+            canToggle = true,
+            i, count, record;
+
+        if (store) {
+            count = store.getCount();
+            for (i = 0; i &lt; count; i++) {
+                record = store.getAt(i);
+                if (record.get('disabled')) {
+                    disabledCount++;
+                }
+            }
+            canToggle = count - disabledCount &gt; 1;
+
+            record = store.getAt(index);
+            if (record) {
+                disabled = record.get('disabled');
+                if (disabled || canToggle) {
+                    // This will trigger AbstractChart.onUpdateLegendStore.
+                    record.set('disabled', !disabled);
+                }
+            }
+        }
+    }
+
+});
+</pre>
+</body>
+</html>

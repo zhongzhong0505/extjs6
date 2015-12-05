@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>The source code</title>
+  <link href="../resources/prettify/prettify.css" type="text/css" rel="stylesheet" />
+  <script type="text/javascript" src="../resources/prettify/prettify.js"></script>
+  <style type="text/css">
+    .highlight { display: block; background-color: #ddd; }
+  </style>
+  <script type="text/javascript">
+    function highlight() {
+      document.getElementById(location.hash.replace(/#/, "")).className = "highlight";
+    }
+  </script>
+</head>
+<body onload="prettyPrint(); highlight();">
+  <pre class="prettyprint lang-js"><span id='Global_CSS-css_mixin-google-webfont'>/**
+</span> * Includes a google webfont for use in your theme.
+ * @param {string} $font-name The name of the font.  If the font name contains spaces
+ * use &quot;+&quot; instead of space.
+ * @param {string} [$font-weights=400] Comma-separated list of font weights to include.
+ *
+ * Example usage:
+ *
+ *     @include google-webfont(
+ *         $font-name: Exo,
+ *         $font-weights: 200 300 400
+ *     );
+ *
+ * Outputs:
+ *
+ *     @import url(//fonts.googleapis.com/css?family=Exo:200,300,400);
+ *
+ * @member Global_CSS
+ */
+@mixin google-webfont(
+    $font-name,
+    $font-weights: 400
+) {
+    @import url('//fonts.googleapis.com/css?family=#{$font-name}:#{$font-weights}');
+}
+</pre>
+</body>
+</html>

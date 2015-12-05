@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>The source code</title>
+  <link href="../resources/prettify/prettify.css" type="text/css" rel="stylesheet" />
+  <script type="text/javascript" src="../resources/prettify/prettify.js"></script>
+  <style type="text/css">
+    .highlight { display: block; background-color: #ddd; }
+  </style>
+  <script type="text/javascript">
+    function highlight() {
+      document.getElementById(location.hash.replace(/#/, "")).className = "highlight";
+    }
+  </script>
+</head>
+<body onload="prettyPrint(); highlight();">
+  <pre class="prettyprint lang-js"><span id='Ext-pivot-plugin-DrillDown'>/**
+</span> *
+ * This plugin allows the user to view all records that were aggregated for a specified cell.
+ *
+ * The user has to double click that cell to open the records viewer.
+ *
+ * If a {@link Ext.pivot.matrix.Remote Remote} matrix is used then the plugin requires
+ * an url to be provided to fetch the records for a left/top keys pair.
+ *
+ */
+Ext.define('Ext.pivot.plugin.DrillDown', {
+    alternateClassName: [
+        'Mz.pivot.plugin.DrillDown'
+    ],
+
+    alias: [
+        'plugin.pivotdrilldown',
+        'plugin.mzdrilldown'
+    ],
+
+    extend: 'Ext.AbstractPlugin',
+    
+    requires: [
+        'Ext.pivot.Grid',
+        'Ext.window.Window',
+        'Ext.data.proxy.Memory',
+        'Ext.data.Store',
+        'Ext.toolbar.Paging'
+    ],
+
+    mixins: {
+        observable: 'Ext.util.Observable'
+    },
+    
+<span id='Ext-pivot-plugin-DrillDown-cfg-columns'>    /**
+</span>     * @cfg {Ext.grid.column.Column[]} [columns] Specify which columns should be visible in the grid.
+     *
+     * Use the same definition as for a grid column. Header and dataIndex are the most important ones.
+     */
+    columns:     null,
+<span id='Ext-pivot-plugin-DrillDown-cfg-width'>    /**
+</span>     * @cfg {Number} width Width of the viewer's window.
+     */
+    width:        400,
+<span id='Ext-pivot-plugin-DrillDown-cfg-height'>    /**
+</span>     * @cfg {Number} height Height of the viewer's window.
+     */
+    height:        300,
+<span id='Ext-pivot-plugin-DrillDown-cfg-remoteStore'>    /**
+</span>     * @cfg {Ext.data.Store} remoteStore
+     * Provide either a store config or a store instance when using a {@link Ext.pivot.matrix.Remote Remote} matrix on the pivot grid.
+     *
+     * The store will be remotely filtered to fetch records from the server.
+     */
+    remoteStore:    null,
+<span id='Ext-pivot-plugin-DrillDown-cfg-textWindow'>    /**
+</span>     * @cfg {String} textWindow Viewer's window title.
+     */
+    textWindow: 'Drill down window',
+    
+<span id='Ext-pivot-plugin-DrillDown-property-lockableScope'>    /**
+</span>     *  `&quot;both&quot;` (the default) - The plugin is added to both grids
+     *  `&quot;top&quot;` - The plugin is added to the containing Panel
+     *  `&quot;locked&quot;` - The plugin is added to the locked (left) grid
+     *  `&quot;normal&quot;` - The plugin is added to the normal (right) grid
+     *
+     * @private
+    */
+    lockableScope:  'top',
+    
+<span id='Ext-pivot-plugin-DrillDown-method-init'>    init: function(grid){
+</span>        var me = this;
+
+        //&lt;debug&gt;
+        // this plugin is available only for the pivot grid
+        if (!grid.isPivotGrid) {
+            Ext.raise('This plugin is only compatible with Ext.pivot.Grid');
+        }
+        //&lt;/debug&gt;
+
+        me.pivot = grid;
+        me.pivotListeners = me.pivot.on({
+            pivotitemcelldblclick:      me.runPlugin,
+            pivotgroupcelldblclick:     me.runPlugin,
+            pivottotalcelldblclick:     me.runPlugin,
+            scope:                      me,
+            destroyable:                true
+        });
+        
+        me.callParent(arguments);        
+    },
+    
+<span id='Ext-pivot-plugin-DrillDown-method-destroy'>    destroy: function(){
+</span>        var me = this;
+        
+        Ext.destroyMembers(me, 'view', 'pivotListeners');
+
+        me.pivot = me.view = me.pivotListeners = me.store = null;
+
+        me.callParent(arguments);
+    },
+
+<span id='Ext-pivot-plugin-DrillDown-method-showView'>    /**
+</span>     *
+     * @param {Ext.pivot.result.Base} result
+     * @private
+     */
+    showView: function(result){
+        var me = this,
+            matrix = me.pivot.getMatrix(),
+            columns = me.columns || [],
+            fields, store, filters;
+
+        if(!result){
+            return;
+        }
+
+        if (!me.view) {
+            
+            switch(matrix.type){
+                case 'local':
+                    fields = matrix.store.model.getFields();
+                    store = Ext.create('Ext.data.Store', {
+                        pageSize: 25,
+                        remoteSort: true,
+                        fields: Ext.clone(fields),
+                        proxy: {
+                            type: 'memory',
+                            reader: {
+                                type: 'array'
+                            },
+                            enablePaging: true
+                        }
+                    });
+                    // if no columns are defined then use those defined in the pivot grid store
+                    if (columns.length === 0) {
+                        Ext.Array.each(fields, function (value, index, all) {
+                            columns.push({
+                                header: Ext.String.capitalize(value.name),
+                                dataIndex: value.name
+                            });
+                        });
+                    }
+                    break;
+
+                case 'remote':
+                    store = Ext.getStore(me.remoteStore);
+
+                    if(store){
+                        store.setRemoteFilter(true);
+                    }
+
+                    //&lt;debug&gt;
+                    if(columns.length === 0){
+                        Ext.raise('No columns defined for the drill down grid!');
+                    }
+                    //&lt;/debug&gt;
+
+                    break;
+
+                default:
+                    return;
+            }
+
+            // create the window that will show the records
+            me.view = Ext.create('Ext.window.Window', {
+                title: me.textWindow,
+                width: me.width,
+                height: me.height,
+                layout: 'fit',
+                modal: true,
+                closeAction: 'hide',
+                items: [{
+                    xtype: 'grid',
+                    border: false,
+                    viewConfig: {
+                        loadMask: false
+                    },
+                    columns: columns,
+                    store: store,
+                    dockedItems: [{
+                        itemId: 'idPager',
+                        xtype: 'pagingtoolbar',
+                        store: store,   // same store GridPanel is using
+                        dock: 'bottom',
+                        displayInfo: true
+                    }]
+                }]
+            });
+
+            me.store = store;
+        }
+
+        switch(matrix.type){
+            case 'local':
+                me.store.getProxy().data = result.records;
+                me.store.load();
+                me.view.down('#idPager').moveFirst();
+                break;
+
+            case 'remote':
+                filters = Ext.Array.merge(me.getFiltersFromParams(result.getLeftAxisItem() ? result.getLeftAxisItem().data : {}), me.getFiltersFromParams(result.getTopAxisItem() ? result.getTopAxisItem().data : {}));
+                me.store.clearFilter(filters.length &gt; 0);
+                me.store.addFilter(filters);
+                break;
+
+            default:
+                return;
+        }
+
+        me.view.show();
+    },
+
+<span id='Ext-pivot-plugin-DrillDown-method-runPlugin'>    runPlugin: function(params, e, eOpts){
+</span>        // do nothing if the plugin is disabled
+        if(this.disabled) {
+            return;
+        }
+
+        this.showView(this.pivot.getMatrix().results.get(params.leftKey, params.topKey));
+    },
+
+<span id='Ext-pivot-plugin-DrillDown-method-getFiltersFromParams'>    getFiltersFromParams: function(obj){
+</span>        var filters = [],
+            i, len, keys;
+
+        if(Ext.isObject(obj)) {
+            keys = Ext.Object.getKeys(obj);
+            len = keys.length;
+
+            for (i = 0; i &lt; len; i++) {
+                filters.push({
+                    property: keys[i],
+                    exactMatch: true,
+                    value: obj[keys[i]]
+                });
+            }
+        }
+
+        return filters;
+    }
+
+});</pre>
+</body>
+</html>

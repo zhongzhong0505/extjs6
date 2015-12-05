@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>The source code</title>
+  <link href="../resources/prettify/prettify.css" type="text/css" rel="stylesheet" />
+  <script type="text/javascript" src="../resources/prettify/prettify.js"></script>
+  <style type="text/css">
+    .highlight { display: block; background-color: #ddd; }
+  </style>
+  <script type="text/javascript">
+    function highlight() {
+      document.getElementById(location.hash.replace(/#/, "")).className = "highlight";
+    }
+  </script>
+</head>
+<body onload="prettyPrint(); highlight();">
+  <pre class="prettyprint lang-js"><span id='Ext-tab-Bar'>/**
+</span> * @class Ext.tab.Bar
+ */
+
+<span id='Ext-tab-Bar-css_var-S-tabbar-padding'>/**
+</span> * @var {number/list}
+ * The padding of the Tab Bar
+ */
+$tabbar-padding: dynamic(0);
+
+<span id='Ext-tab-Bar-css_var-S-tabbar-plain-padding'>/**
+</span> * @var {number/list}
+ * The padding of the Tab Bar when {@link #plain} is `true`.
+ */
+$tabbar-plain-padding: dynamic($tabbar-padding);
+
+<span id='Ext-tab-Bar-css_var-S-tabbar-base-color'>/**
+</span> * @var {color}
+ * The base color of the Tab Bar
+ */
+$tabbar-base-color: dynamic($base-color);
+
+<span id='Ext-tab-Bar-css_var-S-tabbar-background-gradient'>/**
+</span> * @var {string/list}
+ * The background-gradient of the Tab Bar. Can be either the name of a predefined gradient
+ * or a list of color stops. Used as the `$type` parameter for 
+ * {@link Global_CSS#background-gradient}.
+ */
+$tabbar-background-gradient: dynamic('tabbar');
+
+<span id='Ext-tab-Bar-css_var-S-tabbar-border-color'>/**
+</span> * @var {color}
+ * The border-color of the Tab Bar
+ */
+$tabbar-border-color: dynamic($panel-header-border-color);
+
+<span id='Ext-tab-Bar-css_var-S-tabbar-border-width'>/**
+</span> * @var {number/list}
+ * The border-width of the Tab Bar
+ */
+$tabbar-border-width: dynamic(1px 1px 0);
+
+<span id='Ext-tab-Bar-css_var-S-tabbar-strip-height'>/**
+</span> * @var {number}
+ * The height of the Tab Bar strip
+ */
+$tabbar-strip-height: dynamic(3px);
+
+<span id='Ext-tab-Bar-css_var-S-tabbar-strip-border-color'>/**
+</span> * @var {color}
+ * The border-color of the Tab Bar strip
+ */
+$tabbar-strip-border-color: dynamic($panel-header-border-color);
+
+<span id='Ext-tab-Bar-css_var-S-tabbar-strip-background-color'>/**
+</span> * @var {color}
+ * The background-color of the Tab Bar strip
+ */
+$tabbar-strip-background-color: dynamic($tab-base-color-active);
+
+<span id='Ext-tab-Bar-css_var-S-tabbar-strip-border-width'>/**
+</span> * @var {number/list}
+ * The border-width of the Tab Bar strip
+ */
+$tabbar-strip-border-width: dynamic(1px 0 0);
+
+<span id='Ext-tab-Bar-css_var-S-tabbar-scroller-width'>/**
+</span> * @var {number}
+ * The width of the Tab Bar scrollers
+ */
+$tabbar-scroller-width: dynamic(24px);
+
+<span id='Ext-tab-Bar-css_var-S-tabbar-scroller-height'>/**
+</span> * @var {number}
+ * The height of the Tab Bar scrollers
+ */
+$tabbar-scroller-height: dynamic(24px);
+
+<span id='Ext-tab-Bar-css_var-S-tabbar-scroller-top-margin'>/**
+</span> * @var {number/list}
+ * The margin of &quot;top&quot; Tab Bar scroller buttons
+ */
+$tabbar-scroller-top-margin: dynamic(0);
+
+<span id='Ext-tab-Bar-css_var-S-tabbar-scroller-right-margin'>/**
+</span> * @var {number/list}
+ * The margin of &quot;right&quot; Tab Bar scroller buttons
+ */
+$tabbar-scroller-right-margin: dynamic(0);
+
+<span id='Ext-tab-Bar-css_var-S-tabbar-scroller-bottom-margin'>/**
+</span> * @var {number/list}
+ * The margin of &quot;bottom&quot; Tab Bar scroller buttons
+ */
+$tabbar-scroller-bottom-margin: dynamic(0);
+
+<span id='Ext-tab-Bar-css_var-S-tabbar-scroller-left-margin'>/**
+</span> * @var {number/list}
+ * The margin of &quot;left&quot; Tab Bar scroller buttons
+ */
+$tabbar-scroller-left-margin: dynamic(0);
+
+<span id='Ext-tab-Bar-css_var-S-tabbar-scroller-cursor'>/**
+</span> * @var {string}
+ * The cursor of the Tab Bar scrollers
+ */
+$tabbar-scroller-cursor: dynamic(pointer);
+
+<span id='Ext-tab-Bar-css_var-S-tabbar-scroller-cursor-disabled'>/**
+</span> * @var {string}
+ * The cursor of disabled Tab Bar scrollers
+ */
+$tabbar-scroller-cursor-disabled: dynamic(default);
+
+<span id='Ext-tab-Bar-css_var-S-tabbar-scroller-opacity'>/**
+</span> * @var {number}
+ * The opacity of Tab Bar scrollers
+ */
+$tabbar-scroller-opacity: dynamic(0.5);
+
+<span id='Ext-tab-Bar-css_var-S-tabbar-scroller-opacity-over'>/**
+</span> * @var {number}
+ * The opacity of hovered Tab Bar scrollers
+ */
+$tabbar-scroller-opacity-over: dynamic(0.6);
+
+<span id='Ext-tab-Bar-css_var-S-tabbar-scroller-opacity-pressed'>/**
+</span> * @var {number}
+ * The opacity of pressed Tab Bar scrollers
+ */
+$tabbar-scroller-opacity-pressed: dynamic(0.7);
+
+<span id='Ext-tab-Bar-css_var-S-tabbar-scroller-opacity-disabled'>/**
+</span> * @var {number}
+ * The opacity of disabled Tab Bar scrollers
+ */
+$tabbar-scroller-opacity-disabled: dynamic(0.25);
+
+<span id='Ext-tab-Bar-css_var-S-tabbar-scroller-glyph-color'>/**
+</span> * @var {color}
+ * The color to use for Tab Bar scroller icons when {@link Global_CSS#$enable-font-icons} is `true`.
+ */
+$tabbar-scroller-glyph-color: dynamic($neutral-color);
+
+<span id='Ext-tab-Bar-css_var-S-tabbar-plain-scroller-glyph-color'>/**
+</span> * @var {color}
+ * The color to use for &quot;plain&quot; Tab Bar scroller icons when {@link Global_CSS#$enable-font-icons} is `true`.
+ */
+$tabbar-plain-scroller-glyph-color: dynamic($tabbar-scroller-glyph-color);
+
+<span id='Ext-tab-Bar-css_var-S-tabbar-scroller-glyph-font-size'>/**
+</span> * @var {number}
+ * The font size for Tab Bar scroller icons when {@link Global_CSS#$enable-font-icons} is `true`.
+ */
+$tabbar-scroller-glyph-font-size: dynamic(16px);
+
+<span id='Ext-tab-Bar-css_var-S-tabbar-scroller-top-glyph'>/**
+</span> * @var {string/list}
+ * Glyph for the &quot;top&quot; scroller icon when {@link Global_CSS#$enable-font-icons} is `true`.
+ */
+$tabbar-scroller-top-glyph: dynamic($fa-var-chevron-up $tabbar-scroller-glyph-font-size $font-icon-font-family);
+
+<span id='Ext-tab-Bar-css_var-S-tabbar-scroller-right-glyph'>/**
+</span> * @var {string/list}
+ * Glyph for the &quot;right&quot; scroller icon when {@link Global_CSS#$enable-font-icons} is `true`.
+ */
+$tabbar-scroller-right-glyph: dynamic($fa-var-chevron-right $tabbar-scroller-glyph-font-size $font-icon-font-family);
+
+<span id='Ext-tab-Bar-css_var-S-tabbar-scroller-bottom-glyph'>/**
+</span> * @var {string/list}
+ * Glyph for the &quot;bottom&quot; scroller icon when {@link Global_CSS#$enable-font-icons} is `true`.
+ */
+$tabbar-scroller-bottom-glyph: dynamic($fa-var-chevron-down $tabbar-scroller-glyph-font-size $font-icon-font-family);
+
+<span id='Ext-tab-Bar-css_var-S-tabbar-scroller-left-glyph'>/**
+</span> * @var {string/list}
+ * Glyph for the &quot;left&quot; scroller icon when {@link Global_CSS#$enable-font-icons} is `true`.
+ */
+$tabbar-scroller-left-glyph: dynamic($fa-var-chevron-left $tabbar-scroller-glyph-font-size $font-icon-font-family);
+
+<span id='Ext-tab-Bar-css_var-S-tabbar-classic-scrollers'>/**
+</span> * @var {boolean}
+ * `true` to use classic-style scroller buttons.  When `true` scroller buttons are given their
+ * hover state by changing their background-position,  When `false` scroller buttons are
+ * given their hover state by applying opacity.
+ */
+$tabbar-classic-scrollers: dynamic(false);
+
+<span id='Ext-tab-Bar-css_var-S-tabbar-scroller-include-plain-icon'>/**
+</span> * @var {boolean}
+ * true to include separate scroller icons for &quot;plain&quot; tabbars
+ */
+$tabbar-scroller-include-plain-icon: dynamic(false);
+
+<span id='Ext-tab-Bar-css_var-S-tabbar-scroller-symmetrical-icons'>/**
+</span> * @var {boolean}
+ * if true, the tabbar will use symmetrical scroller icons.  Top and bottom tabbars
+ * will share icons, and Left and right will share icons.
+ */
+$tabbar-scroller-symmetrical-icons: dynamic(true);
+
+<span id='Ext-tab-Bar-css_var-S-include-tabbar-default-ui'>/**
+</span> * @var {boolean}
+ * True to include the &quot;default&quot; tabbar UI
+ */
+$include-tabbar-default-ui: dynamic($include-default-uis);
+</pre>
+</body>
+</html>

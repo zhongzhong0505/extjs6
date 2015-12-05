@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>The source code</title>
+  <link href="../resources/prettify/prettify.css" type="text/css" rel="stylesheet" />
+  <script type="text/javascript" src="../resources/prettify/prettify.js"></script>
+  <style type="text/css">
+    .highlight { display: block; background-color: #ddd; }
+  </style>
+  <script type="text/javascript">
+    function highlight() {
+      document.getElementById(location.hash.replace(/#/, "")).className = "highlight";
+    }
+  </script>
+</head>
+<body onload="prettyPrint(); highlight();">
+  <pre class="prettyprint lang-js"><span id='Ext-pivot-plugin-configurator-FilterLabelWindow'>/**
+</span> *
+ * This is the window that allows configuring a label filter
+ *
+ * @private
+ *
+ */
+Ext.define('Ext.pivot.plugin.configurator.FilterLabelWindow',{
+    extend: 'Ext.window.Window',
+    
+    requires: [
+        'Ext.form.Panel',
+        'Ext.form.FieldContainer',
+        'Ext.form.field.Text',
+        'Ext.form.field.Hidden',
+        'Ext.form.field.ComboBox',
+        'Ext.layout.container.HBox'
+    ],
+    
+<span id='Ext-pivot-plugin-configurator-FilterLabelWindow-cfg-modal'>    modal:          true,
+</span><span id='Ext-pivot-plugin-configurator-FilterLabelWindow-cfg-closeAction'>    closeAction:    'destroy',
+</span>    
+<span id='Ext-pivot-plugin-configurator-FilterLabelWindow-property-titleText'>    titleText:          'Label filter ({0})',
+</span><span id='Ext-pivot-plugin-configurator-FilterLabelWindow-property-fieldText'>    fieldText:          'Show items for which the label',
+</span><span id='Ext-pivot-plugin-configurator-FilterLabelWindow-property-caseSensitiveText'>    caseSensitiveText:  'Case sensitive',
+</span>
+<span id='Ext-pivot-plugin-configurator-FilterLabelWindow-method-initComponent'>    initComponent: function(){
+</span>        var me = this,
+            items = [];
+            
+        items = me.filterFields || [];
+        
+        items.push({
+            xtype:          'combo',
+            editable:       false,
+            queryMode:      'local',
+            valueField:     'value',
+            store:          me.store,
+            name:           'operator',
+            
+            listeners: {
+                change: function(combo, newValue){
+                    var me = this,
+                        hidden = me.isOperatorBetween(newValue);
+
+                    me.down('#fValue').setVisible(!hidden);
+                    me.down('#fValue').allowBlank = hidden;
+                    me.down('#fFrom').setVisible(hidden);
+                    me.down('#fFrom').allowBlank = !hidden;
+                    me.down('#fTo').setVisible(hidden);
+                    me.down('#fTo').allowBlank = !hidden;
+                },
+                scope:  me
+            }
+        },{
+            itemId:     'fValue',
+            xtype:      'textfield',
+            margin:     '0 0 0 5',
+            name:       'value'
+        },{
+            itemId:     'fFrom',
+            xtype:      'textfield',
+            margin:     '0 0 0 5',
+            name:       'from'
+        },{
+            itemId:     'fTo',
+            xtype:      'textfield',
+            margin:     '0 0 0 5',
+            name:       'to'
+        });
+        
+        Ext.apply(me, {
+            title:      Ext.String.format(me.titleText, me.title),
+            layout:     'fit',
+            
+            items: [{
+                xtype:  'form',
+                bodyPadding:    5,
+                
+                items: [{
+                    xtype:  'hidden',
+                    name:   'type'
+                },{
+                    xtype:          'fieldcontainer',
+                    labelSeparator: '',
+                    fieldLabel:     me.fieldText,
+                    labelAlign:     'top',
+                    layout: {
+                        type: 'hbox',
+                        align: 'stretch'
+                    },
+                    
+                    defaults: {
+                        allowBlank: false,
+                        flex:       1
+                    },
+                    
+                    items: items 
+                },{
+                    xtype:          'checkbox',
+                    boxLabel:       me.caseSensitiveText,
+                    name:           'caseSensitive'
+                }]
+            }],
+            
+            buttons: [{
+                text:       Ext.Msg.buttonText.ok,
+                handler:    me.applyFilter,
+                scope:      me
+            },{
+                text:       Ext.Msg.buttonText.cancel,
+                handler:    me.cancelFilter,
+                scope:      me
+            }]
+        });
+        
+        me.callParent(arguments);
+    },
+    
+<span id='Ext-pivot-plugin-configurator-FilterLabelWindow-method-applyFilter'>    applyFilter: function(){
+</span>        var form = this.down('form').getForm(),
+            filter;
+        
+        if(form.isValid()){
+            filter = form.getValues();
+
+            if(this.isOperatorBetween(filter.operator)){
+                filter.value = [filter.from, filter.to];
+            }
+            delete(filter.from);
+            delete(filter.to);
+
+            filter.caseSensitive = (filter.caseSensitive === 'on');
+            filter.topSort = (filter.topSort === 'on');
+
+            this.fireEvent('filter', this, filter);
+        }
+    },
+    
+<span id='Ext-pivot-plugin-configurator-FilterLabelWindow-method-cancelFilter'>    cancelFilter: function(){
+</span>        this.close();
+    },
+
+<span id='Ext-pivot-plugin-configurator-FilterLabelWindow-method-isOperatorBetween'>    isOperatorBetween: function(operator){
+</span>        return Ext.Array.indexOf(['between', 'not between'], operator) &gt;= 0;
+    }
+});</pre>
+</body>
+</html>

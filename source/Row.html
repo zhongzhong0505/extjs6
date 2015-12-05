@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>The source code</title>
+  <link href="../resources/prettify/prettify.css" type="text/css" rel="stylesheet" />
+  <script type="text/javascript" src="../resources/prettify/prettify.js"></script>
+  <style type="text/css">
+    .highlight { display: block; background-color: #ddd; }
+  </style>
+  <script type="text/javascript">
+    function highlight() {
+      document.getElementById(location.hash.replace(/#/, "")).className = "highlight";
+    }
+  </script>
+</head>
+<body onload="prettyPrint(); highlight();">
+  <pre class="prettyprint lang-js"><span id='Ext-exporter-file-excel-Row'>/**
+</span> * This class is used to create an xml Excel Row
+ */
+Ext.define('Ext.exporter.file.excel.Row', {
+    extend: 'Ext.exporter.file.Base',
+
+    config: {
+<span id='Ext-exporter-file-excel-Row-cfg-autoFitHeight'>        /**
+</span>         * @cfg {Boolean} [autoFitHeight=false]
+         *
+         * Set this to 1 if you want to auto fit its height
+         */
+        autoFitHeight: false,
+<span id='Ext-exporter-file-excel-Row-cfg-caption'>        /**
+</span>         * @cfg {String} caption
+         *
+         * Specifies the caption that should appear when the Component's custom row and column headers are showing.
+         */
+        caption: null,
+<span id='Ext-exporter-file-excel-Row-cfg-cells'>        /**
+</span>         * @cfg {Ext.exporter.file.excel.Cell[]} cells
+         *
+         * Collection of cells available on this row.
+         */
+        cells: [],
+<span id='Ext-exporter-file-excel-Row-cfg-height'>        /**
+</span>         * @cfg {Number} height
+         *
+         * Row's height in the Excel table
+         */
+        height: null,
+<span id='Ext-exporter-file-excel-Row-cfg-index'>        /**
+</span>         * @cfg {String} index
+         *
+         * Index of this row in the Excel table
+         */
+        index: null,
+<span id='Ext-exporter-file-excel-Row-cfg-span'>        /**
+</span>         * @cfg {Number} span
+         *
+         * Specifies the number of adjacent rows with the same formatting as this row. When a Span attribute
+         * is used, the spanned row elements are not written out.
+         *
+         * As mentioned in the index config, rows must not overlap. Doing so results in an XML Spreadsheet document
+         * that is invalid. Care must be taken with this attribute to ensure that the span does not include another
+         * row index that is specified.
+         *
+         * Unlike columns, rows with the Span attribute must be empty. A row that contains a Span attribute and
+         * one or more Cell elements is considered invalid. The Span attribute for rows is a short-hand method
+         * for setting formatting properties for multiple, empty rows.
+         *
+         */
+        span: null,
+<span id='Ext-exporter-file-excel-Row-cfg-styleId'>        /**
+</span>         * @cfg {String} styleId
+         *
+         * Excel style attached to this row
+         */
+        styleId: null
+    },
+
+<span id='Ext-exporter-file-excel-Row-method-getCells'>    /**
+</span>     * @method getCells
+     * @return {Ext.util.Collection}
+     *
+     * Returns the collection of cells available in this row
+     */
+
+    tpl: [
+        '           &lt;Row',
+            '&lt;tpl if=&quot;this.exists(index)&quot;&gt; ss:Index=&quot;{index}&quot;&lt;/tpl&gt;',
+            '&lt;tpl if=&quot;this.exists(caption)&quot;&gt; c:Caption=&quot;{caption}&quot;&lt;/tpl&gt;',
+            '&lt;tpl if=&quot;this.exists(autoFitHeight)&quot;&gt; ss:AutoFitHeight=&quot;{autoFitHeight:this.toNumber}&quot;&lt;/tpl&gt;',
+            '&lt;tpl if=&quot;this.exists(span)&quot;&gt; ss:Span=&quot;{span}&quot;&lt;/tpl&gt;',
+            '&lt;tpl if=&quot;this.exists(height)&quot;&gt; ss:Height=&quot;{height}&quot;&lt;/tpl&gt;',
+            '&lt;tpl if=&quot;this.exists(styleId)&quot;&gt; ss:StyleID=&quot;{styleId}&quot;&lt;/tpl&gt;',
+        '&gt;\n',
+        '&lt;tpl for=&quot;cells&quot;&gt;{[values.render()]}&lt;/tpl&gt;',
+        '           &lt;/Row&gt;\n',
+        {
+            exists: function(value){
+                return !Ext.isEmpty(value);
+            },
+
+            toNumber: function(value){
+                return Number(Boolean(value));
+            }
+        }
+    ],
+
+<span id='Ext-exporter-file-excel-Row-method-destroy'>    destroy: function(){
+</span>        this.getCells().destroy();
+        return this.callParent(arguments);
+    },
+
+<span id='Ext-exporter-file-excel-Row-method-applyCells'>    applyCells: function(data, dataCollection){
+</span>        return this.checkCollection(data, dataCollection, 'Ext.exporter.file.excel.Cell');
+    },
+
+<span id='Ext-exporter-file-excel-Row-method-addCell'>    /**
+</span>     * Convenience method to add cells. You can also use workbook.getCells().add(config).
+     * @param {Object/Array} config
+     * @return {Ext.exporter.file.excel.Cell/Ext.exporter.file.excel.Cell[]}
+     */
+    addCell: function(config){
+        return this.getCells().add(config || {});
+    },
+
+<span id='Ext-exporter-file-excel-Row-method-getCell'>    /**
+</span>     * Convenience method to fetch a cell by its id.
+     * @param id
+     * @return {Ext.exporter.file.excel.Cell}
+     */
+    getCell: function(id){
+        return this.getCells().get(id);
+    },
+
+<span id='Ext-exporter-file-excel-Row-method-getRenderData'>    getRenderData: function(){
+</span>        return Ext.apply(this.callParent(arguments), {
+            cells: this.getCells().getRange()
+        });
+    }
+
+});</pre>
+</body>
+</html>

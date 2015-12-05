@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>The source code</title>
+  <link href="../resources/prettify/prettify.css" type="text/css" rel="stylesheet" />
+  <script type="text/javascript" src="../resources/prettify/prettify.js"></script>
+  <style type="text/css">
+    .highlight { display: block; background-color: #ddd; }
+  </style>
+  <script type="text/javascript">
+    function highlight() {
+      document.getElementById(location.hash.replace(/#/, "")).className = "highlight";
+    }
+  </script>
+</head>
+<body onload="prettyPrint(); highlight();">
+  <pre class="prettyprint lang-js"><span id='Ext-chart-axis-Category3D'>/**
+</span> * Category 3D Axis
+ */
+Ext.define('Ext.chart.axis.Category3D', {
+    requires: [
+        'Ext.chart.axis.layout.CombineDuplicate',
+        'Ext.chart.axis.segmenter.Names'
+    ],
+    extend: 'Ext.chart.axis.Axis3D',
+    alias: 'axis.category3d',
+<span id='Ext-chart-axis-Category3D-property-type'>    type: 'category3d',
+</span>
+    config: {
+<span id='Ext-chart-axis-Category3D-cfg-layout'>        layout: 'combineDuplicate',
+</span>
+<span id='Ext-chart-axis-Category3D-cfg-segmenter'>        segmenter: 'names'
+</span>    }
+});
+</pre>
+</body>
+</html>

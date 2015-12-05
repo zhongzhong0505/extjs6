@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>The source code</title>
+  <link href="../resources/prettify/prettify.css" type="text/css" rel="stylesheet" />
+  <script type="text/javascript" src="../resources/prettify/prettify.js"></script>
+  <style type="text/css">
+    .highlight { display: block; background-color: #ddd; }
+  </style>
+  <script type="text/javascript">
+    function highlight() {
+      document.getElementById(location.hash.replace(/#/, "")).className = "highlight";
+    }
+  </script>
+</head>
+<body onload="prettyPrint(); highlight();">
+  <pre class="prettyprint lang-js"><span id='Ext-chart-overrides-AbstractChart'>/**
+</span> * @class Ext.chart.overrides.AbstractChart
+ */
+Ext.define('Ext.chart.overrides.AbstractChart', {
+    override: 'Ext.chart.AbstractChart',
+
+<span id='Ext-chart-overrides-AbstractChart-method-updateLegend'>    updateLegend: function (legend, oldLegend) {
+</span>        var dock;
+        this.callParent([legend, oldLegend]);
+        if (legend) {
+            dock = legend.docked;
+            this.addDocked({
+                dock: dock,
+                xtype: 'panel',
+                shrinkWrap: true,
+                scrollable: true,
+                layout: {
+                    type: dock === 'top' || dock === 'bottom' ? 'hbox' : 'vbox',
+                    pack: 'center'
+                },
+                items: legend,
+                cls: Ext.baseCSSPrefix + 'legend-panel'
+            });
+        }
+    },
+
+<span id='Ext-chart-overrides-AbstractChart-method-performLayout'>    performLayout: function() {
+</span>        if (this.isVisible(true)) {
+            return this.callParent();
+        }
+        this.cancelChartLayout();
+        return false;
+    },
+
+<span id='Ext-chart-AbstractChart-method-afterComponentLayout'>    afterComponentLayout: function(width, height, oldWidth, oldHeight) {
+</span>        this.callParent([width, height, oldWidth, oldHeight]);
+        this.scheduleLayout();
+    },
+
+<span id='Ext-chart-overrides-AbstractChart-method-allowSchedule'>    allowSchedule: function() {
+</span>        return this.rendered;
+    },
+
+<span id='Ext-chart-AbstractChart-method-onDestroy'>    onDestroy: function () {
+</span>        this.destroyChart();
+        this.callParent(arguments);
+    }
+
+});</pre>
+</body>
+</html>

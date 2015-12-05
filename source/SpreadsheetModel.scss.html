@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>The source code</title>
+  <link href="../resources/prettify/prettify.css" type="text/css" rel="stylesheet" />
+  <script type="text/javascript" src="../resources/prettify/prettify.js"></script>
+  <style type="text/css">
+    .highlight { display: block; background-color: #ddd; }
+  </style>
+  <script type="text/javascript">
+    function highlight() {
+      document.getElementById(location.hash.replace(/#/, "")).className = "highlight";
+    }
+  </script>
+</head>
+<body onload="prettyPrint(); highlight();">
+  <pre class="prettyprint lang-js">.#{$prefix}ssm-row-numberer-hd {
+    // Needs important to defeat the s-resize rule on all column headers
+    cursor: se-resize!important;
+}
+
+.#{$prefix}ssm-row-numberer-cell {
+    cursor: e-resize;
+}
+
+.#{$prefix}ssm-column-select {
+    .#{$prefix}column-header {
+        cursor: s-resize;
+    }
+}
+
+.#{$prefix}ssm-extender-drag-handle {
+    position: absolute;
+    z-index: 1;
+    cursor: crosshair;
+}
+
+.#{$prefix}ssm-extender-mask {
+    position: absolute;
+    z-index: 1;
+    pointer-events: none;
+}</pre>
+</body>
+</html>

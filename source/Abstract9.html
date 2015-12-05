@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>The source code</title>
+  <link href="../resources/prettify/prettify.css" type="text/css" rel="stylesheet" />
+  <script type="text/javascript" src="../resources/prettify/prettify.js"></script>
+  <style type="text/css">
+    .highlight { display: block; background-color: #ddd; }
+  </style>
+  <script type="text/javascript">
+    function highlight() {
+      document.getElementById(location.hash.replace(/#/, "")).className = "highlight";
+    }
+  </script>
+</head>
+<body onload="prettyPrint(); highlight();">
+  <pre class="prettyprint lang-js"><span id='Ext-overrides-plugin-Abstract'>/**
+</span> *
+ */
+Ext.define('Ext.overrides.plugin.Abstract', {
+    override: 'Ext.plugin.Abstract',
+
+<span id='Ext-plugin-Abstract-property-S-configStrict'>    $configStrict: false,
+</span><span id='Ext-plugin-Abstract-property-S-configPrefixed'>    $configPrefixed: false,
+</span>
+<span id='Ext-plugin-Abstract-property-disabled'>    disabled: false,
+</span>
+<span id='Ext-plugin-Abstract-cfg-stateEvents'>    /**
+</span>     * @cfg {String|Array} stateEvents
+     * The configured list of stateEvents used to (optionally) participate in Owner Component's state management.
+     * @member Ext.plugin.Abstract
+     */
+
+<span id='Ext-plugin-Abstract-method-getState'>    /**
+</span>     * @method
+     * The getState method is invoked by the client Component's State mixin when one or more of the the specified {@link #stateEvents} are raised.
+     *
+     * The supplied implementation is empty. If plugin Subclasses are to (optionally) participate in the client Component's
+     * state management, implementers should provide a suitable method which returns a state object.
+     * @return {Object} state
+     * @member Ext.plugin.Abstract
+     */
+    getState: null,
+
+<span id='Ext-plugin-Abstract-method-applyState'>    /**
+</span>     * @method
+     * The applyState method is invoked by the client Component's State mixin after initComponent method has been run for the client.
+     *
+     * The supplied implementation is empty. If plugin Subclasses are to (optionally) participate in the client Component's
+     * state management, implementers should provide a suitable method to utilize it.
+     * @param {Object} state The current plugin state object to be applied.
+     * @param {Object} allState The current aggregate state of the Component and all plugins.
+     * @member Ext.plugin.Abstract
+     */
+    applyState: null,
+
+<span id='Ext-plugin-Abstract-method-enable'>    /**
+</span>     * The base implementation just sets the plugin's `disabled` flag to `false`
+     *
+     * Plugin subclasses which need more complex processing may implement an overriding implementation.
+     * @member Ext.plugin.Abstract
+     */
+    enable: function() {
+        this.disabled = false;
+    },
+
+<span id='Ext-plugin-Abstract-method-disable'>    /**
+</span>     * The base implementation just sets the plugin's `disabled` flag to `true`
+     *
+     * Plugin subclasses which need more complex processing may implement an overriding implementation.
+     * @member Ext.plugin.Abstract
+     */
+    disable: function() {
+        this.disabled = true;
+    }
+});
+</pre>
+</body>
+</html>

@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>The source code</title>
+  <link href="../resources/prettify/prettify.css" type="text/css" rel="stylesheet" />
+  <script type="text/javascript" src="../resources/prettify/prettify.js"></script>
+  <style type="text/css">
+    .highlight { display: block; background-color: #ddd; }
+  </style>
+  <script type="text/javascript">
+    function highlight() {
+      document.getElementById(location.hash.replace(/#/, "")).className = "highlight";
+    }
+  </script>
+</head>
+<body onload="prettyPrint(); highlight();">
+  <pre class="prettyprint lang-js"><span id='Ext-pivot-plugin-Configurator'>/**
+</span> *
+ * This plugin allows the user to configure the pivot grid using drag and drop.
+ */
+Ext.define('Ext.pivot.plugin.Configurator', {
+    alternateClassName: [
+        'Mz.pivot.plugin.Configurator'
+    ],
+
+    extend: 'Ext.AbstractPlugin',
+
+    requires: [
+        'Ext.util.DelayedTask',
+        'Ext.menu.Menu',        
+        'Ext.menu.CheckItem',        
+        'Ext.pivot.plugin.configurator.Panel'
+    ],
+
+    alias: [
+        'plugin.pivotconfigurator',
+        'plugin.mzconfigurator'
+    ],
+    
+<span id='Ext-pivot-plugin-Configurator-cfg-fields'>    /**
+</span>     * @cfg {Array} fields This is the array of fields you want to be used in the configurator.
+     * Each field is an object with the following properties: dataIndex, header.
+     * If no fields are defined then all fields are fetched from the store model if
+     * a {@link Ext.pivot.matrix.Local Local} matrix is used.
+     *
+     */
+    fields:         [],
+    
+<span id='Ext-pivot-plugin-Configurator-cfg-refreshDelay'>    /**
+</span>     * @cfg {Number} refreshDelay Number of miliseconds to wait for pivot refreshing when a config change occurred.
+     */
+    refreshDelay:   300,
+
+<span id='Ext-pivot-plugin-Configurator-cfg-dock'>    /**
+</span>     * @cfg {String} dock Docking position for the configurator panel. Possible values: top, right, bottom, left
+     */
+    dock: 'right',
+
+<span id='Ext-pivot-plugin-Configurator-cfg-collapsible'>    /**
+</span>     * @cfg {Boolean} collapsible Is the configurator panel collapsible?
+     */
+    collapsible: true,
+
+<span id='Ext-pivot-plugin-Configurator-property-lockableScope'>    /**
+</span>     *  `&quot;both&quot;` (the default) - The plugin is added to both grids
+     *  `&quot;top&quot;` - The plugin is added to the containing Panel
+     *  `&quot;locked&quot;` - The plugin is added to the locked (left) grid
+     *  `&quot;normal&quot;` - The plugin is added to the normal (right) grid
+     *
+     * @private
+     */
+    lockableScope:  'top',
+
+<span id='Ext-pivot-plugin-Configurator-method-init'>    init: function(grid) {
+</span>        var me = this;
+
+        //&lt;debug&gt;
+        // this plugin is available only for the pivot grid
+        if (!grid.isPivotGrid) {
+            Ext.raise('This plugin is only compatible with Ext.pivot.Grid');
+        }
+        //&lt;/debug&gt;
+
+        me.pivot = grid;
+        me.fields = Ext.Array.from(me.fields);
+
+        me.pivotListeners = me.pivot.on({
+            beforerender:   me.onBeforeGridRendered,
+            afterrender:    me.onAfterGridRendered,
+            single:         true,
+            scope:          me,
+            destroyable:    true
+        });
+
+        me.callParent(arguments);
+    },
+
+<span id='Ext-pivot-plugin-Configurator-method-destroy'>    /**
+</span>     * @private
+     * AbstractComponent calls destroy on all its plugins at destroy time.
+     */
+    destroy: function() {
+        var me = this;
+
+        Ext.destroyMembers(me, 'configCt', 'pivotListeners');
+
+        me.pivot = me.fields = me.pivotListeners = me.configCt = null;
+
+        me.callParent(arguments);
+    },
+    
+<span id='Ext-pivot-plugin-Configurator-method-enable'>    /**
+</span>     * Enable the plugin to show the configurator panel.
+     *
+     */
+    enable: function() {
+        var me = this;
+
+        me.disabled = false;
+        
+        if(me.configCt){
+            me.configCt.enable();
+        }
+        me.pivot.fireEvent('showconfigpanel', me.configCt);
+    },
+    
+<span id='Ext-pivot-plugin-Configurator-method-disable'>    /**
+</span>     * Disable the plugin to hide the configurator panel.
+     *
+     */
+    disable: function() {
+        var me = this;
+
+        me.disabled = true;
+        
+        if(me.configCt){
+            me.configCt.disable();
+        }
+        me.pivot.fireEvent('hideconfigpanel', me.configCt);
+    },
+    
+<span id='Ext-pivot-plugin-Configurator-method-onBeforeGridRendered'>    onBeforeGridRendered: function(){
+</span>        this.setDock(this.dock);
+
+<span id='Ext-pivot-plugin-Configurator-event-configchange'>        /**
+</span>         * Fired on the pivot grid when the configuration changes.
+         * Return false if you don't want to apply the new configuration to the pivot grid.
+         *
+         * @event configchange
+         * @param {Ext.pivot.plugin.Configurator} panel
+         * @param {Object} config
+         */
+
+<span id='Ext-pivot-plugin-Configurator-event-showconfigpanel'>        /**
+</span>         * @event showconfigpanel
+         * @param {Ext.pivot.plugin.configurator.Panel} panel
+         */
+
+<span id='Ext-pivot-plugin-Configurator-event-hideconfigpanel'>        /**
+</span>         * @event hideconfigpanel
+         * @param {Ext.pivot.plugin.configurator.Panel} panel
+         */
+
+    },
+    
+<span id='Ext-pivot-plugin-Configurator-method-onAfterGridRendered'>    onAfterGridRendered: function(){
+</span>        if(this.disabled === true){
+            this.disable();
+        }else{
+            this.enable();
+        }
+    },
+
+<span id='Ext-pivot-plugin-Configurator-method-setDock'>    /**
+</span>     * Change configurator panel position.
+     *
+     * @param {String} position Possible values: top, right, bottom, left.
+     */
+    setDock: function(position){
+        var me = this,
+            exists = Ext.isDefined(me.configCt);
+
+        Ext.destroy(me.configCt);
+        me.configCt = me.pivot.addDocked({
+            xtype:          'pivotconfigpanel',
+            dock:           position || me.dock,
+            grid:           me.pivot,
+            fields:         me.fields,
+            refreshDelay:   me.refreshDelay,
+            collapsible:    me.collapsible
+        })[0];
+
+        if(exists) {
+            // we only initialize the fields if docking is changed
+            me.configCt.initPivotFields();
+        }
+    }
+    
+
+});</pre>
+</body>
+</html>

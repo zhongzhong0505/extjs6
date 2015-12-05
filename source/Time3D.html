@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>The source code</title>
+  <link href="../resources/prettify/prettify.css" type="text/css" rel="stylesheet" />
+  <script type="text/javascript" src="../resources/prettify/prettify.js"></script>
+  <style type="text/css">
+    .highlight { display: block; background-color: #ddd; }
+  </style>
+  <script type="text/javascript">
+    function highlight() {
+      document.getElementById(location.hash.replace(/#/, "")).className = "highlight";
+    }
+  </script>
+</head>
+<body onload="prettyPrint(); highlight();">
+  <pre class="prettyprint lang-js"><span id='Ext-chart-axis-Time3D'>/**
+</span> * @class Ext.chart.axis.Time3D
+ */
+Ext.define('Ext.chart.axis.Time3D', {
+    extend: 'Ext.chart.axis.Numeric3D',
+    alias: 'axis.time3d',
+<span id='Ext-chart-axis-Time3D-property-type'>    type: 'time3d',
+</span>    requires: [
+        'Ext.chart.axis.layout.Continuous',
+        'Ext.chart.axis.segmenter.Time'
+    ],
+    config: {
+<span id='Ext-chart-axis-Time3D-cfg-calculateByLabelSize'>        /**
+</span>         * @cfg {Boolean} calculateByLabelSize
+         * The minimum value drawn by the axis. If not set explicitly, the axis
+         * minimum will be calculated automatically.
+         */
+        calculateByLabelSize: true,
+
+<span id='Ext-chart-axis-Time3D-cfg-dateFormat'>        /**
+</span>         * @cfg {String/Boolean} dateFormat
+         * Indicates the format the date will be rendered on.
+         * For example: 'M d' will render the dates as 'Jan 30', etc.
+         */
+        dateFormat: null,
+
+<span id='Ext-chart-axis-Time3D-cfg-fromDate'>        /**
+</span>         * @cfg {Date} fromDate The starting date for the time axis.
+         */
+        fromDate: null,
+
+<span id='Ext-chart-axis-Time3D-cfg-toDate'>        /**
+</span>         * @cfg {Date} toDate The ending date for the time axis.
+         */
+        toDate: null,
+
+<span id='Ext-chart-axis-Time3D-cfg-step'>        /**
+</span>         * @cfg {Array} [step=[Ext.Date.DAY, 1]] An array with two components:
+         *
+         * - The unit of the step (Ext.Date.DAY, Ext.Date.MONTH, etc).
+         * - The number of units for the step (1, 2, etc).
+         *
+         */
+        step: [Ext.Date.DAY, 1],
+
+<span id='Ext-chart-axis-Time3D-cfg-layout'>        layout: 'continuous',
+</span>
+<span id='Ext-chart-axis-Time3D-cfg-segmenter'>        segmenter: 'time',
+</span>
+<span id='Ext-chart-axis-Time3D-cfg-aggregator'>        aggregator: 'time'
+</span>    },
+
+<span id='Ext-chart-axis-Time3D-method-updateDateFormat'>    updateDateFormat: function (format) {
+</span>        this.setRenderer(function (axis, date) {
+            return Ext.Date.format(new Date(date), format);
+        });
+    },
+
+<span id='Ext-chart-axis-Time3D-method-updateFromDate'>    updateFromDate: function (date) {
+</span>        this.setMinimum(+date);
+    },
+
+<span id='Ext-chart-axis-Time3D-method-updateToDate'>    updateToDate: function (date) {
+</span>        this.setMaximum(+date);
+    },
+
+<span id='Ext-chart-axis-Time3D-method-getCoordFor'>    getCoordFor: function (value) {
+</span>        if (Ext.isString(value)) {
+            value = new Date(value);
+        }
+        return +value;
+    }
+});
+</pre>
+</body>
+</html>

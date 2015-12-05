@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>The source code</title>
+  <link href="../resources/prettify/prettify.css" type="text/css" rel="stylesheet" />
+  <script type="text/javascript" src="../resources/prettify/prettify.js"></script>
+  <style type="text/css">
+    .highlight { display: block; background-color: #ddd; }
+  </style>
+  <script type="text/javascript">
+    function highlight() {
+      document.getElementById(location.hash.replace(/#/, "")).className = "highlight";
+    }
+  </script>
+</head>
+<body onload="prettyPrint(); highlight();">
+  <pre class="prettyprint lang-js"><span id='Ext-slider-Multi'>/**
+</span> * @class Ext.slider.Multi
+ */
+
+<span id='Ext-slider-Multi-css_var-S-horizontal-slider-thumb-width'>/**
+</span> * @var {number}
+ * The horizontal slider thumb width
+ */
+$horizontal-slider-thumb-width: dynamic(15px);
+
+<span id='Ext-slider-Multi-css_var-S-horizontal-slider-thumb-height'>/**
+</span> * @var {number}
+ * The horizontal slider thumb height
+ */
+$horizontal-slider-thumb-height: dynamic(15px);
+
+<span id='Ext-slider-Multi-css_var-S-horizontal-slider-start-cap-width'>/**
+</span> * @var {number}
+ * The width of the horizontal slider start cap
+ */
+$horizontal-slider-start-cap-width: dynamic(floor($horizontal-slider-thumb-width / 2));
+
+<span id='Ext-slider-Multi-css_var-S-horizontal-slider-end-cap-width'>/**
+</span> * @var {number}
+ * The width of the horizontal slider end cap
+ */
+$horizontal-slider-end-cap-width: dynamic(ceil($horizontal-slider-thumb-width / 2));
+
+<span id='Ext-slider-Multi-css_var-S-vertical-slider-thumb-width'>/**
+</span> * @var {number}
+ * The vertical slider thumb width
+ */
+$vertical-slider-thumb-width: dynamic(15px);
+
+<span id='Ext-slider-Multi-css_var-S-vertical-slider-thumb-height'>/**
+</span> * @var {number}
+ * The vertical slider thumb height
+ */
+$vertical-slider-thumb-height: dynamic(15px);
+
+<span id='Ext-slider-Multi-css_var-S-vertical-slider-start-cap-height'>/**
+</span> * @var {number}
+ * The height of the vertical slider start cap
+ */
+$vertical-slider-start-cap-height: dynamic(floor($vertical-slider-thumb-height / 2));
+
+<span id='Ext-slider-Multi-css_var-S-vertical-slider-end-cap-height'>/**
+</span> * @var {number}
+ * The height of the vertical slider end cap
+ */
+$vertical-slider-end-cap-height: dynamic(ceil($vertical-slider-thumb-height / 2));
+
+<span id='Ext-slider-Multi-css_var-S-slider-imageless'>/**
+</span> * @var {boolean}
+ * `true` to use imageless sliders
+ */
+$slider-imageless: dynamic($enable-font-icons);
+
+<span id='Ext-slider-Multi-css_var-S-slider-track-size'>/**
+</span> * @var {number}
+ * The size of the slider track when using {@link #$slider-imageless imageless} sliders
+ */
+$slider-track-size: dynamic(10px);
+
+<span id='Ext-slider-Multi-css_var-S-slider-track-border-radius'>/**
+</span> * @var {number}
+ * The border-radius of the slider track when using {@link #$slider-imageless imageless} sliders
+ */
+$slider-track-border-radius: dynamic(2px);
+
+<span id='Ext-slider-Multi-css_var-S-slider-track-border-width'>/**
+</span> * @var {number}
+ * The border-width of the slider track when using {@link #$slider-imageless imageless} sliders
+ */
+$slider-track-border-width: dynamic(1px);
+
+<span id='Ext-slider-Multi-css_var-S-slider-track-border-style'>/**
+</span> * @var {number}
+ * The border-style of the slider track when using {@link #$slider-imageless imageless} sliders
+ */
+$slider-track-border-style: dynamic(solid);
+
+<span id='Ext-slider-Multi-css_var-S-slider-track-border-color'>/**
+</span> * @var {number}
+ * The border-color of the slider track when using {@link #$slider-imageless imageless} sliders
+ */
+$slider-track-border-color: dynamic($base-color);
+
+<span id='Ext-slider-Multi-css_var-S-slider-track-background-color'>/**
+</span> * @var {number}
+ * The background-color of the slider track when using {@link #$slider-imageless imageless} sliders
+ */
+$slider-track-background-color: dynamic($neutral-color);
+
+<span id='Ext-slider-Multi-css_var-S-slider-thumb-border-radius'>/**
+</span> * @var {number}
+ * The border-radius of the slider thumb when using {@link #$slider-imageless imageless} sliders
+ */
+$slider-thumb-border-radius: dynamic(2px);
+
+<span id='Ext-slider-Multi-css_var-S-slider-thumb-border-width'>/**
+</span> * @var {number}
+ * The border-width of the slider thumb when using {@link #$slider-imageless imageless} sliders
+ */
+$slider-thumb-border-width: dynamic(1px);
+
+<span id='Ext-slider-Multi-css_var-S-slider-thumb-border-style'>/**
+</span> * @var {number}
+ * The border-style of the slider thumb when using {@link #$slider-imageless imageless} sliders
+ */
+$slider-thumb-border-style: dynamic(solid);
+
+<span id='Ext-slider-Multi-css_var-S-slider-thumb-border-color'>/**
+</span> * @var {number}
+ * The border-color of the slider thumb when using {@link #$slider-imageless imageless} sliders
+ */
+$slider-thumb-border-color: dynamic($neutral-color);
+
+<span id='Ext-slider-Multi-css_var-S-slider-thumb-border-color-over'>/**
+</span> * @var {number}
+ * The border-color of the hovered slider thumb when using {@link #$slider-imageless imageless} sliders
+ */
+$slider-thumb-border-color-over: dynamic($slider-thumb-border-color);
+
+<span id='Ext-slider-Multi-css_var-S-slider-thumb-border-color-focus'>/**
+</span> * @var {number}
+ * The border-color of the focused slider thumb when using {@link #$slider-imageless imageless} sliders
+ */
+$slider-thumb-border-color-focus: dynamic($base-color);
+
+<span id='Ext-slider-Multi-css_var-S-slider-thumb-border-color-drag'>/**
+</span> * @var {number}
+ * The border-color of the slider thumb while dragging when using {@link #$slider-imageless imageless} sliders
+ */
+$slider-thumb-border-color-drag: dynamic($slider-thumb-border-color);
+
+<span id='Ext-slider-Multi-css_var-S-slider-thumb-background-color'>/**
+</span> * @var {number}
+ * The background-color of the slider thumb when using {@link #$slider-imageless imageless} sliders
+ */
+$slider-thumb-background-color: dynamic(#fff);
+
+<span id='Ext-slider-Multi-css_var-S-slider-thumb-background-color-over'>/**
+</span> * @var {number}
+ * The background-color of the hovered slider thumb when using {@link #$slider-imageless imageless} sliders
+ */
+$slider-thumb-background-color-over: dynamic($slider-thumb-background-color);
+
+<span id='Ext-slider-Multi-css_var-S-slider-thumb-background-color-focus'>/**
+</span> * @var {number}
+ * The background-color of the focused slider thumb when using {@link #$slider-imageless imageless} sliders
+ */
+$slider-thumb-background-color-focus: dynamic($slider-thumb-background-color);
+
+<span id='Ext-slider-Multi-css_var-S-slider-thumb-background-color-drag'>/**
+</span> * @var {number}
+ * The background-color of the slider thumb while dragging when using {@link #$slider-imageless imageless} sliders
+ */
+$slider-thumb-background-color-drag: dynamic($slider-thumb-background-color);
+
+<span id='Ext-slider-Multi-css_var-S-slider-thumb-glyph-color'>/**
+</span> * @var {color}
+ * The color to use for the slider thumb glyph when {@link Global_CSS#$enable-font-icons} is `true`.
+ */
+$slider-thumb-glyph-color: dynamic($neutral-color);
+
+<span id='Ext-slider-Multi-css_var-S-slider-thumb-glyph-color-over'>/**
+</span> * @var {number}
+ * The color to use for the slider thumb glyph when hovered.
+ */
+$slider-thumb-glyph-color-over: dynamic($slider-thumb-glyph-color);
+
+<span id='Ext-slider-Multi-css_var-S-slider-thumb-glyph-color-focus'>/**
+</span> * @var {number}
+ * The color to use for the slider thumb glyph when focused.
+ */
+$slider-thumb-glyph-color-focus: dynamic($slider-thumb-border-color-focus);
+
+<span id='Ext-slider-Multi-css_var-S-slider-thumb-glyph-color-drag'>/**
+</span> * @var {number}
+ * The color to use for the slider thumb glyph while dragging.
+ */
+$slider-thumb-glyph-color-drag: dynamic($slider-thumb-glyph-color);
+
+<span id='Ext-slider-Multi-css_var-S-slider-thumb-glyph-font-size'>/**
+</span> * @var {number}
+ * The font-size to use for the slider thumb glyph when {@link Global_CSS#$enable-font-icons} is `true`.
+ */
+$slider-thumb-glyph-font-size: dynamic(12px);
+
+<span id='Ext-slider-Multi-css_var-S-horizontal-slider-thumb-glyph'>/**
+</span> * @var {string/list}
+ * Glyph to display inside of the slider thumb when {@link Global_CSS#$enable-font-icons} is `true`
+ */
+$horizontal-slider-thumb-glyph: dynamic($ext-var-equals-vertical $slider-thumb-glyph-font-size ExtJS);
+
+<span id='Ext-slider-Multi-css_var-S-vertical-slider-thumb-glyph'>/**
+</span> * @var {string/list}
+ * Glyph to display inside of the slider thumb when {@link Global_CSS#$enable-font-icons} is `true`
+ */
+$vertical-slider-thumb-glyph: dynamic($ext-var-equals $slider-thumb-glyph-font-size ExtJS);
+</pre>
+</body>
+</html>

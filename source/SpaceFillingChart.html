@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>The source code</title>
+  <link href="../resources/prettify/prettify.css" type="text/css" rel="stylesheet" />
+  <script type="text/javascript" src="../resources/prettify/prettify.js"></script>
+  <style type="text/css">
+    .highlight { display: block; background-color: #ddd; }
+  </style>
+  <script type="text/javascript">
+    function highlight() {
+      document.getElementById(location.hash.replace(/#/, "")).className = "highlight";
+    }
+  </script>
+</head>
+<body onload="prettyPrint(); highlight();">
+  <pre class="prettyprint lang-js"><span id='Ext-chart-SpaceFillingChart'>/**
+</span> * @class Ext.chart.SpaceFillingChart
+ * @extends Ext.chart.AbstractChart
+ *
+ * Creates a chart that fills the entire area of the chart.
+ * e.g. Gauge Charts
+ */
+Ext.define('Ext.chart.SpaceFillingChart', {
+
+    extend: 'Ext.chart.AbstractChart',
+    xtype: 'spacefilling',
+
+    config: {
+
+    },
+
+<span id='Ext-chart-SpaceFillingChart-method-performLayout'>    performLayout: function () {
+</span>        var me = this;
+
+        try {
+            me.animationSuspendCount++;
+            if (me.callParent() === false) {
+                // animationSuspendCount will still be decremented
+                return;
+            }
+
+            var chartRect = me.getSurface('chart').getRect(),
+                padding = me.getInsetPadding(),
+                width = chartRect[2] - padding.left - padding.right,
+                height = chartRect[3] - padding.top - padding.bottom,
+                mainRect = [padding.left, padding.top, width, height],
+                seriesList = me.getSeries(), series,
+                i, ln;
+
+            me.getSurface().setRect(mainRect);
+            me.setMainRect(mainRect);
+
+            for (i = 0, ln = seriesList.length; i &lt; ln; i++) {
+                series = seriesList[i];
+                series.getSurface().setRect(mainRect);
+                if (series.setRect) {
+                    series.setRect(mainRect);
+                }
+                series.getOverlaySurface().setRect(chartRect);
+            }
+            me.redraw();
+        } catch (e) { // catch is required in IE8 (try/finally not supported)
+            //&lt;debug&gt;
+            Ext.log.error(me.$className + ': Unhandled Exception: ', e.description || e.message);
+            //&lt;/debug&gt;
+            throw e;
+        }
+        finally {
+            me.animationSuspendCount--;
+        }
+    },
+
+<span id='Ext-chart-SpaceFillingChart-method-redraw'>    redraw: function () {
+</span>        var me = this,
+            seriesList = me.getSeries(), series,
+            i, ln;
+
+        for (i = 0, ln = seriesList.length; i &lt; ln; i++) {
+            series = seriesList[i];
+            series.getSprites();
+        }
+
+        me.renderFrame();
+        me.callParent(arguments);
+    }
+});
+</pre>
+</body>
+</html>

@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>The source code</title>
+  <link href="../resources/prettify/prettify.css" type="text/css" rel="stylesheet" />
+  <script type="text/javascript" src="../resources/prettify/prettify.js"></script>
+  <style type="text/css">
+    .highlight { display: block; background-color: #ddd; }
+  </style>
+  <script type="text/javascript">
+    function highlight() {
+      document.getElementById(location.hash.replace(/#/, "")).className = "highlight";
+    }
+  </script>
+</head>
+<body onload="prettyPrint(); highlight();">
+  <pre class="prettyprint lang-js"><span id='Ext-exporter-file-Base'>/**
+</span> * This is the base class for a file object. This one should be extended
+ * by classes that generate content based on templates.
+ *
+ */
+Ext.define('Ext.exporter.file.Base', {
+    requires: [
+        'Ext.XTemplate',
+        'Ext.util.Collection'
+    ],
+
+    config: {
+<span id='Ext-exporter-file-Base-cfg-id'>        /**
+</span>         * @cfg {String} id
+         *
+         * Unique id for this object. Auto generated when missing.
+         */
+        id: ''
+    },
+
+<span id='Ext-exporter-file-Base-property-tpl'>    tpl: null,
+</span>
+<span id='Ext-exporter-file-Base-method-constructor'>    constructor: function(config){
+</span>        var me = this;
+
+        me.initConfig(config || {});
+        return me.callParent(arguments);
+    },
+
+<span id='Ext-exporter-file-Base-method-applyId'>    applyId: function(data, id){
+</span>        if(Ext.isEmpty(id)){
+            id = Ext.id();
+        }
+        if(!Ext.isEmpty(data)){
+            id = data;
+        }
+        return id;
+    },
+
+<span id='Ext-exporter-file-Base-method-checkCollection'>    /**
+</span>     * This method could be used in config appliers that need to initialize a
+     * Collection that has items of type className.
+     *
+     * @param data
+     * @param dataCollection
+     * @param className
+     * @returns {*}
+     */
+    checkCollection: function(data, dataCollection, className){
+        if(!dataCollection){
+            dataCollection = this.constructCollection(className);
+        }
+
+        if(data){
+            dataCollection.add(data);
+        }
+
+        return dataCollection;
+    },
+
+<span id='Ext-exporter-file-Base-method-constructCollection'>    /**
+</span>     * Create a new Collection with a decoder for the specified className.
+     *
+     * @param className
+     * @returns {Ext.util.Collection}
+     *
+     * @private
+     */
+    constructCollection: function(className){
+        return new Ext.util.Collection({
+            decoder: this.getCollectionDecoder(className)
+        });
+    },
+
+<span id='Ext-exporter-file-Base-method-getCollectionDecoder'>    /**
+</span>     * Builds a Collection decoder for the specified className.
+     *
+     * @param className
+     * @returns {Function}
+     *
+     * @private
+     */
+    getCollectionDecoder: function(className){
+        return function(config){
+            return Ext.create(className, config || {});
+        };
+    },
+
+<span id='Ext-exporter-file-Base-method-render'>    /**
+</span>     * Renders the content according to the template provided to the class
+     *
+     * @returns {String}
+     */
+    render: function(){
+        return this.tpl ? Ext.XTemplate.getTpl(this, 'tpl').apply(this.getRenderData()) : '';
+    },
+
+<span id='Ext-exporter-file-Base-method-getRenderData'>    /**
+</span>     * Return the data used when rendering the template
+     *
+     * @returns {Object}
+     */
+    getRenderData: function(){
+        return this.getConfig();
+    }
+});</pre>
+</body>
+</html>

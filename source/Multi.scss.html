@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>The source code</title>
+  <link href="../resources/prettify/prettify.css" type="text/css" rel="stylesheet" />
+  <script type="text/javascript" src="../resources/prettify/prettify.js"></script>
+  <style type="text/css">
+    .highlight { display: block; background-color: #ddd; }
+  </style>
+  <script type="text/javascript">
+    function highlight() {
+      document.getElementById(location.hash.replace(/#/, "")).className = "highlight";
+    }
+  </script>
+</head>
+<body onload="prettyPrint(); highlight();">
+  <pre class="prettyprint lang-js">.#{$prefix}slider {
+    outline: none; // prevent dotted outline in firefox when focused
+    position: relative;
+}
+
+.#{$prefix}slider-inner {
+    position:relative;
+    left:0;
+    top:0;
+    overflow:visible;
+    .#{$prefix}slider-vert &amp; {
+        background: repeat-y 0 0;
+    }
+}
+
+.#{$prefix}slider-thumb {
+    position: absolute;
+    background: no-repeat 0 0;
+    .#{$prefix}slider-horz &amp; {
+        left: 0;
+    }
+    .#{$prefix}slider-vert &amp; {
+        bottom: 0;
+    }
+    // IE uses cursor:text
+    cursor: default;
+
+    @if $enable-font-icons {
+        // vertical and horizontal centering of the glyph
+        display: table;
+        table-layout: fixed;
+        &amp;:before {
+            display: table-cell;
+            vertical-align: middle;
+            text-align: center;
+        }
+    }
+}</pre>
+</body>
+</html>

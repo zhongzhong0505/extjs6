@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>The source code</title>
+  <link href="../resources/prettify/prettify.css" type="text/css" rel="stylesheet" />
+  <script type="text/javascript" src="../resources/prettify/prettify.js"></script>
+  <style type="text/css">
+    .highlight { display: block; background-color: #ddd; }
+  </style>
+  <script type="text/javascript">
+    function highlight() {
+      document.getElementById(location.hash.replace(/#/, "")).className = "highlight";
+    }
+  </script>
+</head>
+<body onload="prettyPrint(); highlight();">
+  <pre class="prettyprint lang-js"><span id='Ext-chart-series-sprite-Polar'>/**
+</span> * @class Ext.chart.series.sprite.Polar
+ * @extends Ext.draw.sprite.Sprite
+ * 
+ * Polar sprite.
+ */
+Ext.define('Ext.chart.series.sprite.Polar', {
+    extend: 'Ext.chart.series.sprite.Series',
+
+    inheritableStatics: {
+<span id='Ext-chart-series-sprite-Polar-static-property-def'>        def: {
+</span>            processors: {
+<span id='Ext-chart-series-sprite-Polar-cfg-centerX'>                /**
+</span>                 * @cfg {Number} [centerX=0] The central point of the series on the x-axis.
+                 */
+                centerX: 'number',
+
+<span id='Ext-chart-series-sprite-Polar-cfg-centerY'>                /**
+</span>                 * @cfg {Number} [centerY=0] The central point of the series on the y-axis.
+                 */
+                centerY: 'number',
+
+<span id='Ext-chart-series-sprite-Polar-cfg-startAngle'>                /**
+</span>                 * @cfg {Number} [startAngle=0] The starting angle of the polar series.
+                 */
+                startAngle: 'number',
+
+<span id='Ext-chart-series-sprite-Polar-cfg-endAngle'>                /**
+</span>                 * @cfg {Number} [endAngle=Math.PI] The ending angle of the polar series.
+                 */
+                endAngle: 'number',
+
+<span id='Ext-chart-series-sprite-Polar-cfg-startRho'>                /**
+</span>                 * @cfg {Number} [startRho=0] The starting radius of the polar series.
+                 */
+                startRho: 'number',
+
+<span id='Ext-chart-series-sprite-Polar-cfg-endRho'>                /**
+</span>                 * @cfg {Number} [endRho=150] The ending radius of the polar series.
+                 */
+                endRho: 'number',
+
+<span id='Ext-chart-series-sprite-Polar-cfg-baseRotation'>                /**
+</span>                 * @cfg {Number} [baseRotation=0] The starting rotation of the polar series.
+                 */
+                baseRotation: 'number',
+
+<span id='Ext-chart-series-sprite-Polar-cfg-labels'>                /**
+</span>                 * @cfg {Object} [labels=null] Labels used in the series.
+                 */
+                labels: 'default',
+
+<span id='Ext-chart-series-sprite-Polar-cfg-labelOverflowPadding'>                /**
+</span>                 * @cfg {Number} [labelOverflowPadding=10] Padding around labels to determine overlap.
+                 */
+                labelOverflowPadding: 'number'
+            },
+            defaults: {
+                centerX: 0,
+                centerY: 0,
+                startAngle: 0,
+                endAngle: Math.PI,
+                startRho: 0,
+                endRho: 150,
+                baseRotation: 0,
+                labels: null,
+                labelOverflowPadding: 10
+            },
+            triggers: {
+                centerX: 'bbox',
+                centerY: 'bbox',
+                startAngle: 'bbox',
+                endAngle: 'bbox',
+                startRho: 'bbox',
+                endRho: 'bbox',
+                baseRotation: 'bbox'
+            }
+        }
+    },
+
+<span id='Ext-chart-series-sprite-Polar-method-updatePlainBBox'>    updatePlainBBox: function (plain) {
+</span>        var attr = this.attr;
+        plain.x = attr.centerX - attr.endRho;
+        plain.y = attr.centerY + attr.endRho;
+        plain.width = attr.endRho * 2;
+        plain.height = attr.endRho * 2;
+    }
+});</pre>
+</body>
+</html>

@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>The source code</title>
+  <link href="../resources/prettify/prettify.css" type="text/css" rel="stylesheet" />
+  <script type="text/javascript" src="../resources/prettify/prettify.js"></script>
+  <style type="text/css">
+    .highlight { display: block; background-color: #ddd; }
+  </style>
+  <script type="text/javascript">
+    function highlight() {
+      document.getElementById(location.hash.replace(/#/, "")).className = "highlight";
+    }
+  </script>
+</head>
+<body onload="prettyPrint(); highlight();">
+  <pre class="prettyprint lang-js">// panel header changes overflow of it's box layout's innerCt to visible so that certain
+// items can negate the effect of the header's padding by using negative margins
+.#{$prefix}box-inner {
+    .#{$prefix}header &gt; &amp;,
+    .#{$prefix}panel-header-mc &gt; &amp;,
+    .#{$prefix}window-header-mc &gt; &amp; {
+        overflow: visible;
+    }
+}</pre>
+</body>
+</html>

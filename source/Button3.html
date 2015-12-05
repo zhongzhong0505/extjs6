@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>The source code</title>
+  <link href="../resources/prettify/prettify.css" type="text/css" rel="stylesheet" />
+  <script type="text/javascript" src="../resources/prettify/prettify.js"></script>
+  <style type="text/css">
+    .highlight { display: block; background-color: #ddd; }
+  </style>
+  <script type="text/javascript">
+    function highlight() {
+      document.getElementById(location.hash.replace(/#/, "")).className = "highlight";
+    }
+  </script>
+</head>
+<body onload="prettyPrint(); highlight();">
+  <pre class="prettyprint lang-js"><span id='Ext-ux-colorpick-Button'>/**
+</span> * A simple color swatch that can be clicked to bring up the color selector.
+ *
+ * The selected color is configurable via {@link #value}.
+ *
+ *     @example
+ *     Ext.create('Ext.ux.colorpick.Button', {
+ *         value: '993300',  // initial selected color
+ *         renderTo: Ext.getBody(),
+ *
+ *         listeners: {
+ *             select: function(picker, selColor) {
+ *                 Ext.Msg.alert('Color', selColor);
+ *             }
+ *         }
+ *     });
+ */
+Ext.define('Ext.ux.colorpick.Button', {
+    extend: 'Ext.Component',
+    xtype: 'colorbutton',
+
+<span id='Ext-ux-colorpick-Button-cfg-controller'>    controller: 'colorpick-buttoncontroller',
+</span>
+    mixins: [
+        'Ext.ux.colorpick.Selection'
+    ],
+
+    requires: [
+        'Ext.ux.colorpick.ButtonController'
+    ],
+
+<span id='Ext-ux-colorpick-Button-cfg-baseCls'>    baseCls: Ext.baseCSSPrefix + 'colorpicker-button',
+</span>
+<span id='Ext-ux-colorpick-Button-cfg-width'>    width: 20,
+</span><span id='Ext-ux-colorpick-Button-cfg-height'>    height: 20,
+</span>
+<span id='Ext-ux-colorpick-Button-cfg-childEls'>    childEls: [
+</span>        'btnEl', 'filterEl'
+    ],
+
+    config: {
+<span id='Ext-ux-colorpick-Button-cfg-popup'>        /**
+</span>         * @cfg {Object} popup
+         * This object configures the popup window and colorselector component displayed
+         * when this button is clicked. Applications should not need to configure this.
+         * @private
+         */
+        popup: {
+            lazy: true,
+            $value: {
+                xtype: 'window',
+                closeAction: 'hide',
+                referenceHolder: true,
+                minWidth: 540,
+                minHeight: 200,
+                layout: 'fit',
+                header: false,
+                resizable: true,
+                items: {
+                    xtype: 'colorselector',
+                    reference: 'selector',
+                    showPreviousColor: true,
+                    showOkCancelButtons: true
+                }
+            }
+        }
+    },
+
+<span id='Ext-ux-colorpick-Button-property-defaultBindProperty'>    defaultBindProperty: 'value',
+</span><span id='Ext-ux-colorpick-Button-cfg-twoWayBindable'>    twoWayBindable: 'value',
+</span>
+<span id='Ext-ux-colorpick-Button-cfg-renderTpl'>    // Solve issue with IE, when applying a filter the click listener is not being fired.
+</span>    renderTpl:
+        '&lt;div id=&quot;{id}-filterEl&quot; data-ref=&quot;filterEl&quot; style=&quot;height:100%; width:100%; position: absolute;&quot;&gt;&lt;/div&gt;'+
+        '&lt;a id=&quot;{id}-btnEl&quot; data-ref=&quot;btnEl&quot; style=&quot;height:100%; width:100%; position: absolute;&quot;&gt;&lt;/a&gt;',
+
+<span id='Ext-ux-colorpick-Button-cfg-listeners'>    listeners: {
+</span>        click: 'onClick',
+        element: 'btnEl'
+    },
+
+<span id='Ext-ux-colorpick-Button-event-change'>    /**
+</span>     * @event change
+     * Fires when a color is selected.
+     * @param {Ext.ux.colorpick.Selector} this
+     * @param {String} color The value of the selected color as per specified {@link #format}.
+     * @param {String} previousColor The previous color value.
+     */
+
+    updateColor: function (color) {
+        var me = this,
+            cp = me.colorPicker;
+
+        me.mixins.colorselection.updateColor.call(me, color);
+
+        Ext.ux.colorpick.ColorUtils.setBackground(me.filterEl, color);
+
+        if (cp) {
+            cp.setColor(color);
+        }
+    },
+
+<span id='Ext-ux-colorpick-Button-method-updateFormat'>    // Sets this.format and color picker's setFormat()
+</span>    updateFormat: function(format) {
+        var cp = this.colorPicker;
+
+        if (cp) {
+            cp.setFormat(format);
+        }
+    }
+});
+</pre>
+</body>
+</html>

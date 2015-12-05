@@ -1,0 +1,1742 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>The source code</title>
+  <link href="../resources/prettify/prettify.css" type="text/css" rel="stylesheet" />
+  <script type="text/javascript" src="../resources/prettify/prettify.js"></script>
+  <style type="text/css">
+    .highlight { display: block; background-color: #ddd; }
+  </style>
+  <script type="text/javascript">
+    function highlight() {
+      document.getElementById(location.hash.replace(/#/, "")).className = "highlight";
+    }
+  </script>
+</head>
+<body onload="prettyPrint(); highlight();">
+  <pre class="prettyprint lang-js"><span id='Ext-draw-sprite-Sprite'>/**
+</span> * A sprite is a basic primitive from the charts package which represents a graphical 
+ * object that can be drawn. Sprites are used extensively in the charts package to 
+ * create the visual elements of each chart.  You can also create a desired image by 
+ * adding one or more sprites to a {@link Ext.draw.Container draw container}.
+ * 
+ * The Sprite class itself is an abstract class and is not meant to be used directly.  
+ * There are many different kinds of sprites available in the charts package that extend 
+ * Ext.draw.sprite.Sprite. Each sprite type has various attributes that define how that 
+ * sprite should look. For example, this is a {@link Ext.draw.sprite.Rect rect} sprite:
+ * 
+ *     @example
+ *     Ext.create({
+ *         xtype: 'draw', 
+ *         renderTo: document.body,
+ *         width: 400,
+ *         height: 400,
+ *         sprites: [{
+ *             type: 'rect',
+ *             x: 50,
+ *             y: 50,
+ *             width: 100,
+ *             height: 100,
+ *             fillStyle: '#1F6D91'
+ *         }]
+ *     });
+ * 
+ * By default, sprites are added to the default 'main' {@link Ext.draw.Surface surface} 
+ * of the draw container.  However, sprites may also be configured with a reference to a 
+ * specific Ext.draw.Surface when set in the draw container's 
+ * {@link Ext.draw.Container#cfg-sprites sprites} config.  Specifying a surface 
+ * other than 'main' will create a surface by that name if it does not already exist.
+ * 
+ *     @example
+ *     Ext.create({
+ *         xtype: 'draw', 
+ *         renderTo: document.body,
+ *         width: 400,
+ *         height: 400,
+ *         sprites: [{
+ *             type: 'rect',
+ *             surface: 'anim',  // a surface with id &quot;anim&quot; will be created automatically
+ *             x: 50,
+ *             y: 50,
+ *             width: 100,
+ *             height: 100,
+ *             fillStyle: '#1F6D91'
+ *         }]
+ *     });
+ * 
+ * The ability to have multiple surfaces is useful for performance (and battery life) 
+ * reasons. Because changes to sprite attributes cause the whole surface (and all 
+ * sprites in it) to re-render, it makes sense to group sprites by surface, so changes 
+ * to one group of sprites will only trigger the surface they are in to re-render.
+ * 
+ * You can add a sprite to an existing drawing by adding the sprite to a draw surface.  
+ * 
+ *     @example
+ *     var drawCt = Ext.create({
+ *         xtype: 'draw',
+ *         renderTo: document.body,
+ *         width: 400,
+ *         height: 400
+ *     });
+ *     
+ *     // If the surface name is not specified then 'main' will be used
+ *     var surface = drawCt.getSurface();
+ *     
+ *     surface.add({
+ *         type: 'rect',
+ *         x: 50,
+ *         y: 50,
+ *         width: 100,
+ *         height: 100,
+ *         fillStyle: '#1F6D91'
+ *     });
+ *     
+ *     surface.renderFrame();
+ * 
+ * **Note:** Changes to the sprites on a surface will be not be reflected in the DOM 
+ * until you call the surface's {@link Ext.draw.Surface#method-renderFrame renderFrame} 
+ * method.  This must be done after adding, removing, or modifying sprites in order to 
+ * see the changes on-screen.
+ * 
+ * For information on configuring a sprite with an initial transformation see 
+ * {@link #scaling}, {@link rotation}, and {@link translation}.
+ * 
+ * For information on applying a transformation to an existing sprite see the 
+ * Ext.draw.Matrix class.
+ */
+Ext.define('Ext.draw.sprite.Sprite', {
+    alias: 'sprite.sprite',
+
+    mixins: {
+        observable: 'Ext.mixin.Observable'
+    },
+
+    requires: [
+        'Ext.draw.Draw',
+        'Ext.draw.gradient.Gradient',
+        'Ext.draw.sprite.AttributeDefinition',
+        'Ext.draw.modifier.Target',
+        'Ext.draw.modifier.Animation',
+        'Ext.draw.modifier.Highlight'
+    ],
+
+<span id='Ext-draw-sprite-Sprite-property-isSprite'>    isSprite: true,
+</span>
+    statics: {
+<span id='Ext-draw-sprite-Sprite-static-property-defaultHitTestOptions'>        defaultHitTestOptions: {
+</span>            fill: true,
+            stroke: true
+        }
+        //&lt;debug&gt;
+<span id='Ext-draw-sprite-Sprite-static-property-debug'>        /**
+</span>         * Debug rendering options:
+         *
+         * debug: {
+         *     bbox: true, // renders the bounding box of the sprite
+         *     xray: true  // renders control points of the path (for Ext.draw.sprite.Path and descendants only)
+         * }
+         *
+         */
+        ,debug: false
+        //&lt;/debug&gt;
+    },
+
+    inheritableStatics: {
+<span id='Ext-draw-sprite-Sprite-static-property-def'>        def: {
+</span>            processors: {
+                //&lt;debug&gt;
+                debug: 'default',
+                //&lt;/debug&gt;
+
+<span id='Ext-draw-sprite-Sprite-cfg-strokeStyle'>                /**
+</span>                 * @cfg {String} [strokeStyle=&quot;none&quot;] The color of the stroke (a CSS color value).
+                 */
+                strokeStyle: &quot;color&quot;,
+
+<span id='Ext-draw-sprite-Sprite-cfg-fillStyle'>                /**
+</span>                 * @cfg {String} [fillStyle=&quot;none&quot;] The color of the shape (a CSS color value).
+                 */
+                fillStyle: &quot;color&quot;,
+
+<span id='Ext-draw-sprite-Sprite-cfg-strokeOpacity'>                /**
+</span>                 * @cfg {Number} [strokeOpacity=1] The opacity of the stroke. Limited from 0 to 1.
+                 */
+                strokeOpacity: &quot;limited01&quot;,
+
+<span id='Ext-draw-sprite-Sprite-cfg-fillOpacity'>                /**
+</span>                 * @cfg {Number} [fillOpacity=1] The opacity of the fill. Limited from 0 to 1.
+                 */
+                fillOpacity: &quot;limited01&quot;,
+
+<span id='Ext-draw-sprite-Sprite-cfg-lineWidth'>                /**
+</span>                 * @cfg {Number} [lineWidth=1] The width of the line stroke.
+                 */
+                lineWidth: &quot;number&quot;,
+
+<span id='Ext-draw-sprite-Sprite-cfg-lineCap'>                /**
+</span>                 * @cfg {String} [lineCap=&quot;butt&quot;] The style of the line caps.
+                 */
+                lineCap: &quot;enums(butt,round,square)&quot;,
+
+<span id='Ext-draw-sprite-Sprite-cfg-lineJoin'>                /**
+</span>                 * @cfg {String} [lineJoin=&quot;miter&quot;] The style of the line join.
+                 */
+                lineJoin: &quot;enums(round,bevel,miter)&quot;,
+
+<span id='Ext-draw-sprite-Sprite-cfg-lineDash'>                /**
+</span>                 * @cfg {Array} [lineDash=[]]
+                 * An even number of non-negative numbers specifying a dash/space sequence.
+                 * Note that while this is supported in IE8 (VML engine), the behavior is
+                 * different from Canvas and SVG. Please refer to this document for details:
+                 * http://msdn.microsoft.com/en-us/library/bb264085(v=vs.85).aspx
+                 * Although IE9 and IE10 have Canvas support, the 'lineDash'
+                 * attribute is not supported in those browsers.
+                 */
+                lineDash: &quot;data&quot;,
+
+<span id='Ext-draw-sprite-Sprite-cfg-lineDashOffset'>                /**
+</span>                 * @cfg {Number} [lineDashOffset=0]
+                 * A number specifying how far into the line dash sequence drawing commences.
+                 */
+                lineDashOffset: &quot;number&quot;,
+
+<span id='Ext-draw-sprite-Sprite-cfg-miterLimit'>                /**
+</span>                 * @cfg {Number} [miterLimit=10]
+                 * Sets the distance between the inner corner and the outer corner where two lines meet.
+                 */
+                miterLimit: &quot;number&quot;,
+
+<span id='Ext-draw-sprite-Sprite-cfg-shadowColor'>                /**
+</span>                 * @cfg {String} [shadowColor=&quot;none&quot;] The color of the shadow (a CSS color value).
+                 */
+                shadowColor: &quot;color&quot;,
+
+<span id='Ext-draw-sprite-Sprite-cfg-shadowOffsetX'>                /**
+</span>                 * @cfg {Number} [shadowOffsetX=0] The offset of the sprite's shadow on the x-axis.
+                 */
+                shadowOffsetX: &quot;number&quot;,
+
+<span id='Ext-draw-sprite-Sprite-cfg-shadowOffsetY'>                /**
+</span>                 * @cfg {Number} [shadowOffsetY=0] The offset of the sprite's shadow on the y-axis.
+                 */
+                shadowOffsetY: &quot;number&quot;,
+
+<span id='Ext-draw-sprite-Sprite-cfg-shadowBlur'>                /**
+</span>                 * @cfg {Number} [shadowBlur=0] The amount blur used on the shadow.
+                 */
+                shadowBlur: &quot;number&quot;,
+
+<span id='Ext-draw-sprite-Sprite-cfg-globalAlpha'>                /**
+</span>                 * @cfg {Number} [globalAlpha=1] The opacity of the sprite. Limited from 0 to 1.
+                 */
+                globalAlpha: &quot;limited01&quot;,
+
+<span id='Ext-draw-sprite-Sprite-cfg-globalCompositeOperation'>                /**
+</span>                 * @cfg {String} [globalCompositeOperation=source-over]
+                 * Indicates how source images are drawn onto a destination image.
+                 * globalCompositeOperation attribute is not supported by the SVG and VML (excanvas) engines.
+                 */
+                globalCompositeOperation: &quot;enums(source-over,destination-over,source-in,destination-in,source-out,destination-out,source-atop,destination-atop,lighter,xor,copy)&quot;,
+
+<span id='Ext-draw-sprite-Sprite-cfg-hidden'>                /**
+</span>                 * @cfg {Boolean} [hidden=false] Determines whether or not the sprite is hidden.
+                 */
+                hidden: &quot;bool&quot;,
+
+<span id='Ext-draw-sprite-Sprite-cfg-transformFillStroke'>                /**
+</span>                 * @cfg {Boolean} [transformFillStroke=false]
+                 * Determines whether the fill and stroke are affected by sprite transformations.
+                 */
+                transformFillStroke: &quot;bool&quot;,
+
+<span id='Ext-draw-sprite-Sprite-cfg-zIndex'>                /**
+</span>                 * @cfg {Number} [zIndex=0]
+                 * The stacking order of the sprite.
+                 */
+                zIndex: &quot;number&quot;,
+
+<span id='Ext-draw-sprite-Sprite-cfg-translationX'>                /**
+</span>                 * @cfg {Number} [translationX=0]
+                 * The translation, position offset, of the sprite on the x-axis.
+                 * 
+                 * **Note:** Transform configs are *always* performed in the following 
+                 * order:
+                 * 
+                 *  1. Scaling
+                 *  2. Rotation
+                 *  3. Translation
+                 * 
+                 * See also: {@link #translation} and {@link #translationY}
+                 */
+                translationX: &quot;number&quot;,
+
+<span id='Ext-draw-sprite-Sprite-cfg-translationY'>                /**
+</span>                 * @cfg {Number} [translationY=0]
+                 * The translation, position offset, of the sprite on the y-axis.
+                 * 
+                 * **Note:** Transform configs are *always* performed in the following 
+                 * order:
+                 * 
+                 *  1. Scaling
+                 *  2. Rotation
+                 *  3. Translation
+                 * 
+                 * See also: {@link #translation} and {@link #translationX}
+                 */
+                translationY: &quot;number&quot;,
+
+<span id='Ext-draw-sprite-Sprite-cfg-rotationRads'>                /**
+</span>                 * @cfg {Number} [rotationRads=0]
+                 * The angle of rotation of the sprite in radians.
+                 * 
+                 * **Note:** Transform configs are *always* performed in the following 
+                 * order:
+                 * 
+                 *  1. Scaling
+                 *  2. Rotation
+                 *  3. Translation
+                 * 
+                 * See also: {@link #rotation}, {@link #rotationCenterX}, and 
+                 * {@link #rotationCenterY}
+                 */
+                rotationRads: &quot;number&quot;,
+
+<span id='Ext-draw-sprite-Sprite-cfg-rotationCenterX'>                /**
+</span>                 * @cfg {Number} [rotationCenterX=null]
+                 * The central coordinate of the sprite's scale operation on the x-axis.  
+                 * Unless explicitly set, will default to the calculated center of the 
+                 * sprite along the x-axis.
+                 * 
+                 * **Note:** Transform configs are *always* performed in the following 
+                 * order:
+                 * 
+                 *  1. Scaling
+                 *  2. Rotation
+                 *  3. Translation
+                 * 
+                 * See also: {@link #rotation}, {@link #rotationRads}, and 
+                 * {@link #rotationCenterY}
+                 */
+                rotationCenterX: &quot;number&quot;,
+
+<span id='Ext-draw-sprite-Sprite-cfg-rotationCenterY'>                /**
+</span>                 * @cfg {Number} [rotationCenterY=null]
+                 * The central coordinate of the sprite's rotate operation on the y-axis.
+                 * Unless explicitly set, will default to the calculated center of the 
+                 * sprite along the y-axis.
+                 * 
+                 * **Note:** Transform configs are *always* performed in the following 
+                 * order:
+                 * 
+                 *  1. Scaling
+                 *  2. Rotation
+                 *  3. Translation
+                 * 
+                 * See also: {@link #rotation}, {@link #rotationRads}, and 
+                 * {@link #rotationCenterX}
+                 */
+                rotationCenterY: &quot;number&quot;,
+
+<span id='Ext-draw-sprite-Sprite-cfg-scalingX'>                /**
+</span>                 * @cfg {Number} [scalingX=1] The scaling of the sprite on the x-axis.
+                 * The number value represents a percentage by which to scale the 
+                 * sprite.  **1** is equal to 100%, **2** would be 200%, etc.
+                 * 
+                 * **Note:** Transform configs are *always* performed in the following 
+                 * order:
+                 * 
+                 *  1. Scaling
+                 *  2. Rotation
+                 *  3. Translation
+                 * 
+                 * See also: {@link #scaling}, {@link #scalingY}, 
+                 * {@link #scalingCenterX}, and {@link #scalingCenterY}
+                 */
+                scalingX: &quot;number&quot;,
+
+<span id='Ext-draw-sprite-Sprite-cfg-scalingY'>                /**
+</span>                 * @cfg {Number} [scalingY=1] The scaling of the sprite on the y-axis.  
+                 * The number value represents a percentage by which to scale the 
+                 * sprite.  **1** is equal to 100%, **2** would be 200%, etc.
+                 * 
+                 * **Note:** Transform configs are *always* performed in the following 
+                 * order:
+                 * 
+                 *  1. Scaling
+                 *  2. Rotation
+                 *  3. Translation
+                 * 
+                 * See also: {@link #scaling}, {@link #scalingX}, 
+                 * {@link #scalingCenterX}, and {@link #scalingCenterY}
+                 */
+                scalingY: &quot;number&quot;,
+
+<span id='Ext-draw-sprite-Sprite-cfg-scalingCenterX'>                /**
+</span>                 * @cfg {Number} [scalingCenterX=null]
+                 * The central coordinate of the sprite's scale operation on the x-axis.
+                 * 
+                 * **Note:** Transform configs are *always* performed in the following 
+                 * order:
+                 * 
+                 *  1. Scaling
+                 *  2. Rotation
+                 *  3. Translation
+                 * 
+                 * See also: {@link #scaling}, {@link #scalingX}, 
+                 * {@link #scalingY}, and {@link #scalingCenterY}
+                 */
+                scalingCenterX: &quot;number&quot;,
+
+<span id='Ext-draw-sprite-Sprite-cfg-scalingCenterY'>                /**
+</span>                 * @cfg {Number} [scalingCenterY=null]
+                 * The central coordinate of the sprite's scale operation on the y-axis.
+                 * 
+                 * **Note:** Transform configs are *always* performed in the following 
+                 * order:
+                 * 
+                 *  1. Scaling
+                 *  2. Rotation
+                 *  3. Translation
+                 * 
+                 * See also: {@link #scaling}, {@link #scalingX}, 
+                 * {@link #scalingY}, and {@link #scalingCenterX}
+                 */
+                scalingCenterY: &quot;number&quot;,
+                
+                constrainGradients: &quot;bool&quot;
+                
+<span id='Ext-draw-sprite-Sprite-cfg-rotation'>                /**
+</span>                 * @cfg {Number/Object} rotation
+                 * Applies an initial angle of rotation to the sprite.  May be a number 
+                 * specifying the rotation in degrees.  Or may be a config object using 
+                 * the below config options.
+                 * 
+                 * **Note:** Rotation config options will be overridden by values set on 
+                 * the {@link #rotationRads}, {@link #rotationCenterX}, and 
+                 * {@link #rotationCenterY} configs.  
+                 * 
+                 *     Ext.create({
+                 *         xtype: 'draw',
+                 *         renderTo: Ext.getBody(),
+                 *         width: 600,
+                 *         height: 400,
+                 *         sprites: [{
+                 *             type: 'rect',
+                 *             x: 50,
+                 *             y: 50,
+                 *             width: 100,
+                 *             height: 100,
+                 *             fillStyle: '#1F6D91',
+                 *             //rotation: 45
+                 *             rotation: {
+                 *                 degrees: 45,
+                 *                 //rads: Math.PI / 4,
+                 *                 //centerX: 50,
+                 *                 //centerY: 50
+                 *             }
+                 *         }]
+                 *     });
+                 * 
+                 * **Note:** Transform configs are *always* performed in the following 
+                 * order:
+                 * 
+                 *  1. Scaling
+                 *  2. Rotation
+                 *  3. Translation
+                 * 
+                 * @cfg {Number} rotation.rads
+                 * The angle in radians to rotate the sprite
+                 * 
+                 * @cfg {Number} rotation.degrees
+                 * The angle in degrees to rotate the sprite (is ignored if rads or 
+                 * {@link #rotationRads} is set
+                 * 
+                 * @cfg {Number} rotation.centerX
+                 * The central coordinate of the sprite's rotation on the x-axis.  
+                 * Unless explicitly set, will default to the calculated center of the 
+                 * sprite along the x-axis.
+                 * 
+                 * @cfg {Number} rotation.centerY
+                 * The central coordinate of the sprite's rotation on the y-axis.  
+                 * Unless explicitly set, will default to the calculated center of the 
+                 * sprite along the y-axis.
+                 */
+                
+<span id='Ext-draw-sprite-Sprite-cfg-scaling'>                /**
+</span>                 * @cfg {Number/Object} scaling
+                 * Applies initial scaling to the sprite.  May be a number specifying 
+                 * the amount to scale both the x and y-axis.  The number value 
+                 * represents a percentage by which to scale the sprite.  **1** is equal 
+                 * to 100%, **2** would be 200%, etc.  Or may be a config object using 
+                 * the below config options.
+                 * 
+                 * **Note:** Scaling config options will be overridden by values set on 
+                 * the {@link #scalingX}, {@link #scalingY}, {@link #scalingCenterX}, 
+                 * and {@link #scalingCenterY} configs.
+                 * 
+                 *     Ext.create({
+                 *         xtype: 'draw',
+                 *         renderTo: Ext.getBody(),
+                 *         width: 600,
+                 *         height: 400,
+                 *         sprites: [{
+                 *             type: 'rect',
+                 *             x: 50,
+                 *             y: 50,
+                 *             width: 100,
+                 *             height: 100,
+                 *             fillStyle: '#1F6D91',
+                 *             //scaling: 2,
+                 *             scaling: {
+                 *                 x: 2,
+	             *                 y: 2
+                 *                 //centerX: 100,
+                 *                 //centerY: 100
+                 *             }
+                 *         }]
+                 *     });
+                 * 
+                 * **Note:** Transform configs are *always* performed in the following 
+                 * order:
+                 * 
+                 *  1. Scaling
+                 *  2. Rotation
+                 *  3. Translation
+                 * 
+                 * @cfg {Number} scaling.x
+                 * The amount by which to scale the sprite along the x-axis.  The number 
+                 * value represents a percentage by which to scale the sprite.  **1** is 
+                 * equal to 100%, **2** would be 200%, etc.
+                 * 
+                 * @cfg {Number} scaling.y
+                 * The amount by which to scale the sprite along the y-axis.  The number 
+                 * value represents a percentage by which to scale the sprite.  **1** is 
+                 * equal to 100%, **2** would be 200%, etc.
+                 * 
+                 * @cfg scaling.centerX
+                 * The central coordinate of the sprite's scaling on the x-axis.  Unless 
+                 * explicitly set, will default to the calculated center of the sprite 
+                 * along the x-axis.
+                 * 
+                 * @cfg {Number} scaling.centerY
+                 * The central coordinate of the sprite's scaling on the y-axis.  Unless 
+                 * explicitly set, will default to the calculated center of the sprite 
+                 * along the y-axis.
+                 */
+                
+<span id='Ext-draw-sprite-Sprite-cfg-translation'>                /**
+</span>                 * @cfg {Object} translation
+                 * Applies an initial translation, adjustment in x/y positioning, to the 
+                 * sprite.
+                 * 
+                 * **Note:** Translation config options will be overridden by values set 
+                 * on the {@link #translationX} and {@link #translationY} configs.
+                 * 
+                 *     Ext.create({
+                 *         xtype: 'draw',
+                 *         renderTo: Ext.getBody(),
+                 *         width: 600,
+                 *         height: 400,
+                 *             sprites: [{
+                 *             type: 'rect',
+                 *             x: 50,
+                 *             y: 50,
+                 *             width: 100,
+                 *             height: 100,
+                 *             fillStyle: '#1F6D91',
+                 *             translation: {
+                 *                 x: 50,
+                 *                 y: 50
+                 *             }
+                 *         }]
+                 *     });
+                 * 
+                 * **Note:** Transform configs are *always* performed in the following 
+                 * order:
+                 * 
+                 *  1. Scaling
+                 *  2. Rotation
+                 *  3. Translation
+                 * 
+                 * @cfg {Number} translation.x
+                 * The amount to translate the sprite along the x-axis.
+                 * 
+                 * @cfg {Number} translation.y
+                 * The amount to translate the sprite along the y-axis.
+                 */
+            },
+
+            aliases: {
+                &quot;stroke&quot;: &quot;strokeStyle&quot;,
+                &quot;fill&quot;: &quot;fillStyle&quot;,
+                &quot;color&quot;: &quot;fillStyle&quot;,
+                &quot;stroke-width&quot;: &quot;lineWidth&quot;,
+                &quot;stroke-linecap&quot;: &quot;lineCap&quot;,
+                &quot;stroke-linejoin&quot;: &quot;lineJoin&quot;,
+                &quot;stroke-miterlimit&quot;: &quot;miterLimit&quot;,
+                &quot;text-anchor&quot;: &quot;textAlign&quot;,
+                &quot;opacity&quot;: &quot;globalAlpha&quot;,
+
+                translateX: &quot;translationX&quot;,
+                translateY: &quot;translationY&quot;,
+                rotateRads: &quot;rotationRads&quot;,
+                rotateCenterX: &quot;rotationCenterX&quot;,
+                rotateCenterY: &quot;rotationCenterY&quot;,
+                scaleX: &quot;scalingX&quot;,
+                scaleY: &quot;scalingY&quot;,
+                scaleCenterX: &quot;scalingCenterX&quot;,
+                scaleCenterY: &quot;scalingCenterY&quot;
+            },
+
+            defaults: {
+                hidden: false,
+                zIndex: 0,
+
+                strokeStyle: &quot;none&quot;,
+                fillStyle: &quot;none&quot;,
+                lineWidth: 1,
+                lineDash: [],
+                lineDashOffset: 0,
+                lineCap: &quot;butt&quot;,
+                lineJoin: &quot;miter&quot;,
+                miterLimit: 10,
+
+                shadowColor: &quot;none&quot;,
+                shadowOffsetX: 0,
+                shadowOffsetY: 0,
+                shadowBlur: 0,
+
+                globalAlpha: 1,
+                strokeOpacity: 1,
+                fillOpacity: 1,
+                transformFillStroke: false,
+
+                translationX: 0,
+                translationY: 0,
+                rotationRads: 0,
+                rotationCenterX: null,
+                rotationCenterY: null,
+                scalingX: 1,
+                scalingY: 1,
+                scalingCenterX: null,
+                scalingCenterY: null,
+                
+                constrainGradients: false
+            },
+
+            triggers: {
+                zIndex: &quot;zIndex&quot;,
+
+                globalAlpha: &quot;canvas&quot;,
+                globalCompositeOperation: &quot;canvas&quot;,
+
+                transformFillStroke: &quot;canvas&quot;,
+                strokeStyle: &quot;canvas&quot;,
+                fillStyle: &quot;canvas&quot;,
+                strokeOpacity: &quot;canvas&quot;,
+                fillOpacity: &quot;canvas&quot;,
+
+                lineWidth: &quot;canvas&quot;,
+                lineCap: &quot;canvas&quot;,
+                lineJoin: &quot;canvas&quot;,
+                lineDash: &quot;canvas&quot;,
+                lineDashOffset: &quot;canvas&quot;,
+                miterLimit: &quot;canvas&quot;,
+
+                shadowColor: &quot;canvas&quot;,
+                shadowOffsetX: &quot;canvas&quot;,
+                shadowOffsetY: &quot;canvas&quot;,
+                shadowBlur: &quot;canvas&quot;,
+
+                translationX: &quot;transform&quot;,
+                translationY: &quot;transform&quot;,
+                rotationRads: &quot;transform&quot;,
+                rotationCenterX: &quot;transform&quot;,
+                rotationCenterY: &quot;transform&quot;,
+                scalingX: &quot;transform&quot;,
+                scalingY: &quot;transform&quot;,
+                scalingCenterX: &quot;transform&quot;,
+                scalingCenterY: &quot;transform&quot;,
+                
+                constrainGradients: &quot;canvas&quot;
+            },
+
+            updaters: {
+                // 'bbox' updater is meant to be called by subclasses when changes
+                // to attributes are expected to result in a change in sprite's dimensions.
+                bbox: 'bboxUpdater',
+
+                zIndex: function (attr) {
+                    attr.dirtyZIndex = true;
+                },
+
+                transform: function (attr) {
+                    attr.dirtyTransform = true;
+                    attr.bbox.transform.dirty = true;
+                }
+            }
+        }
+    },
+
+<span id='Ext-draw-sprite-Sprite-property-attr'>    /**
+</span>     * @property {Object} attr
+     * The visual attributes of the sprite, e.g. strokeStyle, fillStyle, lineWidth...
+     */
+
+<span id='Ext-draw-sprite-Sprite-cfg-animation'>    /**
+</span>     * @cfg {Ext.draw.modifier.Animation} animation
+     * @accessor
+     */
+
+    config: {
+<span id='Ext-draw-sprite-Sprite-cfg-parent'>        /**
+</span>         * @cfg {Ext.draw.Surface/Ext.draw.sprite.Instancing/Ext.draw.sprite.Composite} parent
+         * The immediate parent of the sprite. Not necessarily a surface.
+         */
+        parent: null,
+<span id='Ext-draw-sprite-Sprite-cfg-surface'>        /**
+</span>         * @cfg {Ext.draw.Surface} surface
+         * The surface that this sprite is rendered into.
+         */
+        surface: null
+    },
+
+<span id='Ext-draw-sprite-Sprite-method-onClassExtended'>    onClassExtended: function (subClass, data) {
+</span>        // The `def` here is no longer a config, but an instance
+        // of the AttributeDefinition class created with that config,
+        // which can now be retrieved from `initialConfig`.
+        var superclassCfg = subClass.superclass.self.def.initialConfig,
+            ownCfg = data.inheritableStatics &amp;&amp; data.inheritableStatics.def,
+            cfg;
+
+        // If sprite defines attributes of its own, merge that with those of its parent.
+        if (ownCfg) {
+            cfg = Ext.Object.merge({}, superclassCfg, ownCfg);
+            subClass.def = new Ext.draw.sprite.AttributeDefinition(cfg);
+            delete data.inheritableStatics.def;
+        } else {
+            subClass.def = new Ext.draw.sprite.AttributeDefinition(superclassCfg);
+        }
+
+        subClass.def.spriteClass = subClass;
+    },
+
+<span id='Ext-draw-sprite-Sprite-method-constructor'>    constructor: function (config) {
+</span>        //&lt;debug&gt;
+        if (Ext.getClassName(this) === 'Ext.draw.sprite.Sprite') {
+            throw 'Ext.draw.sprite.Sprite is an abstract class';
+        }
+        //&lt;/debug&gt;
+        var me = this,
+            attributeDefinition = me.self.def,
+            // It is important to get defaults (make sure
+            // 'defaults' config applier of the AttributeDefinition is called,
+            // since it is initialized lazily) before the attributes
+            // are initialized ('initializeAttributes' call).
+            defaults = attributeDefinition.getDefaults(),
+            modifiers;
+
+        config = Ext.isObject(config) ? config : {};
+
+        me.id = config.id || Ext.id(null, 'ext-sprite-');
+        me.attr = {};
+        me.mixins.observable.constructor.apply(me, arguments);
+        
+        modifiers = Ext.Array.from(config.modifiers, true);
+        me.prepareModifiers(modifiers);
+        me.initializeAttributes();
+        me.setAttributes(defaults, true);
+        //&lt;debug&gt;
+        var processors = attributeDefinition.getProcessors();
+        for (var name in config) {
+            if (name in processors &amp;&amp; me['get' + name.charAt(0).toUpperCase() + name.substr(1)]) {
+                Ext.raise('The ' + me.$className +
+                    ' sprite has both a config and an attribute with the same name: ' + name + '.');
+            }
+        }
+        //&lt;/debug&gt;
+        me.setAttributes(config);
+    },
+
+<span id='Ext-draw-sprite-Sprite-cfg-dirty'>    /**
+</span>     * @private
+     * Current state of the sprite.
+     * Set to `true` if the sprite needs to be repainted.
+     * @cfg {Boolean} dirty
+     * @accessor
+     */
+
+    getDirty: function () {
+        return this.attr.dirty;
+    },
+
+<span id='Ext-draw-sprite-Sprite-method-setDirty'>    setDirty: function (dirty) {
+</span>        // This could have been a regular attribute.
+        // Instead, it's a hidden one, which is initialized inside in the
+        // Target's modifier `prepareAttributes` method and is exposed
+        // as a config. The idea is to skip the modifier chain when
+        // we simply need to change the sprite's state and notify
+        // the sprite's parent.
+        this.attr.dirty = dirty;
+        if (dirty) {
+            var parent = this.getParent();
+            if (parent) {
+                parent.setDirty(true);
+            }
+        }
+    },
+
+<span id='Ext-draw-sprite-Sprite-method-addModifier'>    addModifier: function (modifier, reinitializeAttributes) {
+</span>        var me = this;
+        if (!(modifier instanceof Ext.draw.modifier.Modifier)) {
+            modifier = Ext.factory(modifier, null, null, 'modifier');
+        }
+        modifier.setSprite(me);
+        if (modifier.preFx || modifier.config &amp;&amp; modifier.config.preFx) {
+            if (me.fx.getPrevious()) {
+                me.fx.getPrevious().setNext(modifier);
+            }
+            modifier.setNext(me.fx);
+        } else {
+            me.topModifier.getPrevious().setNext(modifier);
+            modifier.setNext(me.topModifier);
+        }
+        if (reinitializeAttributes) {
+            me.initializeAttributes();
+        }
+        return modifier;
+    },
+
+<span id='Ext-draw-sprite-Sprite-method-prepareModifiers'>    prepareModifiers: function (additionalModifiers) {
+</span>        // Set defaults
+        var me = this,
+            i, ln;
+
+        me.topModifier = new Ext.draw.modifier.Target({sprite: me});
+
+        // Link modifiers
+        me.fx = new Ext.draw.modifier.Animation({sprite: me});
+        me.fx.setNext(me.topModifier);
+
+        for (i = 0, ln = additionalModifiers.length; i &lt; ln; i++) {
+            me.addModifier(additionalModifiers[i], false);
+        }
+    },
+
+<span id='Ext-draw-sprite-Sprite-method-getAnimation'>    /**
+</span>     * Returns the current animation instance.
+     * return {Ext.draw.modifier.Animation} The animation modifier used to animate the 
+     * sprite
+     */
+    getAnimation: function () {
+        return this.fx;
+    },
+
+<span id='Ext-draw-sprite-Sprite-method-setAnimation'>    /**
+</span>     * Sets the animation config used by the sprite when animating the sprite's 
+     * attributes and transformation properties.
+     * 
+     *     var drawCt = Ext.create({
+     *         xtype: 'draw',
+     *         renderTo: document.body,
+     *         width: 400,
+     *         height: 400,
+     *         sprites: [{
+     *             type: 'rect',
+     *             x: 50,
+     *             y: 50,
+     *             width: 100,
+     *             height: 100,
+     *             fillStyle: '#1F6D91'
+     *         }]
+     *     });
+     *     
+     *     var rect = drawCt.getSurface().getItems()[0];
+     *     
+     *     rect.setAnimation({
+     *         duration: 1000,
+     *         easing: 'elasticOut'
+     *     });
+     *     
+     *     Ext.defer(function () {
+     *         rect.setAttributes({
+     *             width: 250
+     *         });
+     *     }, 500);
+     * 
+     * @param {Object} config The Ext.draw.modifier.Animation config for this sprite's 
+     * animations.
+     */
+    setAnimation: function (config) {
+        this.fx.setConfig(config);
+    },
+
+<span id='Ext-draw-sprite-Sprite-method-initializeAttributes'>    initializeAttributes: function () {
+</span>        this.topModifier.prepareAttributes(this.attr);
+    },
+
+<span id='Ext-draw-sprite-Sprite-method-callUpdaters'>    /**
+</span>     * @private
+     * Calls updaters triggered by changes to sprite attributes.
+     * @param attr The attributes of a sprite or its instance.
+     */
+    callUpdaters: function (attr) {
+        var me = this,
+            pendingUpdaters = attr.pendingUpdaters,
+            updaters = me.self.def.getUpdaters(),
+            any = false,
+            dirty = false,
+            flags, updater, fn;
+
+        // If updaters set sprite attributes that trigger other updaters,
+        // those updaters are not called right away, but wait until all current
+        // updaters are called (till the next do/while loop iteration).
+
+        me.callUpdaters = Ext.emptyFn; // Hide class method from the instance.
+
+        do {
+            any = false;
+            for (updater in pendingUpdaters) {
+                any = true;
+                flags = pendingUpdaters[updater];
+                delete pendingUpdaters[updater];
+                fn = updaters[updater];
+                if (typeof fn === 'string') {
+                    fn = me[fn];
+                }
+                if (fn) {
+                    fn.call(me, attr, flags);
+                }
+            }
+            dirty = dirty || any;
+        } while (any);
+
+        delete me.callUpdaters; // Restore class method.
+
+        if (dirty) {
+            me.setDirty(true);
+        }
+    },
+
+<span id='Ext-draw-sprite-Sprite-method-scheduleUpdaters'>    /**
+</span>     * @private
+     * Schedules specified updaters to be called.
+     * Updaters are called implicitly as a result of a change to sprite attributes.
+     * But sometimes it may be required to call an updater without setting an attribute,
+     * and without messing up the updater call order (by calling the updater immediately).
+     * For example:
+     *
+     *     updaters: {
+     *          onDataX: function (attr) {
+     *              this.processDataX();
+     *              // Process data Y every time data X is processed.
+     *              // Call the onDataY updater as if changes to dataY attribute itself
+     *              // triggered the update.
+     *              this.scheduleUpdaters(attr, {onDataY: ['dataY']});
+     *              // Alternatively:
+     *              // this.scheduleUpdaters(attr, ['onDataY'], ['dataY']);
+     *          }
+     *     }
+     *
+     * @param {Object} attr The attributes object (not necesseraly of a sprite, but of its instance).
+     * @param {Object/String[]} updaters A map of updaters to be called to attributes that triggered the update.
+     * @param {String[]} [triggers] Attributes that triggered the update. An optional parameter.
+     * If used, the `updaters` parameter will be treated as an array of updaters to be called.
+     */
+    scheduleUpdaters: function (attr, updaters, triggers) {
+        var updater;
+
+        if (triggers) {
+            for (var i = 0, ln = updaters.length; i &lt; ln; i++) {
+                updater = updaters[i];
+                this.scheduleUpdater(attr, updater, triggers);
+            }
+        } else {
+            for (updater in updaters) {
+                triggers = updaters[updater];
+                this.scheduleUpdater(attr, updater, triggers);
+            }
+        }
+    },
+
+<span id='Ext-draw-sprite-Sprite-method-scheduleUpdater'>    /**
+</span>     * @private
+     * @param attr {Object} The attributes object (not necesseraly of a sprite, but of its instance).
+     * @param updater {String} Updater to be called.
+     * @param {String[]} [triggers] Attributes that triggered the update.
+     */
+    scheduleUpdater: function (attr, updater, triggers) {
+        triggers = triggers || [];
+
+        var pendingUpdaters = attr.pendingUpdaters;
+
+        if (updater in pendingUpdaters) {
+            if (triggers.length) {
+                pendingUpdaters[updater] = Ext.Array.merge(pendingUpdaters[updater], triggers);
+            }
+        } else {
+            pendingUpdaters[updater] = triggers;
+        }
+    },
+
+<span id='Ext-draw-sprite-Sprite-method-setAttributes'>    /**
+</span>     * Set attributes of the sprite.
+     * By default only the attributes that have processors will be set
+     * and all other attributes will be filtered out as a result of the
+     * normalization process.
+     * The normalization process can be skipped. In that case all the given
+     * attributes will be set unprocessed. This will result in better
+     * performance, but might also pollute the sprite's attributes with
+     * unwanted attributes or attributes with invalid values, if one is not
+     * careful. See also {@link #setAttributesBypassingNormalization}.
+     * If normalization is skipped, one may also chose to avoid copying
+     * the given object. This may result in even better performance, but
+     * only in cases where most of the attributes have values that are
+     * different from the old values, because copying additionally checks
+     * if the value has changed.
+     *
+     * @param {Object} changes The content of the change.
+     * @param {Boolean} [bypassNormalization] `true` to avoid normalization of the given changes.
+     * @param {Boolean} [avoidCopy] `true` to avoid copying the `changes` object.
+     * `bypassNormalization` should also be `true`. The content of object may be destroyed.
+     */
+    setAttributes: function (changes, bypassNormalization, avoidCopy) {
+        var attr = this.attr,
+            name, value, obj;
+
+        if (bypassNormalization) {
+            if (avoidCopy) {
+                this.topModifier.pushDown(attr, changes);
+            } else {
+                obj = {};
+                for (name in changes) {
+                    value = changes[name];
+                    if (value !== attr[name]) {
+                        obj[name] = value;
+                    }
+                }
+                this.topModifier.pushDown(attr, obj);
+            }
+        } else {
+            this.topModifier.pushDown(attr, this.self.def.normalize(changes));
+        }
+    },
+
+<span id='Ext-draw-sprite-Sprite-method-setAttributesBypassingNormalization'>    /**
+</span>     * Set attributes of the sprite, assuming the names and values have already been
+     * normalized.
+     *
+     * @deprecated Use setAttributes directy with bypassNormalization argument being `true`.
+     * @param {Object} changes The content of the change.
+     * @param {Boolean} [avoidCopy] `true` to avoid copying the `changes` object.
+     * The content of object may be destroyed.
+     */
+    setAttributesBypassingNormalization: function (changes, avoidCopy) {
+        return this.setAttributes(changes, true, avoidCopy);
+    },
+
+<span id='Ext-draw-sprite-Sprite-method-bboxUpdater'>    /**
+</span>     * @private
+     */
+    bboxUpdater: function (attr) {
+        var hasRotation = attr.rotationRads !== 0,
+            hasScaling = attr.scalingX !== 1 || attr.scalingY !== 1,
+            noRotationCenter = attr.rotationCenterX === null || attr.rotationCenterY === null,
+            noScalingCenter = attr.scalingCenterX === null || attr.scalingCenterY === null;
+
+        // 'bbox' is not a standard attribute (in the sense that it doesn't have
+        // a processor = not explicitly declared and cannot be set by a user)
+        // and is calculated automatically by the 'getBBox' method.
+        // The 'bbox' attribute is created by the 'prepareAttributes' method
+        // of the Target modifier at construction time.
+
+        // Both plain and tranformed bounding boxes need to be updated.
+        // Mark them as such below.
+        attr.bbox.plain.dirty = true;      // updated by the 'updatePlainBBox' method
+
+        // Before transformed bounding box can be updated,
+        // we must ensure that we have correct forward and inverse
+        // transformation matrices (which are also created by the Target modifier),
+        // so that they reflect the current state of the scaling, rotation
+        // and other transformation attributes.
+        // The 'applyTransformations' method does just that.
+
+        // The 'dirtyTransform' flag (another implicit attribute)
+        // is set to true when any of the transformation attributes change,
+        // to let us know that transformation matrices need to be updated.
+
+        attr.bbox.transform.dirty = true;  // updated by the 'updateTransformedBBox' method
+
+        if (hasRotation &amp;&amp; noRotationCenter || hasScaling &amp;&amp; noScalingCenter) {
+            this.scheduleUpdater(attr, 'transform');
+        }
+    },
+
+<span id='Ext-draw-sprite-Sprite-method-getBBox'>    /**
+</span>     * Returns the bounding box for the given Sprite as calculated with the Canvas engine.
+     *
+     * @param {Boolean} [isWithoutTransform] Whether to calculate the bounding box with the current transforms or not.
+     */
+    getBBox: function (isWithoutTransform) {
+        var me = this,
+            attr = me.attr,
+            bbox = attr.bbox,
+            plain = bbox.plain,
+            transform = bbox.transform;
+
+        if (plain.dirty) {
+            me.updatePlainBBox(plain);
+            plain.dirty = false;
+        }
+
+        if (!isWithoutTransform) {
+            // If tranformations are to be applied ('dirtyTransform' is true),
+            // then this will itself call the 'getBBox' method
+            // to get the plain untransformed bbox and calculate its center.
+            me.applyTransformations();
+            if (transform.dirty) {
+                me.updateTransformedBBox(transform, plain);
+                transform.dirty = false;
+            }
+            return transform;
+        }
+
+        return plain;
+    },
+
+<span id='Ext-draw-sprite-Sprite-method-updatePlainBBox'>    /**
+</span>     * @method
+     * @protected
+     * Subclass will fill the plain object with `x`, `y`, `width`, `height` information
+     * of the plain bounding box of this sprite.
+     *
+     * @param {Object} plain Target object.
+     */
+    updatePlainBBox: Ext.emptyFn,
+
+<span id='Ext-draw-sprite-Sprite-method-updateTransformedBBox'>    /**
+</span>     * @protected
+     * Subclass will fill the plain object with `x`, `y`, `width`, `height` information
+     * of the transformed bounding box of this sprite.
+     *
+     * @param {Object} transform Target object (transformed bounding box) to populate.
+     * @param {Object} plain Untransformed bounding box.
+     */
+    updateTransformedBBox: function (transform, plain) {
+        this.attr.matrix.transformBBox(plain, 0, transform);
+    },
+
+<span id='Ext-draw-sprite-Sprite-method-getBBoxCenter'>    /**
+</span>     * Subclass can rewrite this function to gain better performance.
+     * @param {Boolean} isWithoutTransform
+     * @return {Array}
+     */
+    getBBoxCenter: function (isWithoutTransform) {
+        var bbox = this.getBBox(isWithoutTransform);
+        if (bbox) {
+            return [
+                bbox.x + bbox.width * 0.5,
+                bbox.y + bbox.height * 0.5
+            ];
+        } else {
+            return [0, 0];
+        }
+    },
+
+<span id='Ext-draw-sprite-Sprite-method-hide'>    /**
+</span>     * Hide the sprite.
+     * @return {Ext.draw.sprite.Sprite} this
+     * @chainable
+     */
+    hide: function () {
+        this.attr.hidden = true;
+        this.setDirty(true);
+        return this;
+    },
+
+<span id='Ext-draw-sprite-Sprite-method-show'>    /**
+</span>     * Show the sprite.
+     * @return {Ext.draw.sprite.Sprite} this
+     * @chainable
+     */
+    show: function () {
+        this.attr.hidden = false;
+        this.setDirty(true);
+        return this;
+    },
+
+<span id='Ext-draw-sprite-Sprite-method-useAttributes'>    /**
+</span>     * Applies sprite's attributes to the given context.
+     * @param {Object} ctx Context to apply sprite's attributes to.
+     * @param {Array} rect The rect of the context to be affected by gradients.
+     */
+    useAttributes: function (ctx, rect) {
+        this.applyTransformations();
+        var attr = this.attr,
+            canvasAttributes = attr.canvasAttributes,
+            strokeStyle = canvasAttributes.strokeStyle,
+            fillStyle = canvasAttributes.fillStyle,
+            lineDash = canvasAttributes.lineDash,
+            lineDashOffset = canvasAttributes.lineDashOffset,
+            id;
+
+        if (strokeStyle) {
+            if (strokeStyle.isGradient) {
+                ctx.strokeStyle = 'black';
+                ctx.strokeGradient = strokeStyle;
+            } else {
+                ctx.strokeGradient = false;
+            }
+        }
+
+        if (fillStyle) {
+            if (fillStyle.isGradient) {
+                ctx.fillStyle = 'black';
+                ctx.fillGradient = fillStyle;
+            } else {
+                ctx.fillGradient = false;
+            }
+        }
+
+        if (lineDash) {
+            ctx.setLineDash(lineDash);
+        }
+
+        // Only set lineDashOffset to contexts that support the property (excludes VML).
+        if (Ext.isNumber(lineDashOffset + ctx.lineDashOffset)) {
+            ctx.lineDashOffset = lineDashOffset;
+        }
+
+        for (id in canvasAttributes) {
+            if (canvasAttributes[id] !== undefined &amp;&amp; canvasAttributes[id] !== ctx[id]) {
+                ctx[id] = canvasAttributes[id];
+            }
+        }
+
+        this.setGradientBBox(ctx, rect);
+    },
+
+<span id='Ext-draw-sprite-Sprite-method-setGradientBBox'>    setGradientBBox: function (ctx, rect) {
+</span>        var attr = this.attr;
+        if (attr.constrainGradients) {
+            ctx.setGradientBBox({x: rect[0], y: rect[1], width: rect[2], height: rect[3]});
+        } else {
+            ctx.setGradientBBox(this.getBBox(attr.transformFillStroke));
+        }
+    },
+
+<span id='Ext-draw-sprite-Sprite-method-applyTransformations'>    /**
+</span>     * @private
+     *
+     * Calculates forward and inverse transform matrices from sprite's attributes.
+     * Transformations are applied in the following order: Scaling, Rotation, Translation.
+     * @param {Boolean} [force=false] Forces recalculation of transform matrices even when
+     * sprite's transform attributes supposedly haven't changed.
+     */
+    applyTransformations: function (force) {
+        if (!force &amp;&amp; !this.attr.dirtyTransform) {
+            return;
+        }
+        var me = this,
+            attr = me.attr,
+            center = me.getBBoxCenter(true),
+            centerX = center[0],
+            centerY = center[1],
+
+            tx = attr.translationX,
+            ty = attr.translationY,
+
+            sx = attr.scalingX,
+            sy = attr.scalingY === null ? attr.scalingX : attr.scalingY,
+            scx = attr.scalingCenterX === null ? centerX : attr.scalingCenterX,
+            scy = attr.scalingCenterY === null ? centerY : attr.scalingCenterY,
+
+            rad = attr.rotationRads,
+            rcx = attr.rotationCenterX === null ? centerX : attr.rotationCenterX,
+            rcy = attr.rotationCenterY === null ? centerY : attr.rotationCenterY,
+
+            cos = Math.cos(rad),
+            sin = Math.sin(rad),
+
+            tx_4, ty_4;
+
+        if (sx === 1 &amp;&amp; sy === 1) {
+            scx = 0;
+            scy = 0;
+        }
+
+        if (rad === 0) {
+            rcx = 0;
+            rcy = 0;
+        }
+
+        // Translation component after steps 1-4 (see below).
+        // Saving it here to prevent double calculation.
+        tx_4 = scx * (1 - sx) - rcx;
+        ty_4 = scy * (1 - sy) - rcy;
+
+        // The matrix below is a result of:
+        //     (7)          (6)             (5)             (4)           (3)           (2)           (1)
+        // | 1 0 tx |   | 1 0 rcx |   | cos -sin 0 |   | 1 0 -rcx |   | 1 0 scx |   | sx 0 0 |   | 1 0 -scx |
+        // | 0 1 ty | * | 0 1 rcy | * | sin  cos 0 | * | 0 1 -rcy | * | 0 1 scy | * | 0 sy 0 | * | 0 1 -scy |
+        // | 0 0  1 |   | 0 0  1  |   |  0    0  1 |   | 0 0  1   |   | 0 0  1  |   | 0  0 0 |   | 0 0  1   |
+        attr.matrix.elements = [
+            cos * sx, sin * sx,
+            -sin * sy, cos * sy,
+            cos * tx_4 - sin * ty_4 + rcx + tx,
+            sin * tx_4 + cos * ty_4 + rcy + ty
+        ];
+        attr.matrix.inverse(attr.inverseMatrix);
+        attr.dirtyTransform = false;
+        attr.bbox.transform.dirty = true;
+    },
+
+<span id='Ext-draw-sprite-Sprite-method-transform'>    /**
+</span>     * Pre-multiplies the current transformation matrix of a sprite with the given matrix.
+     * If `isSplit` parameter is `true`, the resulting matrix is also split into
+     * individual components (scaling, rotation, translation) and corresponding sprite
+     * attributes are updated. The shearing component is not extracted.
+     * Note, that transformation attributes work as if transformations are applied to the
+     * local coordinate system of a sprite, while matrix transformations transform
+     * the global coordinate space or the surface grid.
+     * Since the `transform` method returns the sprite itself, calls to the method
+     * can be chained. And if updating sprite transformation attributes is desired,
+     * it can be achieved by setting the `isSplit` parameter of the last call to `true`.
+     * For example:
+     *
+     *     sprite.transform(matrixA).transform(matrixB).transform(matrixC, true);
+     * 
+     * See also: {@link #setTransform}
+     *
+     * @param {Ext.draw.Matrix/Number[]} matrix A transformation matrix or array of its elements.
+     * @param {Boolean} [isSplit=false] If 'true', transformation attributes are updated.
+     * @return {Ext.draw.sprite.Sprite} This sprite.
+     */
+    transform: function (matrix, isSplit) {
+        var attr = this.attr,
+            spriteMatrix = attr.matrix,
+            elements;
+
+        if (matrix &amp;&amp; matrix.isMatrix) {
+            elements = matrix.elements;
+        } else {
+            elements = matrix;
+        }
+        //&lt;debug&gt;
+        if (!(Ext.isArray(elements) &amp;&amp; elements.length === 6)) {
+            Ext.raise(&quot;An instance of Ext.draw.Matrix or an array of 6 numbers is expected.&quot;);
+        }
+        //&lt;/debug&gt;
+
+        spriteMatrix.prepend.apply(spriteMatrix, elements.slice());
+        spriteMatrix.inverse(attr.inverseMatrix);
+
+        if (isSplit) {
+            this.updateTransformAttributes();
+        }
+
+        attr.dirtyTransform = false;
+        attr.bbox.transform.dirty = true;
+
+        this.setDirty(true);
+
+        return this;
+    },
+
+<span id='Ext-draw-sprite-Sprite-method-updateTransformAttributes'>    /**
+</span>     * @private
+     */
+    updateTransformAttributes: function () {
+        var attr = this.attr,
+            split = attr.matrix.split();
+
+        attr.rotationRads = split.rotate;
+        attr.rotationCenterX = 0;
+        attr.rotationCenterY = 0;
+        attr.scalingX = split.scaleX;
+        attr.scalingY = split.scaleY;
+        attr.scalingCenterX = 0;
+        attr.scalingCenterY = 0;
+        attr.translationX = split.translateX;
+        attr.translationY = split.translateY;
+    },
+
+<span id='Ext-draw-sprite-Sprite-method-resetTransform'>    /**
+</span>     * Resets current transformation matrix of a sprite to the identify matrix.
+     * @param {Boolean} [isSplit=false] If 'true', transformation attributes are updated.
+     * @return {Ext.draw.sprite.Sprite} This sprite.
+     */
+    resetTransform: function (isSplit) {
+        var attr = this.attr;
+
+        attr.matrix.reset();
+        attr.inverseMatrix.reset();
+
+        if (!isSplit) {
+            this.updateTransformAttributes();
+        }
+
+        attr.dirtyTransform = false;
+        attr.bbox.transform.dirty = true;
+
+        this.setDirty(true);
+
+        return this;
+    },
+
+<span id='Ext-draw-sprite-Sprite-method-setTransform'>    /**
+</span>     * Resets current transformation matrix of a sprite to the identify matrix
+     * and pre-multiplies it with the given matrix.
+     * This is effectively the same as calling {@link #resetTransform},
+     * followed by {@link #transform} with the same arguments.
+     * 
+     * See also: {@link #transform}
+     * 
+     *     var drawContainer = new Ext.draw.Container({
+     *         renderTo: Ext.getBody(),
+     *         width: 380,
+     *         height: 380,
+     *         sprites: [{
+     *             type: 'rect',
+     *             width: 100,
+     *             height: 100,
+     *             fillStyle: 'red'
+     *         }]
+     *     });
+     *     
+     *     var main = drawContainer.getSurface();
+     *     var rect = main.getItems()[0];
+     *     
+     *     var m = new Ext.draw.Matrix().rotate(Math.PI, 100, 100);
+     *     
+     *     rect.setTransform(m);
+     *     main.renderFrame();
+     * 
+     * There may be times where the transformation you need to apply cannot easily be 
+     * accomplished using the sprite’s convenience transform methods.  Or, you may want 
+     * to pass a matrix directly to the sprite in order to set a transformation.  The 
+     * `setTransform` method allows for this sort of advanced usage as well.  The 
+     * following tables show each transformation matrix used when applying 
+     * transformations to a sprite.
+     * 
+     * ### Translate
+     * &lt;table style=&quot;text-align: center;&quot;&gt;
+     *     &lt;tr&gt;
+     *         &lt;td style=&quot;font-weight: normal;&quot;&gt;1&lt;/td&gt;
+     *         &lt;td style=&quot;font-weight: normal;&quot;&gt;0&lt;/td&gt;
+     *         &lt;td style=&quot;font-weight: normal;&quot;&gt;tx&lt;/td&gt;
+     *     &lt;/tr&gt;
+     *     &lt;tr&gt;
+     *         &lt;td&gt;0&lt;/td&gt;
+     *         &lt;td&gt;1&lt;/td&gt;
+     *         &lt;td&gt;ty&lt;/td&gt;
+     *     &lt;/tr&gt;
+     *     &lt;tr&gt;
+     *         &lt;td&gt;0&lt;/td&gt;
+     *         &lt;td&gt;0&lt;/td&gt;
+     *         &lt;td&gt;1&lt;/td&gt;
+     *     &lt;/tr&gt;
+     * &lt;/table&gt;
+     * 
+     * ### Rotate (θ is the angle of rotation)
+     * &lt;table style=&quot;text-align: center;&quot;&gt;
+     *     &lt;tr&gt;
+     *         &lt;td style=&quot;font-weight: normal;&quot;&gt;cos(θ)&lt;/td&gt;
+     *         &lt;td style=&quot;font-weight: normal;&quot;&gt;-sin(θ)&lt;/td&gt;
+     *         &lt;td style=&quot;font-weight: normal;&quot;&gt;0&lt;/td&gt;
+     *     &lt;/tr&gt;
+     *     &lt;tr&gt;
+     *         &lt;td&gt;0&lt;/td&gt;
+     *         &lt;td&gt;cos(θ)&lt;/td&gt;
+     *         &lt;td&gt;0&lt;/td&gt;
+     *     &lt;/tr&gt;
+     *     &lt;tr&gt;
+     *         &lt;td&gt;0&lt;/td&gt;
+     *         &lt;td&gt;0&lt;/td&gt;
+     *         &lt;td&gt;1&lt;/td&gt;
+     *     &lt;/tr&gt;
+     * &lt;/table&gt;
+     * 
+     * ### Scale
+     * &lt;table style=&quot;text-align: center;&quot;&gt;
+     *     &lt;tr&gt;
+     *         &lt;td style=&quot;font-weight: normal;&quot;&gt;sx&lt;/td&gt;
+     *         &lt;td style=&quot;font-weight: normal;&quot;&gt;0&lt;/td&gt;
+     *         &lt;td style=&quot;font-weight: normal;&quot;&gt;0&lt;/td&gt;
+     *     &lt;/tr&gt;
+     *     &lt;tr&gt;
+     *         &lt;td&gt;0&lt;/td&gt;
+     *         &lt;td&gt;cos(θ)&lt;/td&gt;
+     *         &lt;td&gt;0&lt;/td&gt;
+     *     &lt;/tr&gt;
+     *     &lt;tr&gt;
+     *         &lt;td&gt;0&lt;/td&gt;
+     *         &lt;td&gt;0&lt;/td&gt;
+     *         &lt;td&gt;1&lt;/td&gt;
+     *     &lt;/tr&gt;
+     * &lt;/table&gt;
+     * 
+     * ### Shear X _(λ is the distance on the x axis to shear by)_
+     * &lt;table style=&quot;text-align: center;&quot;&gt;
+     *     &lt;tr&gt;
+     *         &lt;td style=&quot;font-weight: normal;&quot;&gt;1&lt;/td&gt;
+     *         &lt;td style=&quot;font-weight: normal;&quot;&gt;λx&lt;/td&gt;
+     *         &lt;td style=&quot;font-weight: normal;&quot;&gt;0&lt;/td&gt;
+     *     &lt;/tr&gt;
+     *     &lt;tr&gt;
+     *         &lt;td&gt;0&lt;/td&gt;
+     *         &lt;td&gt;1&lt;/td&gt;
+     *         &lt;td&gt;0&lt;/td&gt;
+     *     &lt;/tr&gt;
+     *     &lt;tr&gt;
+     *         &lt;td&gt;0&lt;/td&gt;
+     *         &lt;td&gt;0&lt;/td&gt;
+     *         &lt;td&gt;1&lt;/td&gt;
+     *     &lt;/tr&gt;
+     * &lt;/table&gt;
+     * 
+     * ### Shear Y (λ is the distance on the y axis to shear by)
+     * &lt;table style=&quot;text-align: center;&quot;&gt;
+     *     &lt;tr&gt;
+     *         &lt;td style=&quot;font-weight: normal;&quot;&gt;1&lt;/td&gt;
+     *         &lt;td style=&quot;font-weight: normal;&quot;&gt;0&lt;/td&gt;
+     *         &lt;td style=&quot;font-weight: normal;&quot;&gt;0&lt;/td&gt;
+     *     &lt;/tr&gt;
+     *     &lt;tr&gt;
+     *         &lt;td&gt;λy&lt;/td&gt;
+     *         &lt;td&gt;1&lt;/td&gt;
+     *         &lt;td&gt;0&lt;/td&gt;
+     *     &lt;/tr&gt;
+     *     &lt;tr&gt;
+     *         &lt;td&gt;0&lt;/td&gt;
+     *         &lt;td&gt;0&lt;/td&gt;
+     *         &lt;td&gt;1&lt;/td&gt;
+     *     &lt;/tr&gt;
+     * &lt;/table&gt;
+     * 
+     * ### Skew X (θ is the angle to skew by)
+     * &lt;table style=&quot;text-align: center;&quot;&gt;
+     *     &lt;tr&gt;
+     *         &lt;td style=&quot;font-weight: normal;&quot;&gt;1&lt;/td&gt;
+     *         &lt;td style=&quot;font-weight: normal;&quot;&gt;tan(θ)&lt;/td&gt;
+     *         &lt;td style=&quot;font-weight: normal;&quot;&gt;0&lt;/td&gt;
+     *     &lt;/tr&gt;
+     *     &lt;tr&gt;
+     *         &lt;td&gt;0&lt;/td&gt;
+     *         &lt;td&gt;1&lt;/td&gt;
+     *         &lt;td&gt;0&lt;/td&gt;
+     *     &lt;/tr&gt;
+     *     &lt;tr&gt;
+     *         &lt;td&gt;0&lt;/td&gt;
+     *         &lt;td&gt;0&lt;/td&gt;
+     *         &lt;td&gt;1&lt;/td&gt;
+     *     &lt;/tr&gt;
+     * &lt;/table&gt;
+     * 
+     * ### Skew Y (θ is the angle to skew by)
+     * &lt;table style=&quot;text-align: center;&quot;&gt;
+     *     &lt;tr&gt;
+     *         &lt;td style=&quot;font-weight: normal;&quot;&gt;1&lt;/td&gt;
+     *         &lt;td style=&quot;font-weight: normal;&quot;&gt;0&lt;/td&gt;
+     *         &lt;td style=&quot;font-weight: normal;&quot;&gt;0&lt;/td&gt;
+     *     &lt;/tr&gt;
+     *     &lt;tr&gt;
+     *         &lt;td&gt;tan(θ)&lt;/td&gt;
+     *         &lt;td&gt;1&lt;/td&gt;
+     *         &lt;td&gt;0&lt;/td&gt;
+     *     &lt;/tr&gt;
+     *     &lt;tr&gt;
+     *         &lt;td&gt;0&lt;/td&gt;
+     *         &lt;td&gt;0&lt;/td&gt;
+     *         &lt;td&gt;1&lt;/td&gt;
+     *     &lt;/tr&gt;
+     * &lt;/table&gt;
+     * 
+     * Multiplying matrices for translation, rotation, scaling, and shearing / skewing 
+     * any number of times in the desired order produces a single matrix for a composite 
+     * transformation.  You can use the product as a value for the `setTransform`method 
+     * of a sprite:
+     * 
+     *     mySprite.setTransform([a, b, c, d, e, f]);
+     * 
+     * Where `a`, `b`, `c`, `d`, `e`, `f` are numeric values that correspond to the 
+     * following transformation matrix components:
+     * 
+     * &lt;table style=&quot;text-align: center;&quot;&gt;
+     *     &lt;tr&gt;
+     *         &lt;td style=&quot;font-weight: normal;&quot;&gt;a&lt;/td&gt;
+     *         &lt;td style=&quot;font-weight: normal;&quot;&gt;c&lt;/td&gt;
+     *         &lt;td style=&quot;font-weight: normal;&quot;&gt;e&lt;/td&gt;
+     *     &lt;/tr&gt;
+     *     &lt;tr&gt;
+     *         &lt;td&gt;b&lt;/td&gt;
+     *         &lt;td&gt;d&lt;/td&gt;
+     *         &lt;td&gt;f&lt;/td&gt;
+     *     &lt;/tr&gt;
+     *     &lt;tr&gt;
+     *         &lt;td&gt;0&lt;/td&gt;
+     *         &lt;td&gt;0&lt;/td&gt;
+     *         &lt;td&gt;1&lt;/td&gt;
+     *     &lt;/tr&gt;
+     * &lt;/table&gt;
+     * 
+     * @param {Ext.draw.Matrix/Number[]} matrix The transformation matrix to apply or its 
+     * raw elements as an array.
+     * @param {Boolean} [isSplit=false] If `true`, transformation attributes are updated.
+     * @return {Ext.draw.sprite.Sprite} This sprite.
+     */
+    setTransform: function (matrix, isSplit) {
+        this.resetTransform(true);
+        this.transform.call(this, matrix, isSplit);
+
+        return this;
+    },
+
+<span id='Ext-draw-sprite-Sprite-method-preRender'>    /**
+</span>     * Called before rendering.
+     */
+    preRender: Ext.emptyFn,
+
+<span id='Ext-draw-sprite-Sprite-method-render'>    /**
+</span>     * @method
+     * Render method.
+     * @param {Ext.draw.Surface} surface The surface.
+     * @param {Object} ctx A context object compatible with CanvasRenderingContext2D.
+     * @param {Array} rect The clip rect (or called dirty rect) of the current rendering. Not to be confused
+     * with `surface.getRect()`.
+     *
+     * @return {*} returns `false` to stop rendering in this frame.
+     * All the sprites that haven't been rendered will have their dirty flag untouched.
+     */
+    render: Ext.emptyFn,
+
+    //&lt;debug&gt;
+<span id='Ext-draw-sprite-Sprite-method-renderBBox'>    /**
+</span>     * @private
+     * Renders the bounding box of transformed sprite.
+     */
+    renderBBox: function (surface, ctx) {
+        var bbox = this.getBBox();
+
+        ctx.beginPath();
+        ctx.moveTo(bbox.x, bbox.y);
+        ctx.lineTo(bbox.x + bbox.width, bbox.y);
+        ctx.lineTo(bbox.x + bbox.width, bbox.y + bbox.height);
+        ctx.lineTo(bbox.x, bbox.y + bbox.height);
+        ctx.closePath();
+
+        ctx.strokeStyle = 'red';
+        ctx.strokeOpacity = 1;
+        ctx.lineWidth = 0.5;
+
+        ctx.stroke();
+    },
+    //&lt;/debug&gt;
+
+<span id='Ext-draw-sprite-Sprite-method-hitTest'>    /**
+</span>     * Performs a hit test on the sprite.
+     * @param {Array} point A two-item array containing x and y coordinates of the point.
+     * @param {Object} options Hit testing options.
+     * @return {Object} A hit result object that contains more information about what
+     * exactly was hit or null if nothing was hit.
+     */
+    hitTest: function (point, options) {
+        // Meant to be overridden in subclasses for more precise hit testing.
+        // This version doesn't take any options and simply hit tests sprite's
+        // bounding box, if the sprite is visible.
+        if (this.isVisible()) {
+            var x = point[0],
+                y = point[1],
+                bbox = this.getBBox(),
+                isBBoxHit = bbox &amp;&amp; x &gt;= bbox.x &amp;&amp; x &lt;= (bbox.x + bbox.width) &amp;&amp;
+                                    y &gt;= bbox.y &amp;&amp; y &lt;= (bbox.y + bbox.height);
+            if (isBBoxHit) {
+                return {
+                    sprite: this
+                };
+            }
+        }
+        return null;
+    },
+
+<span id='Ext-draw-sprite-Sprite-method-isVisible'>    /**
+</span>     * @private
+     * Checks if the sprite can be seen.
+     * This includes the `hidden` attribute check, alpha/opacity checks,
+     * fill/stroke color checks and surface/parent checks.
+     * The method doesn't check if the sprite is off-screen.
+     * @return {Boolean} Returns `true`, if the sprite can be seen.
+     */
+    isVisible: function () {
+        var attr = this.attr,
+            parent = this.getParent(),
+            hasParent = parent &amp;&amp; (parent.isSurface || parent.isVisible()),
+            isSeen = hasParent &amp;&amp; !attr.hidden &amp;&amp; attr.globalAlpha,
+            none1 = Ext.draw.Color.NONE,
+            none2 = Ext.draw.Color.RGBA_NONE,
+            hasFill = attr.fillOpacity &amp;&amp; attr.fillStyle !== none1 &amp;&amp; attr.fillStyle !== none2,
+            hasStroke = attr.strokeOpacity &amp;&amp; attr.strokeStyle !== none1 &amp;&amp; attr.strokeStyle !== none2,
+            result = isSeen &amp;&amp; (hasFill || hasStroke);
+
+        return !!result;
+    },
+
+<span id='Ext-draw-sprite-Sprite-method-repaint'>    repaint: function () {
+</span>        var surface = this.getSurface();
+        if (surface) {
+            surface.renderFrame();
+        }
+    },
+
+<span id='Ext-draw-sprite-Sprite-method-remove'>    /**
+</span>     * Removes this sprite from its surface.
+     * The sprite itself is not destroyed.
+     * @returns {Ext.draw.sprite.Sprite} Returns the removed sprite or `null` otherwise.
+     */
+    remove: function () {
+        var surface = this.getSurface();
+
+        if (surface &amp;&amp; surface.isSurface) {
+            return surface.remove(this);
+        }
+
+        return null;
+    },
+
+<span id='Ext-draw-sprite-Sprite-method-destroy'>    /**
+</span>     * Removes the sprite and clears all listeners.
+     */
+    destroy: function () {
+        var me = this,
+            modifier = me.topModifier,
+            currentModifier;
+
+        while (modifier) {
+            currentModifier = modifier;
+            modifier = modifier.getPrevious();
+            currentModifier.destroy();
+        }
+
+        delete me.attr;
+
+        me.remove();
+
+        if (me.fireEvent('beforedestroy', me) !== false) {
+            me.fireEvent('destroy', me);
+        }
+
+        me.callParent();
+    }
+}, function () { // onClassCreated
+    // Create one AttributeDefinition instance per sprite class when a class is created
+    // and replace the `def` config with the instance that was created using that config.
+    // Here we only create an AttributeDefinition instance for the base Sprite class,
+    // attribute definitions for subclasses are created inside onClassExtended method.
+    this.def = new Ext.draw.sprite.AttributeDefinition(this.def);
+    this.def.spriteClass = this;
+});
+
+</pre>
+</body>
+</html>

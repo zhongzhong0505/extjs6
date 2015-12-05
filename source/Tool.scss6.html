@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>The source code</title>
+  <link href="../resources/prettify/prettify.css" type="text/css" rel="stylesheet" />
+  <script type="text/javascript" src="../resources/prettify/prettify.js"></script>
+  <style type="text/css">
+    .highlight { display: block; background-color: #ddd; }
+  </style>
+  <script type="text/javascript">
+    function highlight() {
+      document.getElementById(location.hash.replace(/#/, "")).className = "highlight";
+    }
+  </script>
+</head>
+<body onload="prettyPrint(); highlight();">
+  <pre class="prettyprint lang-js"><span id='Ext-panel-Tool'>/**
+</span> * @class Ext.panel.Tool
+ */
+
+<span id='Ext-panel-Tool-css_var-S-tool-size'>/**
+</span> * @var {number}
+ * The size of Tools
+ */
+$tool-size: dynamic(16px);
+
+<span id='Ext-panel-Tool-css_var-S-tool-include-hover-icons'>/**
+</span> * @var {boolean}
+ * True to change the background-position of the Tool on hover. Allows for a separate
+ * hover state icon in the sprite.
+ */
+$tool-include-hover-icons: dynamic(true);
+
+<span id='Ext-panel-Tool-css_var-S-tool-cursor'>/**
+</span> * @var {string}
+ * The cursor to display when the mouse cursor is over a Tool
+ */
+$tool-cursor: dynamic(pointer);
+
+<span id='Ext-panel-Tool-css_var-S-tool-opacity'>/**
+</span> * @var {number}
+ * The opacity of Tools
+ */
+$tool-opacity: dynamic(1);
+
+<span id='Ext-panel-Tool-css_var-S-tool-opacity-over'>/**
+</span> * @var {number}
+ * The opacity of hovered Tools
+ */
+$tool-opacity-over: dynamic(1);
+
+<span id='Ext-panel-Tool-css_var-S-tool-opacity-pressed'>/**
+</span> * @var {number}
+ * The opacity of pressed Tools
+ */
+$tool-opacity-pressed: dynamic(1);
+
+<span id='Ext-panel-Tool-css_var-S-tool-background-image'>/**
+</span> * @var {string}
+ * The sprite to use as the background-image for Tools
+ */
+$tool-background-image: dynamic('tools/tool-sprites');
+
+<span id='Ext-panel-Tool-css_var-S-tool-glyph-color'>/**
+</span> * @var {color}
+ * The color to use for tool icons when {@link Global_CSS#$enable-font-icons} is `true`.
+ */
+$tool-glyph-color: dynamic(#fff);
+
+<span id='Ext-panel-Tool-css_var-S-tool-glyph-font-size'>/**
+</span> * @var {number}
+ * The font size to use for tool icons when {@link Global_CSS#$enable-font-icons} is `true`.
+ */
+$tool-glyph-font-size: dynamic(16px);
+
+<span id='Ext-panel-Tool-css_var-S-tool-close-glyph'>/**
+</span> * @var {string/list}
+ * Glyph for the &quot;close&quot; tool icon when {@link Global_CSS#$enable-font-icons} is `true`.
+ */
+$tool-close-glyph: dynamic($fa-var-close $tool-glyph-font-size $font-icon-font-family);
+
+<span id='Ext-panel-Tool-css_var-S-tool-minimize-glyph'>/**
+</span> * @var {string/list}
+ * Glyph for the &quot;minimize&quot; tool icon when {@link Global_CSS#$enable-font-icons} is `true`.
+ */
+$tool-minimize-glyph: dynamic($ext-var-minimize $tool-glyph-font-size ExtJS);
+
+<span id='Ext-panel-Tool-css_var-S-tool-maximize-glyph'>/**
+</span> * @var {string/list}
+ * Glyph for the &quot;maximize&quot; tool icon when {@link Global_CSS#$enable-font-icons} is `true`.
+ */
+$tool-maximize-glyph: dynamic($fa-var-expand $tool-glyph-font-size $font-icon-font-family);
+
+<span id='Ext-panel-Tool-css_var-S-tool-restore-glyph'>/**
+</span> * @var {string/list}
+ * Glyph for the &quot;restore&quot; tool icon when {@link Global_CSS#$enable-font-icons} is `true`.
+ */
+$tool-restore-glyph: dynamic($fa-var-compress $tool-glyph-font-size $font-icon-font-family);
+
+<span id='Ext-panel-Tool-css_var-S-tool-toggle-up-glyph'>/**
+</span> * @var {string/list}
+ * Glyph for the up &quot;toggle&quot; tool icon when {@link Global_CSS#$enable-font-icons} is `true`.
+ */
+$tool-toggle-up-glyph: dynamic($fa-var-chevron-up $tool-glyph-font-size $font-icon-font-family);
+
+<span id='Ext-panel-Tool-css_var-S-tool-toggle-down-glyph'>/**
+</span> * @var {string/list}
+ * Glyph for the down &quot;toggle&quot; tool icon when {@link Global_CSS#$enable-font-icons} is `true`.
+ */
+$tool-toggle-down-glyph: dynamic($fa-var-chevron-down $tool-glyph-font-size $font-icon-font-family);
+
+<span id='Ext-panel-Tool-css_var-S-tool-gear-glyph'>/**
+</span> * @var {string/list}
+ * Glyph for the &quot;gear&quot; tool icon when {@link Global_CSS#$enable-font-icons} is `true`.
+ */
+$tool-gear-glyph: dynamic($fa-var-cog $tool-glyph-font-size $font-icon-font-family);
+
+<span id='Ext-panel-Tool-css_var-S-tool-prev-glyph'>/**
+</span> * @var {string/list}
+ * Glyph for the &quot;prev&quot; tool icon when {@link Global_CSS#$enable-font-icons} is `true`.
+ */
+$tool-prev-glyph: dynamic($fa-var-chevron-left $tool-glyph-font-size $font-icon-font-family);
+
+<span id='Ext-panel-Tool-css_var-S-tool-next-glyph'>/**
+</span> * @var {string/list}
+ * Glyph for the &quot;next&quot; tool icon when {@link Global_CSS#$enable-font-icons} is `true`.
+ */
+$tool-next-glyph: dynamic($fa-var-chevron-right $tool-glyph-font-size $font-icon-font-family);
+
+<span id='Ext-panel-Tool-css_var-S-tool-pin-glyph'>/**
+</span> * @var {string/list}
+ * Glyph for the &quot;pin&quot; tool icon when {@link Global_CSS#$enable-font-icons} is `true`.
+ */
+$tool-pin-glyph: dynamic($fa-var-thumb-tack $tool-glyph-font-size $font-icon-font-family);
+
+<span id='Ext-panel-Tool-css_var-S-tool-unpin-glyph'>/**
+</span> * @var {string/list}
+ * Glyph for the &quot;unpin&quot; tool icon when {@link Global_CSS#$enable-font-icons} is `true`.
+ */
+$tool-unpin-glyph: dynamic($ext-var-unpin $tool-glyph-font-size ExtJS);
+
+<span id='Ext-panel-Tool-css_var-S-tool-right-glyph'>/**
+</span> * @var {string/list}
+ * Glyph for the &quot;right&quot; tool icon when {@link Global_CSS#$enable-font-icons} is `true`.
+ */
+$tool-right-glyph: dynamic($fa-var-caret-right $tool-glyph-font-size $font-icon-font-family);
+
+<span id='Ext-panel-Tool-css_var-S-tool-left-glyph'>/**
+</span> * @var {string/list}
+ * Glyph for the &quot;left&quot; tool icon when {@link Global_CSS#$enable-font-icons} is `true`.
+ */
+$tool-left-glyph: dynamic($fa-var-caret-left $tool-glyph-font-size $font-icon-font-family);
+
+<span id='Ext-panel-Tool-css_var-S-tool-down-glyph'>/**
+</span> * @var {string/list}
+ * Glyph for the &quot;down&quot; tool icon when {@link Global_CSS#$enable-font-icons} is `true`.
+ */
+$tool-down-glyph: dynamic($fa-var-caret-down $tool-glyph-font-size $font-icon-font-family);
+
+<span id='Ext-panel-Tool-css_var-S-tool-up-glyph'>/**
+</span> * @var {string/list}
+ * Glyph for the &quot;up&quot; tool icon when {@link Global_CSS#$enable-font-icons} is `true`.
+ */
+$tool-up-glyph: dynamic($fa-var-caret-up $tool-glyph-font-size $font-icon-font-family);
+
+<span id='Ext-panel-Tool-css_var-S-tool-refresh-glyph'>/**
+</span> * @var {string/list}
+ * Glyph for the &quot;refresh&quot; tool icon when {@link Global_CSS#$enable-font-icons} is `true`.
+ */
+$tool-refresh-glyph: dynamic($fa-var-refresh $tool-glyph-font-size $font-icon-font-family);
+
+<span id='Ext-panel-Tool-css_var-S-tool-plus-glyph'>/**
+</span> * @var {string/list}
+ * Glyph for the &quot;plus&quot; tool icon when {@link Global_CSS#$enable-font-icons} is `true`.
+ */
+$tool-plus-glyph: dynamic($fa-var-plus $tool-glyph-font-size $font-icon-font-family);
+
+<span id='Ext-panel-Tool-css_var-S-tool-minus-glyph'>/**
+</span> * @var {string/list}
+ * Glyph for the &quot;minus&quot; tool icon when {@link Global_CSS#$enable-font-icons} is `true`.
+ */
+$tool-minus-glyph: dynamic($fa-var-minus $tool-glyph-font-size $font-icon-font-family);
+
+<span id='Ext-panel-Tool-css_var-S-tool-search-glyph'>/**
+</span> * @var {string/list}
+ * Glyph for the &quot;search&quot; tool icon when {@link Global_CSS#$enable-font-icons} is `true`.
+ */
+$tool-search-glyph: dynamic($fa-var-search $tool-glyph-font-size $font-icon-font-family);
+
+<span id='Ext-panel-Tool-css_var-S-tool-save-glyph'>/**
+</span> * @var {string/list}
+ * Glyph for the &quot;save&quot; tool icon when {@link Global_CSS#$enable-font-icons} is `true`.
+ */
+$tool-save-glyph: dynamic($fa-var-check $tool-glyph-font-size $font-icon-font-family);
+
+<span id='Ext-panel-Tool-css_var-S-tool-help-glyph'>/**
+</span> * @var {string/list}
+ * Glyph for the &quot;help&quot; tool icon when {@link Global_CSS#$enable-font-icons} is `true`.
+ */
+$tool-help-glyph: dynamic($fa-var-question $tool-glyph-font-size $font-icon-font-family);
+
+<span id='Ext-panel-Tool-css_var-S-tool-print-glyph'>/**
+</span> * @var {string/list}
+ * Glyph for the &quot;print&quot; tool icon when {@link Global_CSS#$enable-font-icons} is `true`.
+ */
+$tool-print-glyph: dynamic($fa-var-print $tool-glyph-font-size $font-icon-font-family);
+
+<span id='Ext-panel-Tool-css_var-S-tool-expand-glyph'>/**
+</span> * @var {string/list}
+ * Glyph for the &quot;expand&quot; tool icon when {@link Global_CSS#$enable-font-icons} is `true`.
+ */
+$tool-expand-glyph: dynamic($ext-var-expand $tool-glyph-font-size ExtJS);
+
+<span id='Ext-panel-Tool-css_var-S-tool-collapse-glyph'>/**
+</span> * @var {string/list}
+ * Glyph for the &quot;collapse&quot; tool icon when {@link Global_CSS#$enable-font-icons} is `true`.
+ */
+$tool-collapse-glyph: dynamic($ext-var-collapse $tool-glyph-font-size ExtJS);
+
+<span id='Ext-panel-Tool-css_var-S-tool-resize-glyph'>/**
+</span> * @var {string/list}
+ * Glyph for the &quot;resize&quot; tool icon when {@link Global_CSS#$enable-font-icons} is `true`.
+ */
+$tool-resize-glyph: dynamic($fa-var-arrows-h $tool-glyph-font-size $font-icon-font-family);
+
+<span id='Ext-panel-Tool-css_var-S-tool-move-glyph'>/**
+</span> * @var {string/list}
+ * Glyph for the &quot;move&quot; tool icon when {@link Global_CSS#$enable-font-icons} is `true`.
+ */
+$tool-move-glyph: dynamic($fa-var-arrows $tool-glyph-font-size $font-icon-font-family);
+
+<span id='Ext-panel-Tool-css_var-S-tool-expand-bottom-glyph'>/**
+</span> * @var {string/list}
+ * Glyph for the downward &quot;expand&quot; tool icon when {@link Global_CSS#$enable-font-icons} is `true`.
+ */
+$tool-expand-bottom-glyph: dynamic($fa-var-caret-down $tool-glyph-font-size $font-icon-font-family);
+
+<span id='Ext-panel-Tool-css_var-S-tool-collapse-bottom-glyph'>/**
+</span> * @var {string/list}
+ * Glyph for the downward &quot;collapse&quot; tool icon when {@link Global_CSS#$enable-font-icons} is `true`.
+ */
+$tool-collapse-bottom-glyph: dynamic($fa-var-caret-down $tool-glyph-font-size $font-icon-font-family);
+
+<span id='Ext-panel-Tool-css_var-S-tool-expand-top-glyph'>/**
+</span> * @var {string/list}
+ * Glyph for the upward &quot;expand&quot; tool icon when {@link Global_CSS#$enable-font-icons} is `true`.
+ */
+$tool-expand-top-glyph: dynamic($fa-var-caret-up $tool-glyph-font-size $font-icon-font-family);
+
+<span id='Ext-panel-Tool-css_var-S-tool-collapse-top-glyph'>/**
+</span> * @var {string/list}
+ * Glyph for the upward &quot;collapse&quot; tool icon when {@link Global_CSS#$enable-font-icons} is `true`.
+ */
+$tool-collapse-top-glyph: dynamic($fa-var-caret-up $tool-glyph-font-size $font-icon-font-family);
+
+<span id='Ext-panel-Tool-css_var-S-tool-expand-left-glyph'>/**
+</span> * @var {string/list}
+ * Glyph for the left &quot;expand&quot; tool icon when {@link Global_CSS#$enable-font-icons} is `true`.
+ */
+$tool-expand-left-glyph: dynamic($fa-var-caret-left $tool-glyph-font-size $font-icon-font-family);
+
+<span id='Ext-panel-Tool-css_var-S-tool-collapse-left-glyph'>/**
+</span> * @var {string/list}
+ * Glyph for the left &quot;collapse&quot; tool icon when {@link Global_CSS#$enable-font-icons} is `true`.
+ */
+$tool-collapse-left-glyph: dynamic($fa-var-caret-left $tool-glyph-font-size $font-icon-font-family);
+
+<span id='Ext-panel-Tool-css_var-S-tool-expand-right-glyph'>/**
+</span> * @var {string/list}
+ * Glyph for the right &quot;expand&quot; tool icon when {@link Global_CSS#$enable-font-icons} is `true`.
+ */
+$tool-expand-right-glyph: dynamic($fa-var-caret-right $tool-glyph-font-size $font-icon-font-family);
+
+<span id='Ext-panel-Tool-css_var-S-tool-collapse-right-glyph'>/**
+</span> * @var {string/list}
+ * Glyph for the right &quot;collapse&quot; tool icon when {@link Global_CSS#$enable-font-icons} is `true`.
+ */
+$tool-collapse-right-glyph: dynamic($fa-var-caret-right $tool-glyph-font-size $font-icon-font-family);
+</pre>
+</body>
+</html>

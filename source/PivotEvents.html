@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>The source code</title>
+  <link href="../resources/prettify/prettify.css" type="text/css" rel="stylesheet" />
+  <script type="text/javascript" src="../resources/prettify/prettify.js"></script>
+  <style type="text/css">
+    .highlight { display: block; background-color: #ddd; }
+  </style>
+  <script type="text/javascript">
+    function highlight() {
+      document.getElementById(location.hash.replace(/#/, "")).className = "highlight";
+    }
+  </script>
+</head>
+<body onload="prettyPrint(); highlight();">
+  <pre class="prettyprint lang-js"><span id='Ext-pivot-feature-PivotEvents'>/**
+</span> * This is the class that takes care of pivot grid mouse events.
+ *
+ * @private
+ *
+ */
+Ext.define('Ext.pivot.feature.PivotEvents',{
+    alternateClassName: [
+        'Mz.pivot.feature.PivotEvents'
+    ],
+
+    extend: 'Ext.grid.feature.Feature',
+    
+    alias: 'feature.pivotevents',
+
+    requires: [
+        'Ext.pivot.feature.PivotStore'
+    ],
+
+<span id='Ext-pivot-feature-PivotEvents-property-eventPrefix'>    eventPrefix:    'pivotcell',
+</span><span id='Ext-pivot-feature-PivotEvents-property-eventSelector'>    eventSelector:  '.' + Ext.baseCSSPrefix + 'grid-cell',
+</span>
+<span id='Ext-pivot-feature-PivotEvents-property-summaryDataCls'>    // this cls is used to catch events on the summary data rows (not on the header)
+</span>    summaryDataCls:             Ext.baseCSSPrefix + 'pivot-summary-data',
+<span id='Ext-pivot-feature-PivotEvents-property-summaryDataSelector'>    summaryDataSelector:        '.' + Ext.baseCSSPrefix + 'pivot-summary-data',
+</span><span id='Ext-pivot-feature-PivotEvents-property-cellSelector'>    cellSelector:               '.' + Ext.baseCSSPrefix + 'grid-cell',
+</span><span id='Ext-pivot-feature-PivotEvents-property-groupHeaderCls'>    groupHeaderCls:             Ext.baseCSSPrefix + 'pivot-grid-group-header',
+</span><span id='Ext-pivot-feature-PivotEvents-property-groupHeaderCollapsibleCls'>    groupHeaderCollapsibleCls:  Ext.baseCSSPrefix + 'pivot-grid-group-header-collapsible',
+</span>
+<span id='Ext-pivot-feature-PivotEvents-property-summaryRowCls'>    // summary rows styling
+</span>    summaryRowCls:              Ext.baseCSSPrefix + 'pivot-grid-group-total',
+<span id='Ext-pivot-feature-PivotEvents-property-summaryRowSelector'>    summaryRowSelector:         '.' + Ext.baseCSSPrefix + 'pivot-grid-group-total',
+</span><span id='Ext-pivot-feature-PivotEvents-property-grandSummaryRowCls'>    grandSummaryRowCls:         Ext.baseCSSPrefix + 'pivot-grid-grand-total',
+</span><span id='Ext-pivot-feature-PivotEvents-property-grandSummaryRowSelector'>    grandSummaryRowSelector:    '.' + Ext.baseCSSPrefix + 'pivot-grid-grand-total',
+</span>
+<span id='Ext-pivot-feature-PivotEvents-method-init'>    init: function(grid){
+</span>        var me = this,
+            view = me.view,
+            lockPartner;
+        
+        me.initEventsListeners();
+
+        // if summaryRowCls or grandSummaryRowCls are changed then the selectors should match the new classes otherwise
+        // events handling will have problems
+        me.summaryRowSelector = '.' + me.summaryRowCls;
+        me.grandSummaryRowSelector = '.' + me.grandSummaryRowCls;
+
+        me.callParent(arguments);
+
+        // Share the GroupStore between both sides of a locked grid
+        lockPartner = me.lockingPartner;
+        if (lockPartner &amp;&amp; lockPartner.dataSource) {
+            me.dataSource = lockPartner.dataSource;
+        } else {
+            me.dataSource = new Ext.pivot.feature.PivotStore({
+                store:          me.grid.store,
+                pivotFeature:   me
+            });
+        }
+    },
+    
+<span id='Ext-pivot-feature-PivotEvents-method-destroy'>    destroy: function(){
+</span>        var me = this;
+        
+        me.destroyEventsListeners();
+        
+        Ext.destroy(me.dataSource);
+        me.view = me.grid = me.gridMaster = me.matrix = me.dataSource = null;
+        
+        me.callParent(arguments);
+    },
+
+<span id='Ext-pivot-feature-PivotEvents-method-initEventsListeners'>    initEventsListeners: function(){
+</span>        var me = this;
+        
+        me.eventsViewListeners = me.view.on(Ext.apply({
+            scope:          me,
+            destroyable:    true
+        }, me.getViewListeners() || {}));
+
+        me.gridListeners = me.grid.on(Ext.apply({
+            scope:          me,
+            destroyable:    true
+        }, me.getGridListeners() || {}));
+    },
+    
+<span id='Ext-pivot-feature-PivotEvents-method-getViewListeners'>    getViewListeners: function(){
+</span>        var me = this,
+            listeners = {
+                afterrender:    me.onViewAfterRender
+            };
+        
+        listeners[me.eventPrefix + 'click'] = me.onCellEvent;
+        listeners[me.eventPrefix + 'dblclick'] = me.onCellEvent;
+        listeners[me.eventPrefix + 'contextmenu'] = me.onCellEvent;
+        
+        return listeners;
+    },
+    
+<span id='Ext-pivot-feature-PivotEvents-method-getGridListeners'>    getGridListeners: Ext.emptyFn,
+</span>
+<span id='Ext-pivot-feature-PivotEvents-method-destroyEventsListeners'>    destroyEventsListeners: function(){
+</span>        Ext.destroyMembers(this, 'eventsViewListeners', 'gridListeners');
+        this.eventsViewListeners = this.gridListeners = null;
+    },
+    
+<span id='Ext-pivot-feature-PivotEvents-method-onViewAfterRender'>    onViewAfterRender: function(){
+</span>        var me = this;
+        
+        me.gridMaster = me.view.up('pivotgrid');
+        me.matrix = me.gridMaster.getMatrix();
+        me.dataSource.matrix = me.matrix;
+    },
+    
+<span id='Ext-pivot-feature-PivotEvents-method-getRowId'>    getRowId: function(record){
+</span>        return this.view.id + '-record-' + record.internalId;
+    },
+
+<span id='Ext-pivot-feature-PivotEvents-method-getRecord'>    getRecord: function(row){
+</span>        return this.view.getRecord(row);
+    },
+    
+<span id='Ext-pivot-feature-PivotEvents-method-onCellEvent'>    onCellEvent: function(view, tdCell, e){
+</span>        var me = this,
+            row = Ext.fly(tdCell).findParent(me.summaryDataSelector) || Ext.fly(tdCell).findParent(me.summaryRowSelector),
+            record = me.getRecord(row),
+            params = {
+                grid:       me.gridMaster,
+                view:       me.view,
+                cellEl:     tdCell
+            },
+            colIndex, ret, eventName, column, colDef, leftKey, topKey;
+        
+        if(!row || !record){
+            return false;
+        }
+        
+        leftKey = me.dataSource.storeInfo[record.internalId].leftKey;
+        row = Ext.fly(row);
+        
+        if(row.hasCls(me.grandSummaryRowCls)){
+            // we are on the grand total row
+            eventName = 'pivottotal';
+        }else if(row.hasCls(me.summaryRowCls)){
+            // we are on a group total row
+            eventName = 'pivotgroup';
+        }else if(row.hasCls(me.summaryDataCls)){
+            // we are on a pivot item row
+            eventName = 'pivotitem';
+        }
+        
+        colIndex = Ext.getDom(tdCell).getAttribute('data-columnid');
+        column = me.getColumnHeaderById(colIndex);
+        
+        Ext.apply(params, {
+            columnId:   colIndex,
+            column:     column,
+            leftKey:    leftKey
+        });
+        
+        if(Ext.fly(tdCell).hasCls(me.groupHeaderCls)){
+            // it's a header cell
+        }else if(column){
+            eventName += 'cell';
+            colDef = me.getTopAxisGroupByDataIndex(column.dataIndex);
+            if(colDef){
+                topKey = colDef.col;
+                
+                Ext.apply(params, {
+                    topKey:         topKey,
+                    dimensionId:    colDef.agg
+                });
+            }
+        }
+        
+        ret = me.gridMaster.fireEvent(eventName + e.type, params, e);
+        
+        if(ret !== false &amp;&amp; e.type == 'click' &amp;&amp; Ext.fly(tdCell).hasCls(me.groupHeaderCollapsibleCls)){
+            // if this is a pivotgroupclick event type then expand/collapse that row group
+            me.dataSource.doExpandCollapse(leftKey, record);
+            
+            if(!me.view.bufferedRenderer &amp;&amp; Ext.fly(me.getRowId(record))){
+                Ext.fly(me.getRowId(record)).scrollIntoView(me.view.el, false, false);
+            }
+        }
+        
+        return false;
+    },
+    
+<span id='Ext-pivot-feature-PivotEvents-method-getColumnHeaderById'>    getColumnHeaderById: function(columnId){
+</span>        var columns = this.view.getGridColumns(),
+            i;
+        
+        for(i = 0; i &lt; columns.length; i++){
+            if(columns[i].id === columnId){
+                return columns[i];
+            }
+        }
+    },
+    
+<span id='Ext-pivot-feature-PivotEvents-method-getTopAxisGroupByDataIndex'>    getTopAxisGroupByDataIndex: function(dataIndex){
+</span>        var columns = this.gridMaster.matrix.getColumns(),
+            i;
+            
+        for(i = 0; i &lt; columns.length; i++){
+            if(columns[i].name === dataIndex){
+                return columns[i];
+            }
+        }
+    }
+
+
+});</pre>
+</body>
+</html>

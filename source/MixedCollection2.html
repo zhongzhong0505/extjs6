@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>The source code</title>
+  <link href="../resources/prettify/prettify.css" type="text/css" rel="stylesheet" />
+  <script type="text/javascript" src="../resources/prettify/prettify.js"></script>
+  <style type="text/css">
+    .highlight { display: block; background-color: #ddd; }
+  </style>
+  <script type="text/javascript">
+    function highlight() {
+      document.getElementById(location.hash.replace(/#/, "")).className = "highlight";
+    }
+  </script>
+</head>
+<body onload="prettyPrint(); highlight();">
+  <pre class="prettyprint lang-js"><span id='Ext-pivot-MixedCollection'>/**
+</span> *
+ * This class enhances the {@link Ext.util.MixedCollection} class by allowing the
+ * children objects to be destroyed on remove.
+ *
+ * @private
+ *
+ */
+Ext.define('Ext.pivot.MixedCollection', {
+    extend: 'Ext.util.MixedCollection',
+
+    alternateClassName: [
+        'Mz.aggregate.MixedCollection'
+    ],
+
+<span id='Ext-pivot-MixedCollection-method-removeAt'>    removeAt: function(index){
+</span>        Ext.destroy(this.callParent(arguments));
+    },
+    
+<span id='Ext-pivot-MixedCollection-method-clear'>    clear: function(){
+</span>        Ext.destroy(this.items);
+        this.callParent(arguments);
+    },
+    
+<span id='Ext-pivot-MixedCollection-method-removeAll'>    removeAll: function(){
+</span>        Ext.destroy(this.items);
+        this.callParent(arguments);
+    },
+    
+<span id='Ext-pivot-MixedCollection-method-destroy'>    destroy: function(){
+</span>        // destroy all objects in the items array
+        this.clear();
+    }
+});</pre>
+</body>
+</html>

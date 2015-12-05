@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>The source code</title>
+  <link href="../resources/prettify/prettify.css" type="text/css" rel="stylesheet" />
+  <script type="text/javascript" src="../resources/prettify/prettify.js"></script>
+  <style type="text/css">
+    .highlight { display: block; background-color: #ddd; }
+  </style>
+  <script type="text/javascript">
+    function highlight() {
+      document.getElementById(location.hash.replace(/#/, "")).className = "highlight";
+    }
+  </script>
+</head>
+<body onload="prettyPrint(); highlight();">
+  <pre class="prettyprint lang-js"><span id='Ext-chart-grid-HorizontalGrid3D'>/**
+</span> * @class Ext.chart.grid.HorizontalGrid3D
+ * @extends Ext.chart.grid.HorizontalGrid
+ *
+ * Horizontal 3D Grid sprite. Used in 3D Cartesian Charts.
+ */
+Ext.define('Ext.chart.grid.HorizontalGrid3D', {
+    extend: 'Ext.chart.grid.HorizontalGrid',
+    alias: 'grid.horizontal3d',
+
+    inheritableStatics: {
+<span id='Ext-chart-grid-HorizontalGrid3D-static-property-def'>        def: {
+</span>            processors: {
+                depth: 'number'
+            },
+
+            defaults: {
+                depth: 0
+            }
+        }
+    },
+
+<span id='Ext-chart-grid-HorizontalGrid3D-method-render'>    render: function (surface, ctx, clipRect) {
+</span>        var attr = this.attr,
+            x = surface.roundPixel(attr.x),
+            y = surface.roundPixel(attr.y),
+            dx = surface.matrix.getDX(),
+            halfLineWidth = ctx.lineWidth * 0.5,
+            height = attr.height,
+            depth = attr.depth,
+            left, top;
+
+        if (y &lt;= clipRect[1]) {
+            return;
+        }
+
+        // Horizontal stripe.
+
+        left = clipRect[0] + depth - dx;
+        top  = y + halfLineWidth - depth;
+
+        ctx.beginPath();
+        ctx.rect(left, top, clipRect[2], height);
+        ctx.fill();
+
+        // Horizontal line.
+
+        ctx.beginPath();
+        ctx.moveTo(left,               top);
+        ctx.lineTo(left + clipRect[2], top);
+        ctx.stroke();
+
+        // Diagonal stripe.
+
+        left = clipRect[0] + x - dx;
+        top  = y + halfLineWidth;
+
+        ctx.beginPath();
+        ctx.moveTo(left,         top);
+        ctx.lineTo(left + depth, top - depth);
+        ctx.lineTo(left + depth, top - depth + height);
+        ctx.lineTo(left,         top + height);
+        ctx.closePath();
+        ctx.fill();
+
+        // Diagonal line.
+
+        ctx.beginPath();
+        ctx.moveTo(left,         top);
+        ctx.lineTo(left + depth, top - depth);
+        ctx.stroke();
+    }
+});</pre>
+</body>
+</html>

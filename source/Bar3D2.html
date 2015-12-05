@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>The source code</title>
+  <link href="../resources/prettify/prettify.css" type="text/css" rel="stylesheet" />
+  <script type="text/javascript" src="../resources/prettify/prettify.js"></script>
+  <style type="text/css">
+    .highlight { display: block; background-color: #ddd; }
+  </style>
+  <script type="text/javascript">
+    function highlight() {
+      document.getElementById(location.hash.replace(/#/, "")).className = "highlight";
+    }
+  </script>
+</head>
+<body onload="prettyPrint(); highlight();">
+  <pre class="prettyprint lang-js"><span id='Ext-chart-series-sprite-Bar3D'>/**
+</span> * @class Ext.chart.series.sprite.Bar3D
+ * @extends Ext.chart.series.sprite.Bar
+ *
+ * Draws a sprite used in {@link Ext.chart.series.Bar3D} series.
+ */
+Ext.define('Ext.chart.series.sprite.Bar3D', {
+    extend: 'Ext.chart.series.sprite.Bar',
+    alias: 'sprite.bar3dSeries',
+
+    requires: ['Ext.draw.gradient.Linear'],
+
+    inheritableStatics: {
+<span id='Ext-chart-series-sprite-Bar3D-static-property-def'>        def: {
+</span>            processors: {
+                depthWidthRatio: 'number',
+<span id='Ext-chart-series-sprite-Bar3D-cfg-saturationFactor'>                /**
+</span>                 * @cfg {Number} [saturationFactor=1]
+                 * The factor applied to the saturation of the bars.
+                 */
+                saturationFactor: 'number',
+<span id='Ext-chart-series-sprite-Bar3D-cfg-brightnessFactor'>                /**
+</span>                 * @cfg {Number} [brightnessFactor=1]
+                 * The factor applied to the brightness of the bars.
+                 */
+                brightnessFactor: 'number',
+<span id='Ext-chart-series-sprite-Bar3D-cfg-colorSpread'>                /**
+</span>                 * @cfg {Number} [colorSpread=1]
+                 * An attribute used to control how flat the bar gradient looks.
+                 * A value of 0 essentially means no gradient (flat color).
+                 */
+                colorSpread: 'number'
+            },
+
+            defaults: {
+                depthWidthRatio: 1/3,
+                saturationFactor: 1,
+                brightnessFactor: 1,
+                colorSpread: 1,
+                transformFillStroke: true
+            },
+
+            triggers: {
+                groupCount: 'panzoom'
+            },
+
+            updaters: {
+                panzoom: function (attr) {
+                    var me = this,
+                        dx = attr.visibleMaxX - attr.visibleMinX,
+                        dy = attr.visibleMaxY - attr.visibleMinY,
+                        innerWidth = attr.flipXY ? attr.innerHeight : attr.innerWidth,
+                        innerHeight = !attr.flipXY ? attr.innerHeight : attr.innerWidth,
+                        surface = me.getSurface(),
+                        isRtl = surface ? surface.getInherited().rtl : false;
+
+                    if (isRtl &amp;&amp; !attr.flipXY) {
+                        attr.translationX = innerWidth + attr.visibleMinX * innerWidth / dx;
+                    } else {
+                        attr.translationX = -attr.visibleMinX * innerWidth / dx;
+                    }
+                    attr.translationY = -attr.visibleMinY * (innerHeight - me.depth) / dy;
+                    attr.scalingX = (isRtl &amp;&amp; !attr.flipXY ? -1 : 1) * innerWidth / dx;
+                    attr.scalingY = (innerHeight - me.depth) / dy;
+                    attr.scalingCenterX = 0;
+                    attr.scalingCenterY = 0;
+                    me.applyTransformations(true);
+                }
+            }
+        }
+    },
+
+    config: {
+<span id='Ext-chart-series-sprite-Bar3D-cfg-showStroke'>        showStroke: false
+</span>    },
+
+<span id='Ext-chart-series-sprite-Bar3D-property-depth'>    depth: 0,
+</span>
+<span id='Ext-chart-series-sprite-Bar3D-method-drawBar'>    drawBar: function (ctx, surface, clip, left, top, right, bottom, index) {
+</span>        var me = this,
+            attr = me.attr,
+            itemCfg = {},
+            renderer = attr.renderer,
+            changes, depth, series, params;
+
+        itemCfg.x = (left + right) * 0.5;
+        itemCfg.y = top;
+        itemCfg.width = (right - left) * 0.75;
+        itemCfg.height = bottom - top;
+        itemCfg.depth = depth = itemCfg.width * attr.depthWidthRatio;
+        itemCfg.orientation = attr.flipXY ? 'horizontal' : 'vertical';
+        itemCfg.saturationFactor = attr.saturationFactor;
+        itemCfg.brightnessFactor = attr.brightnessFactor;
+        itemCfg.colorSpread = attr.colorSpread;
+
+        if (depth !== me.depth) {
+            me.depth = depth;
+            series = me.getSeries();
+            series.fireEvent('depthchange', series, depth);
+        }
+
+        if (renderer) {
+            params = [me, itemCfg, {store: me.getStore()}, index];
+            changes = Ext.callback(renderer, null, params, 0, me.getSeries());
+            Ext.apply(itemCfg, changes);
+        }
+        me.putMarker('items', itemCfg, index, !renderer);
+    }
+
+});
+</pre>
+</body>
+</html>

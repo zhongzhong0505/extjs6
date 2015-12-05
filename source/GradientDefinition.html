@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>The source code</title>
+  <link href="../resources/prettify/prettify.css" type="text/css" rel="stylesheet" />
+  <script type="text/javascript" src="../resources/prettify/prettify.js"></script>
+  <style type="text/css">
+    .highlight { display: block; background-color: #ddd; }
+  </style>
+  <script type="text/javascript">
+    function highlight() {
+      document.getElementById(location.hash.replace(/#/, "")).className = "highlight";
+    }
+  </script>
+</head>
+<body onload="prettyPrint(); highlight();">
+  <pre class="prettyprint lang-js"><span id='Ext-draw-gradient-GradientDefinition'>/**
+</span> * @class Ext.draw.gradient.GradientDefinition
+ *
+ * A global map of all gradient configs.
+ */
+Ext.define('Ext.draw.gradient.GradientDefinition', {
+    singleton: true,
+
+<span id='Ext-draw-gradient-GradientDefinition-property-urlStringRe'>    urlStringRe: /^url\(#([\w\-]+)\)$/,
+</span><span id='Ext-draw-gradient-GradientDefinition-property-gradients'>    gradients: {},
+</span>
+<span id='Ext-draw-gradient-GradientDefinition-method-add'>    add: function (gradients) {
+</span>        var store = this.gradients,
+            i, n, gradient;
+
+        for (i = 0, n = gradients.length; i &lt; n; i++) {
+            gradient = gradients[i];
+            if (Ext.isString(gradient.id)) {
+                store[gradient.id] = gradient;
+            }
+        }
+    },
+
+<span id='Ext-draw-gradient-GradientDefinition-method-get'>    get: function (str) {
+</span>        var store = this.gradients,
+            match = str.match(this.urlStringRe),
+            gradient;
+
+        if (match &amp;&amp; match[1] &amp;&amp; (gradient = store[match[1]])) {
+            return gradient || str;
+        }
+        return str;
+    }
+});</pre>
+</body>
+</html>

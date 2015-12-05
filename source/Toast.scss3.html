@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>The source code</title>
+  <link href="../resources/prettify/prettify.css" type="text/css" rel="stylesheet" />
+  <script type="text/javascript" src="../resources/prettify/prettify.js"></script>
+  <style type="text/css">
+    .highlight { display: block; background-color: #ddd; }
+  </style>
+  <script type="text/javascript">
+    function highlight() {
+      document.getElementById(location.hash.replace(/#/, "")).className = "highlight";
+    }
+  </script>
+</head>
+<body onload="prettyPrint(); highlight();">
+  <pre class="prettyprint lang-js">.#{$prefix}toast-icon-information {
+    background-image: theme-background-image('window/toast/icon16_info', 'png');
+}
+
+.#{$prefix}toast-icon-error {
+    background-image: theme-background-image('window/toast/icon16_error', 'png');
+}
+
+
+/* Using standard theme */
+.#{$prefix}toast-window .x-window-body {
+    padding: 15px 5px 15px 5px;
+}
+
+
+/* Custom styling */
+.#{$prefix}toast-light .x-window-header {
+  background-color: $toast-header-background-color;
+}
+
+.#{$prefix}toast-light .x-tool-img {
+  background-color: $toast-header-background-color;
+}
+
+.#{$prefix}toast-light {
+    background-image: theme-background-image('window/toast/fader', 'png');
+}
+
+.#{$prefix}toast-light .x-window-body {
+    padding: 15px 5px 20px 5px;
+    background-color: transparent;
+    border: 0px solid white;
+}
+</pre>
+</body>
+</html>

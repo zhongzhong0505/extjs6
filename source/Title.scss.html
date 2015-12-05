@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>The source code</title>
+  <link href="../resources/prettify/prettify.css" type="text/css" rel="stylesheet" />
+  <script type="text/javascript" src="../resources/prettify/prettify.js"></script>
+  <style type="text/css">
+    .highlight { display: block; background-color: #ddd; }
+  </style>
+  <script type="text/javascript">
+    function highlight() {
+      document.getElementById(location.hash.replace(/#/, "")).className = "highlight";
+    }
+  </script>
+</head>
+<body onload="prettyPrint(); highlight();">
+  <pre class="prettyprint lang-js">.#{$prefix}title-icon {
+    background-repeat: no-repeat;
+    background-position: 0 0;
+    vertical-align: middle;
+    line-height: 1;
+    text-align: center;
+}
+
+.#{$prefix}title {
+    display: table;
+    table-layout: fixed;
+}
+
+@if $include-rtl {
+    .#{$prefix}rtl.#{$prefix}title {
+        -o-text-overflow: clip;
+        text-overflow: clip;
+    }
+}
+
+.#{$prefix}title-text {
+    display: table-cell;
+    overflow: hidden;
+    white-space: nowrap;
+    -o-text-overflow: ellipsis;
+    text-overflow: ellipsis;
+    vertical-align: middle;
+}
+
+.#{$prefix}title-align-left {
+    text-align: left;
+    @if $include-rtl {
+        &amp;.#{$prefix}rtl {
+            text-align: right;
+        }
+    }
+}
+
+.#{$prefix}title-align-center {
+    text-align: center;
+}
+
+.#{$prefix}title-align-right {
+    text-align: right;
+    @if $include-rtl {
+        &amp;.#{$prefix}rtl {
+            text-align: left;
+        }
+    }
+}
+
+.#{$prefix}title-rotate-right {
+    @include rotate-element($angle: 90);
+
+    @if $include-rtl {
+        &amp;.#{$prefix}rtl {
+            @include rotate-element($angle: 270);
+        }
+    }
+}
+
+.#{$prefix}title-rotate-left {
+    @include rotate-element($angle: 270);
+
+    @if $include-rtl {
+        &amp;.#{$prefix}rtl {
+            @include rotate-element($angle: 90);
+        }
+    }
+}
+
+@if $include-ext-panel-panel {
+    .#{$prefix}horizontal.#{$prefix}header {
+        .#{$prefix}title-rotate-right {
+            &amp;.#{$prefix}title-align-left &gt; .#{$prefix}title-item {
+                vertical-align: bottom;
+            }
+
+            &amp;.#{$prefix}title-align-center &gt; .#{$prefix}title-item {
+                vertical-align: middle;
+            }
+
+            &amp;.#{$prefix}title-align-right &gt; .#{$prefix}title-item {
+                vertical-align: top;
+            }
+        }
+
+        .#{$prefix}title-rotate-left {
+            &amp;.#{$prefix}title-align-left &gt; .#{$prefix}title-item {
+                vertical-align: top;
+            }
+
+            &amp;.#{$prefix}title-align-center &gt; .#{$prefix}title-item {
+                vertical-align: middle;
+            }
+
+            &amp;.#{$prefix}title-align-right &gt; .#{$prefix}title-item {
+                vertical-align: bottom;
+            }
+        }
+    }
+
+    .#{$prefix}vertical.#{$prefix}header {
+        .#{$prefix}title-rotate-none {
+            &amp;.#{$prefix}title-align-left &gt; .#{$prefix}title-item {
+                vertical-align: top;
+            }
+
+            &amp;.#{$prefix}title-align-center &gt; .#{$prefix}title-item {
+                vertical-align: middle;
+            }
+
+            &amp;.#{$prefix}title-align-right &gt; .#{$prefix}title-item {
+                vertical-align: bottom;
+            }
+        }
+    }
+}
+
+.#{$prefix}title-icon-wrap {
+    display: table-cell;
+    text-align: center;
+    vertical-align: middle;
+    line-height: 0;
+    &amp;.#{$prefix}title-icon-top,
+    &amp;.#{$prefix}title-icon-bottom {
+        display: table-row;
+    }
+}
+
+.#{$prefix}title-icon {
+    display: inline-block;
+    vertical-align: middle;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+</pre>
+</body>
+</html>

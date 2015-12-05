@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>The source code</title>
+  <link href="../resources/prettify/prettify.css" type="text/css" rel="stylesheet" />
+  <script type="text/javascript" src="../resources/prettify/prettify.js"></script>
+  <style type="text/css">
+    .highlight { display: block; background-color: #ddd; }
+  </style>
+  <script type="text/javascript">
+    function highlight() {
+      document.getElementById(location.hash.replace(/#/, "")).className = "highlight";
+    }
+  </script>
+</head>
+<body onload="prettyPrint(); highlight();">
+  <pre class="prettyprint lang-js"><span id='Ext-ux-ajax-PivotSimlet'>/**
+</span> * Pivot Simlet does remote pivot calculations.
+ * Filtering the pivot results doesn't work.
+ */
+Ext.define('Ext.ux.ajax.PivotSimlet', {
+    extend: 'Ext.ux.ajax.JsonSimlet',
+    alias: 'simlet.pivot',
+
+<span id='Ext-ux-ajax-PivotSimlet-property-lastResponse'><span id='Ext-ux-ajax-PivotSimlet-property-lastPost'>    lastPost:           null, // last Ajax params sent to this simlet
+</span></span><span id='Ext-ux-ajax-PivotSimlet-property-keysSeparator'>    lastResponse:       null, // last JSON response produced by this simlet
+</span>    keysSeparator:      '',
+<span id='Ext-ux-ajax-PivotSimlet-property-grandTotalKey'>    grandTotalKey:      '',
+</span>
+<span id='Ext-ux-ajax-PivotSimlet-method-doPost'>    doPost: function (ctx) {
+</span>        var me = this,
+            ret = me.callParent(arguments); // pick up status/statusText
+
+        me.lastResponse = me.processData( me.getData(ctx), Ext.decode(ctx.xhr.body) );
+        ret.responseText = Ext.encode(me.lastResponse);
+
+        return ret;
+    },
+
+<span id='Ext-ux-ajax-PivotSimlet-method-processData'>    processData: function(data, params){
+</span>        var me = this,
+            len = data.length,
+            response = {
+                success: true,
+                leftAxis: [],
+                topAxis: [],
+                results: []
+            },
+            leftAxis = new Ext.util.MixedCollection(),
+            topAxis = new Ext.util.MixedCollection(),
+            results = new Ext.util.MixedCollection(),
+            i, j, k, leftKeys, topKeys, item, agg;
+
+        me.lastPost = params;
+        me.keysSeparator = params.keysSeparator;
+        me.grandTotalKey = params.grandTotalKey;
+
+        for(i = 0; i &lt; len; i++){
+            leftKeys = me.extractValues(data[i], params.leftAxis, leftAxis);
+            topKeys = me.extractValues(data[i], params.topAxis, topAxis);
+
+            // add record to grand totals
+            me.addResult(data[i], me.grandTotalKey, me.grandTotalKey, results);
+
+            for(j = 0; j &lt; leftKeys.length; j++){
+                // add record to col grand totals
+                me.addResult(data[i], leftKeys[j], me.grandTotalKey, results);
+
+                // add record to left/top keys pair
+                for(k = 0; k &lt; topKeys.length; k++){
+                    me.addResult(data[i], leftKeys[j], topKeys[k], results);
+                }
+            }
+
+            // add record to row grand totals
+            for(j = 0; j &lt; topKeys.length; j++){
+                me.addResult(data[i], me.grandTotalKey, topKeys[j], results);
+            }
+        }
+
+        // extract items from their left/top collections and build the json response
+        response.leftAxis = leftAxis.getRange();
+        response.topAxis = topAxis.getRange();
+
+        len = results.getCount();
+        for(i = 0; i &lt; len; i++){
+            item = results.getAt(i);
+            item.values = {};
+
+            for(j = 0; j &lt; params.aggregate.length; j++){
+                agg = params.aggregate[j];
+
+                item.values[agg.id] = me[agg.aggregator](item.records, agg.dataIndex, item.leftKey, item.topKey);
+            }
+            delete(item.records);
+            response.results.push(item);
+        }
+
+        leftAxis.clear();
+        topAxis.clear();
+        results.clear();
+
+        return response;
+    },
+
+<span id='Ext-ux-ajax-PivotSimlet-method-getKey'>    getKey: function(value){
+</span>        var me = this;
+
+        me.keysMap = me.keysMap || {};
+        if(!Ext.isDefined(me.keysMap[value])){
+            me.keysMap[value] = Ext.id();
+        }
+        return me.keysMap[value];
+    },
+
+<span id='Ext-ux-ajax-PivotSimlet-method-extractValues'>    extractValues: function(record, dimensions, col){
+</span>        var len = dimensions.length,
+            keys = [],
+            i, j, key, item, dim;
+
+        key = '';
+        for(j = 0; j &lt; len; j++){
+            dim = dimensions[j];
+            key += (j &gt; 0 ? this.keysSeparator : '') + this.getKey(record[dim.dataIndex]);
+            item = col.getByKey(key);
+
+            if(!item) {
+                item = col.add(key, {
+                    key:            key,
+                    value:          record[dim.dataIndex],
+                    dimensionId:    dim.id
+                });
+            }
+            keys.push(key);
+        }
+
+        return keys;
+    },
+
+<span id='Ext-ux-ajax-PivotSimlet-method-addResult'>    addResult: function(record, leftKey, topKey, results){
+</span>        var item = results.getByKey(leftKey + '/' + topKey);
+
+        if(!item){
+            item = results.add(leftKey + '/' + topKey, {
+                leftKey: leftKey,
+                topKey: topKey,
+                records: []
+            });
+        }
+        item.records.push(record);
+    },
+
+
+
+
+<span id='Ext-ux-ajax-PivotSimlet-method-sum'>    sum: function(records, measure, rowGroupKey, colGroupKey) {
+</span>        var length = records.length,
+            total  = 0,
+            i;
+
+        for (i = 0; i &lt; length; i++) {
+            total += Ext.Number.from(records[i][measure], 0);
+        }
+
+        return total;
+    },
+
+<span id='Ext-ux-ajax-PivotSimlet-method-avg'>    avg: function(records, measure, rowGroupKey, colGroupKey) {
+</span>        var length = records.length,
+            total  = 0,
+            i;
+
+        for (i = 0; i &lt; length; i++) {
+            total += Ext.Number.from(records[i][measure], 0);
+        }
+
+        return length &gt; 0 ? (total / length) : 0;
+    },
+
+<span id='Ext-ux-ajax-PivotSimlet-method-min'>    min: function(records, measure, rowGroupKey, colGroupKey) {
+</span>        var data   = [],
+            length = records.length,
+            i, v;
+
+        for (i = 0; i &lt; length; i++) {
+            data.push(records[i][measure]);
+        }
+
+        v = Ext.Array.min(data);
+        return v;
+    },
+
+<span id='Ext-ux-ajax-PivotSimlet-method-max'>    max: function(records, measure, rowGroupKey, colGroupKey) {
+</span>        var data   = [],
+            length = records.length,
+            i;
+
+        for (i = 0; i &lt; length; i++) {
+            data.push(records[i][measure]);
+        }
+
+        v = Ext.Array.max(data);
+        return v;
+    },
+
+<span id='Ext-ux-ajax-PivotSimlet-method-count'>    count: function(records, measure, rowGroupKey, colGroupKey) {
+</span>        return records.length;
+    },
+
+<span id='Ext-ux-ajax-PivotSimlet-method-variance'>    variance: function(records, measure, rowGroupKey, colGroupKey) {
+</span>        var me = Ext.pivot.Aggregators,
+            length = records.length,
+            avg = me.avg.apply(me, arguments),
+            total  = 0,
+            i;
+
+        if(avg &gt; 0){
+            for (i = 0; i &lt; length; i++) {
+                total += Math.pow( Ext.Number.from(records[i][measure], 0) - avg, 2 );
+            }
+        }
+
+        return (total &gt; 0 &amp;&amp; length &gt; 1) ? (total / (length - 1)) : 0;
+    },
+
+<span id='Ext-ux-ajax-PivotSimlet-method-varianceP'>    varianceP: function(records, measure, rowGroupKey, colGroupKey) {
+</span>        var me = Ext.pivot.Aggregators,
+            length = records.length,
+            avg = me.avg.apply(me, arguments),
+            total  = 0,
+            i;
+
+        if(avg &gt; 0){
+            for (i = 0; i &lt; length; i++) {
+                total += Math.pow( Ext.Number.from(records[i][measure], 0) - avg, 2 );
+            }
+        }
+
+        return (total &gt; 0 &amp;&amp; length &gt; 0) ? (total / length) : 0;
+    },
+
+<span id='Ext-ux-ajax-PivotSimlet-method-stdDev'>    stdDev: function(records, measure, rowGroupKey, colGroupKey) {
+</span>        var me = Ext.pivot.Aggregators,
+            v = me.variance.apply(me, arguments);
+
+        return v &gt; 0 ? Math.sqrt(v) : 0;
+    },
+
+<span id='Ext-ux-ajax-PivotSimlet-method-stdDevP'>    stdDevP: function(records, measure, rowGroupKey, colGroupKey) {
+</span>        var me = Ext.pivot.Aggregators,
+            v = me.varianceP.apply(me, arguments);
+
+        return v &gt; 0 ? Math.sqrt(v) : 0;
+    }
+
+});
+</pre>
+</body>
+</html>

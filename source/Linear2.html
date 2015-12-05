@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>The source code</title>
+  <link href="../resources/prettify/prettify.css" type="text/css" rel="stylesheet" />
+  <script type="text/javascript" src="../resources/prettify/prettify.js"></script>
+  <style type="text/css">
+    .highlight { display: block; background-color: #ddd; }
+  </style>
+  <script type="text/javascript">
+    function highlight() {
+      document.getElementById(location.hash.replace(/#/, "")).className = "highlight";
+    }
+  </script>
+</head>
+<body onload="prettyPrint(); highlight();">
+  <pre class="prettyprint lang-js"><span id='Ext-draw-gradient-Linear'>/**
+</span> * Linear gradient.
+ *
+ *     @example
+ *     Ext.create({
+ *        xtype: 'draw', 
+ *        renderTo: document.body,
+ *        width: 600,
+ *        height: 400,
+ *        sprites: [{
+ *            type: 'circle',
+ *            cx: 100,
+ *            cy: 100,
+ *            r: 100,
+ *            fillStyle: {
+ *                type: 'linear',
+ *                degrees: 180,
+ *                stops: [{
+ *                    offset: 0,
+ *                    color: '#1F6D91'
+ *                }, {
+ *                    offset: 1,
+ *                    color: '#90BCC9'
+ *                }]
+ *            }
+ *        }]
+ *     });
+ */
+Ext.define('Ext.draw.gradient.Linear', {
+    extend: 'Ext.draw.gradient.Gradient',
+    requires: ['Ext.draw.Color'],
+<span id='Ext-draw-gradient-Linear-property-type'>    type: 'linear',
+</span>    config: {
+<span id='Ext-draw-gradient-Linear-cfg-degrees'>        /**
+</span>         * @cfg {Number} degrees
+         * The angle of rotation of the gradient in degrees.
+         */
+        degrees: 0,
+<span id='Ext-draw-gradient-Linear-cfg-radians'>        /**
+</span>         * @cfg {Number} radians
+         * The angle of rotation of the gradient in radians.
+         */
+        radians: 0
+    },
+
+<span id='Ext-draw-gradient-Linear-method-applyRadians'>    applyRadians: function (radians, oldRadians) {
+</span>        if (Ext.isNumber(radians)) {
+            return radians;
+        }
+        return oldRadians;
+    },
+
+<span id='Ext-draw-gradient-Linear-method-applyDegrees'>    applyDegrees: function (degrees, oldDegrees) {
+</span>        if (Ext.isNumber(degrees)) {
+            return degrees;
+        }
+        return oldDegrees;
+    },
+
+<span id='Ext-draw-gradient-Linear-method-updateRadians'>    updateRadians: function (radians) {
+</span>        this.setDegrees(Ext.draw.Draw.degrees(radians));
+    },
+
+<span id='Ext-draw-gradient-Linear-method-updateDegrees'>    updateDegrees: function (degrees) {
+</span>        this.setRadians(Ext.draw.Draw.rad(degrees));
+    },
+
+<span id='Ext-draw-gradient-Linear-method-generateGradient'>    /**
+</span>     * @inheritdoc
+     */
+    generateGradient: function (ctx, bbox) {
+        var angle = this.getRadians(),
+            cos = Math.cos(angle),
+            sin = Math.sin(angle),
+            w = bbox.width,
+            h = bbox.height,
+            cx = bbox.x + w * 0.5,
+            cy = bbox.y + h * 0.5,
+            stops = this.getStops(),
+            ln = stops.length,
+            gradient,
+            l, i;
+
+        if (Ext.isNumber(cx + cy) &amp;&amp; h &gt; 0 &amp;&amp; w &gt; 0) {
+            l = (Math.sqrt(h * h + w * w) * Math.abs(Math.cos(angle - Math.atan(h / w)))) / 2;
+            gradient = ctx.createLinearGradient(
+                cx + cos * l, cy + sin * l,
+                cx - cos * l, cy - sin * l
+            );
+
+            for (i = 0; i &lt; ln; i++) {
+                gradient.addColorStop(stops[i].offset, stops[i].color);
+            }
+            return gradient;
+        }
+        return Ext.draw.Color.NONE;
+    }
+});</pre>
+</body>
+</html>

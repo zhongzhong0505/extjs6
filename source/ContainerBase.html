@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>The source code</title>
+  <link href="../resources/prettify/prettify.css" type="text/css" rel="stylesheet" />
+  <script type="text/javascript" src="../resources/prettify/prettify.js"></script>
+  <style type="text/css">
+    .highlight { display: block; background-color: #ddd; }
+  </style>
+  <script type="text/javascript">
+    function highlight() {
+      document.getElementById(location.hash.replace(/#/, "")).className = "highlight";
+    }
+  </script>
+</head>
+<body onload="prettyPrint(); highlight();">
+  <pre class="prettyprint lang-js"><span id='Ext-draw-ContainerBase'>/**
+</span> * @private
+ * @class Ext.draw.ContainerBase
+ */
+Ext.define('Ext.draw.ContainerBase', {
+    extend: 'Ext.panel.Panel',
+
+    requires: ['Ext.window.Window'],
+    
+<span id='Ext-draw-ContainerBase-cfg-previewTitleText'>    /**
+</span>     * @cfg {String} previewTitleText The text to place in Preview Chart window title.
+     */
+    previewTitleText: 'Chart Preview',
+    
+<span id='Ext-draw-ContainerBase-cfg-previewAltText'>    /**
+</span>     * @cfg {String} previewAltText The text to place in the Preview image alt attribute.
+     */
+    previewAltText: 'Chart preview',
+
+<span id='Ext-draw-ContainerBase-cfg-layout'>    layout: 'container',
+</span>
+<span id='Ext-draw-ContainerBase-method-addElementListener'>    // Adds a listener to this draw container's element. If the element does not yet exist
+</span>    // addition of the listener will be deferred until onRender.  Useful when listeners
+    // need to be attached during initConfig.
+    addElementListener: function() {
+        var me = this,
+            args = arguments;
+
+        if (me.rendered) {
+            me.el.on.apply(me.el, args);
+        } else {
+            me.on('render', function() {
+                me.el.on.apply(me.el, args);
+            });
+        }
+    },
+
+<span id='Ext-draw-ContainerBase-method-removeElementListener'>    removeElementListener: function() {
+</span>        var me = this,
+            args = arguments;
+        if (me.rendered) {
+            me.el.un.apply(me.el, args);
+        }
+    },
+
+<span id='Ext-draw-ContainerBase-method-afterRender'>    afterRender: function() {
+</span>        this.callParent(arguments);
+        this.initAnimator();
+    },
+
+<span id='Ext-draw-ContainerBase-method-getItems'>    getItems: function() {
+</span>        var me = this,
+            items = me.items;
+
+        if (!items || !items.isMixedCollection) {
+            // getItems may be called before initItems has run and created the items
+            // collection, so we have to create it here just in case (this can happen
+            // if getItems is called during initConfig)
+            me.initItems();
+        }
+
+        return me.items;
+    },
+
+<span id='Ext-draw-ContainerBase-method-onRender'>    onRender: function() {
+</span>        this.callParent(arguments);
+        this.element = this.el;
+        this.innerElement = this.body;
+    },
+
+<span id='Ext-draw-ContainerBase-method-setItems'>    setItems: function(items) {
+</span>        this.items = items;
+        return items;
+    },
+
+<span id='Ext-draw-ContainerBase-method-setSurfaceSize'>    setSurfaceSize: function(width, height) {
+</span>        this.resizeHandler({width:width, height:height});
+        this.renderFrame();
+    },
+
+<span id='Ext-draw-ContainerBase-method-onResize'>    onResize: function (width, height, oldWidth, oldHeight) {
+</span>        var me = this;
+
+        me.callParent([width, height, oldWidth, oldHeight]);
+        me.setBodySize({
+            width: width,
+            height: height
+        });
+    },
+
+<span id='Ext-draw-ContainerBase-method-preview'>    preview: function () {
+</span>        var image = this.getImage();
+        new Ext.window.Window({
+            title: this.previewTitleText,
+            closeable: true,
+            renderTo: Ext.getBody(),
+            autoShow: true,
+            maximizeable: true,
+            maximized: true,
+            border: true,
+            layout: {
+                type: 'hbox',
+                pack: 'center',
+                align: 'middle'
+            },
+            items: {
+                xtype: 'container',
+                items: {
+                    xtype: 'image',
+                    mode: 'img',
+                    cls: Ext.baseCSSPrefix + 'chart-image',
+                    alt: this.previewAltText,
+                    src: image.data,
+                    listeners: {
+                        afterrender: function () {
+                            var me = this,
+                                img = me.imgEl.dom,
+                                ratio = image.type === 'svg' ? 1 : (window['devicePixelRatio'] || 1),
+                                size;
+
+                            if (!img.naturalWidth || !img.naturalHeight) {
+                                img.onload = function () {
+                                    var width = img.naturalWidth,
+                                        height = img.naturalHeight;
+                                    me.setWidth(Math.floor(width / ratio));
+                                    me.setHeight(Math.floor(height / ratio));
+                                }
+                            } else {
+                                size = me.getSize();
+                                me.setWidth(Math.floor(size.width / ratio));
+                                me.setHeight(Math.floor(size.height / ratio));
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    },
+
+<span id='Ext-draw-ContainerBase-property-privates'>    privates: {
+</span>        getTargetEl: function() {
+            return this.innerElement;
+        },
+
+        reattachToBody: function() {
+            // This is to ensure charts work properly as grid column widgets.
+            var me = this;
+            if (me.pendingDetachSize) {
+                me.onBodyResize();
+            }
+            me.pendingDetachSize = false;
+            me.callParent();
+        }
+    }
+});
+</pre>
+</body>
+</html>

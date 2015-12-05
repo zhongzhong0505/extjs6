@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>The source code</title>
+  <link href="../resources/prettify/prettify.css" type="text/css" rel="stylesheet" />
+  <script type="text/javascript" src="../resources/prettify/prettify.js"></script>
+  <style type="text/css">
+    .highlight { display: block; background-color: #ddd; }
+  </style>
+  <script type="text/javascript">
+    function highlight() {
+      document.getElementById(location.hash.replace(/#/, "")).className = "highlight";
+    }
+  </script>
+</head>
+<body onload="prettyPrint(); highlight();">
+  <pre class="prettyprint lang-js">.#{$prefix}resizable-handle {
+    background-repeat: no-repeat;
+}
+
+// In neptune, the side handles are 1px width and background position is at centre of the dimension;
+.#{$prefix}resizable-handle-east-over,
+.#{$prefix}resizable-handle-west-over {
+    background-position: center;
+}
+
+.#{$prefix}resizable-handle-south-over,
+.#{$prefix}resizable-handle-north-over {
+    background-position: center;
+}
+
+.#{$prefix}resizable-handle-southeast-over {
+    background-position: -2px -2px;
+}
+
+.#{$prefix}resizable-handle-northwest-over {
+    background-position: 2px 2px;
+}
+
+.#{$prefix}resizable-handle-northeast-over {
+    background-position: -2px 2px;
+}
+
+.#{$prefix}resizable-handle-southwest-over {
+    background-position: 2px -2px;
+}
+
+.#{$prefix}resizable-pinned {
+    .#{$prefix}resizable-handle-east,
+    .#{$prefix}resizable-handle-west {
+        background-position: center;
+    }
+    
+    .#{$prefix}resizable-handle-south,
+    .#{$prefix}resizable-handle-north {
+        background-position: center;
+    }
+
+    .#{$prefix}resizable-handle-southeast {
+        background-position: -2px -2px;
+    }
+    
+    .#{$prefix}resizable-handle-northwest {
+        background-position: 2px 2px;
+    }
+    
+    .#{$prefix}resizable-handle-northeast {
+        background-position: -2px 2px;
+    }
+
+    .#{$prefix}resizable-handle-southwest {
+        background-position: 2px -2px;
+    }
+}
+</pre>
+</body>
+</html>

@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>The source code</title>
+  <link href="../resources/prettify/prettify.css" type="text/css" rel="stylesheet" />
+  <script type="text/javascript" src="../resources/prettify/prettify.js"></script>
+  <style type="text/css">
+    .highlight { display: block; background-color: #ddd; }
+  </style>
+  <script type="text/javascript">
+    function highlight() {
+      document.getElementById(location.hash.replace(/#/, "")).className = "highlight";
+    }
+  </script>
+</head>
+<body onload="prettyPrint(); highlight();">
+  <pre class="prettyprint lang-js"><span id='Ext-chart-grid-VerticalGrid3D'>/**
+</span> * @class Ext.chart.grid.VerticalGrid3D
+ * @extends Ext.chart.grid.VerticalGrid
+ * 
+ * Vertical 3D Grid sprite. Used in 3D Cartesian Charts.
+ */
+Ext.define('Ext.chart.grid.VerticalGrid3D', {
+    extend: 'Ext.chart.grid.VerticalGrid',
+    alias: 'grid.vertical3d',
+
+    inheritableStatics: {
+<span id='Ext-chart-grid-VerticalGrid3D-static-property-def'>        def: {
+</span>            processors: {
+                depth: 'number'
+            },
+
+            defaults: {
+                depth: 0
+            }
+        }
+    },
+
+<span id='Ext-chart-grid-VerticalGrid3D-method-render_'>    render_: function (surface, ctx, clipRect) {
+</span>        var attr = this.attr,
+            x = surface.roundPixel(attr.x),
+            halfLineWidth = ctx.lineWidth * 0.5;
+
+        ctx.beginPath();
+        ctx.rect(x - halfLineWidth, clipRect[1] - surface.matrix.getDY(), attr.width, clipRect[3]);
+        ctx.fill();
+
+        ctx.beginPath();
+        ctx.moveTo(x - halfLineWidth, clipRect[1] - surface.matrix.getDY());
+        ctx.lineTo(x - halfLineWidth, clipRect[1] + clipRect[3] - surface.matrix.getDY());
+        ctx.stroke();
+    },
+
+<span id='Ext-chart-grid-VerticalGrid3D-method-render'>    render: function (surface, ctx, clipRect) {
+</span>        var attr = this.attr,
+            x = surface.roundPixel(attr.x),
+            dy = surface.matrix.getDY(),
+            halfLineWidth = ctx.lineWidth * 0.5,
+            width = attr.width,
+            depth = attr.depth,
+            left, top;
+
+        if (x &gt;= clipRect[2]) {
+            return;
+        }
+
+        // Vertical stripe.
+
+        left = x - halfLineWidth + depth;
+        top  = clipRect[1] - depth - dy;
+
+        ctx.beginPath();
+        ctx.rect(left, top, width, clipRect[3]);
+        ctx.fill();
+
+        // Vertical line.
+
+        ctx.beginPath();
+        ctx.moveTo(left, top);
+        ctx.lineTo(left, top + clipRect[3]);
+        ctx.stroke();
+
+        // Diagonal stripe.
+
+        left = x - halfLineWidth;
+        top  = clipRect[3];
+
+        ctx.beginPath();
+        ctx.moveTo(left,                 top);
+        ctx.lineTo(left + depth,         top - depth);
+        ctx.lineTo(left + depth + width, top - depth);
+        ctx.lineTo(left + width,         top);
+        ctx.closePath();
+        ctx.fill();
+
+        // Diagonal line.
+
+        left = x - halfLineWidth;
+        top  = clipRect[3];
+
+        ctx.beginPath();
+        ctx.moveTo(left,         top);
+        ctx.lineTo(left + depth, top - depth);
+        ctx.stroke();
+    }
+});</pre>
+</body>
+</html>

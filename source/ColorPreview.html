@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>The source code</title>
+  <link href="../resources/prettify/prettify.css" type="text/css" rel="stylesheet" />
+  <script type="text/javascript" src="../resources/prettify/prettify.js"></script>
+  <style type="text/css">
+    .highlight { display: block; background-color: #ddd; }
+  </style>
+  <script type="text/javascript">
+    function highlight() {
+      document.getElementById(location.hash.replace(/#/, "")).className = "highlight";
+    }
+  </script>
+</head>
+<body onload="prettyPrint(); highlight();">
+  <pre class="prettyprint lang-js"><span id='Ext-ux-colorpick-ColorPreview'>/**
+</span> * A basic component that changes background color, with considerations for opacity
+ * support (checkered background image and IE8 support).
+ */
+Ext.define('Ext.ux.colorpick.ColorPreview', {
+    extend     : 'Ext.Component',
+    alias      : 'widget.colorpickercolorpreview',
+
+    requires: [
+        'Ext.util.Format'
+    ],
+
+<span id='Ext-ux-colorpick-ColorPreview-cfg-style'>    //hack to solve issue with IE, when applying a filter the click listener is not being fired.
+</span>    style: 'position: relative',
+<span id='Ext-ux-colorpick-ColorPreview-cfg-html'>    html: '&lt;div class=&quot;filter&quot; style=&quot;height:100%; width:100%; position: absolute;&quot;&gt;&lt;/div&gt;'+
+</span>          '&lt;a class=&quot;btn&quot; style=&quot;height:100%; width:100%; position: absolute;&quot;&gt;&lt;/a&gt;',
+<span id='Ext-ux-colorpick-ColorPreview-cfg-cls'>    //eo hack
+</span>
+    cls: 'x-colorpreview',
+
+<span id='Ext-ux-colorpick-ColorPreview-cfg-height'>    height: 256,
+</span>
+<span id='Ext-ux-colorpick-ColorPreview-method-onRender'>    onRender: function () {
+</span>        var me = this;
+
+        me.callParent(arguments);
+
+        me.mon(me.el.down('.btn'), 'click', me.onClick, me);
+    },
+
+<span id='Ext-ux-colorpick-ColorPreview-method-onClick'>    onClick: function () {
+</span>        this.fireEvent('click', this, this.color);
+    },
+
+<span id='Ext-ux-colorpick-ColorPreview-method-setColor'>    // Called via databinding - update background color whenever ViewModel changes
+</span>    setColor: function(color) {
+        var me = this,
+            el = me.getEl();
+
+        // Too early in rendering cycle; skip
+        if (!el) {
+            return;
+        }
+        me.color = color;
+
+        me.applyBgStyle(color);
+    },
+
+<span id='Ext-ux-colorpick-ColorPreview-property-bgStyleTpl'>    bgStyleTpl: Ext.create('Ext.XTemplate',
+</span>        Ext.isIE &amp;&amp; Ext.ieVersion &lt; 10 ?
+          'filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0, startColorstr=\'#{hexAlpha}{hex}\', endColorstr=\'#{hexAlpha}{hex}\');' /* IE6-9 */
+        : 'background: {rgba};'
+    ),
+
+<span id='Ext-ux-colorpick-ColorPreview-method-applyBgStyle'>    applyBgStyle: function (color) {
+</span>        var me         = this,
+            colorUtils = Ext.ux.colorpick.ColorUtils,
+            el         = me.getEl().down('.filter'),
+            hex, alpha, rgba, bgStyle;
+
+        hex     = colorUtils.rgb2hex(color.r, color.g, color.b);
+        alpha   = Ext.util.Format.hex(Math.floor(color.a * 255), 2);
+        rgba    = colorUtils.getRGBAString(color);
+        bgStyle = this.bgStyleTpl.apply({hex: hex, hexAlpha: alpha, rgba: rgba});
+
+        el.applyStyles(bgStyle);
+    }
+});
+</pre>
+</body>
+</html>

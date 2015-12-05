@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>The source code</title>
+  <link href="../resources/prettify/prettify.css" type="text/css" rel="stylesheet" />
+  <script type="text/javascript" src="../resources/prettify/prettify.js"></script>
+  <style type="text/css">
+    .highlight { display: block; background-color: #ddd; }
+  </style>
+  <script type="text/javascript">
+    function highlight() {
+      document.getElementById(location.hash.replace(/#/, "")).className = "highlight";
+    }
+  </script>
+</head>
+<body onload="prettyPrint(); highlight();">
+  <pre class="prettyprint lang-js"><span id='Ext-pivot-matrix-Remote'>/**
+</span> * This matrix allows you to do all the calculations on the backend.
+ * This is handy when you have large data sets.
+ *
+ * Basically this class sends to the specified URL the following configuration object:
+ *
+ * - leftAxis: array of serialized dimensions on the left axis
+ *
+ * - topAxis: array of serialized dimensions on the top axis
+ *
+ * - aggregate: array of serialized dimensions on the aggregate
+ *
+ * - keysSeparator: the separator used by the left/top items keys. It's the one defined on the matrix
+ *
+ * - grandTotalKey: the key for the grand total items. It's the one defined on the matrix
+ *
+ *
+ * The expected JSON should have the following format:
+ *
+ * - success - true/false
+ *
+ * - leftAxis - array of items that were generated for the left axis. Each item is an
+ * object with keys for: key, value, name, dimensionId. If you send back the item name and you also
+ * have a renderer defined then the renderer is not called anymore.
+ *
+ * - topAxis - array of items that were generated for the top axis.
+ *
+ * - results - array of results for all left/top axis items. Each result is an object
+ * with keys for: leftKey, topKey, values. The 'values' object has keys for each
+ * aggregate id that was sent to the backend.
+ *
+ * Example
+ *
+ *      // let's assume that we have this configuration on the pivot grid
+ *      {
+ *          xtype:  'pivotgrid',
+ *
+ *          matrixConfig: {
+ *              type:   'remote',
+ *              url:    'your-backend-url'
+ *          },
+ *
+ *          aggregate: [{
+ *              id:         'agg1',
+ *              dataIndex:  'value',
+ *              header:     'Sum of value',
+ *              aggregator: 'sum'
+ *          },{
+ *              id:         'agg2',
+ *              dataIndex:  'value',
+ *              header:     '# records',
+ *              aggregator: 'count',
+ *              align:      'right',
+ *              renderer:   Ext.util.Format.numberRenderer('0')
+ *          }],
+ *
+ *          leftAxis: [{
+ *              id:         'person',
+ *              dataIndex:  'person',
+ *              header:     'Person',
+ *              sortable:   false
+ *          },{
+ *              id:         'country',
+ *              dataIndex:  'country',
+ *              header:     'Country'
+ *          }],
+ *
+ *          topAxis: [{
+ *              id:         'year',
+ *              dataIndex:  'year',
+ *              header:     'Year'
+ *          },{
+ *              id:         'month',
+ *              dataIndex:  'month',
+ *              header:     'Month'
+ *          }]
+ *      }
+ *
+ *      // this is the expected result from the server
+ *      {
+ *          &quot;success&quot;: true,
+ *          &quot;leftAxis&quot;: [{
+ *              &quot;key&quot;: &quot;john&quot;,
+ *              &quot;value&quot;: &quot;John&quot;,
+ *              &quot;name&quot;: &quot;John&quot;,
+ *              &quot;dimensionId&quot;: &quot;person&quot;
+ *          }, {
+ *              &quot;key&quot;: &quot;john#_#usa&quot;,
+ *              &quot;value&quot;: &quot;USA&quot;,
+ *              &quot;name&quot;: &quot;United States of America&quot;,
+ *              &quot;dimensionId&quot;: &quot;country&quot;
+ *          }, {
+ *              &quot;key&quot;: &quot;john#_#canada&quot;,
+ *              &quot;value&quot;: &quot;Canada&quot;,
+ *              &quot;name&quot;: &quot;Canada&quot;,
+ *              &quot;dimensionId&quot;: &quot;country&quot;
+ *          }],
+ *          &quot;topAxis&quot;: [{
+ *              &quot;key&quot;: &quot;2014&quot;,
+ *              &quot;value&quot;: &quot;2014&quot;,
+ *              &quot;name&quot;: &quot;2014&quot;,
+ *              &quot;dimensionId&quot;: &quot;year&quot;
+ *          }, {
+ *              &quot;key&quot;: &quot;2014#_#2&quot;,
+ *              &quot;value&quot;: &quot;2&quot;,
+ *              &quot;name&quot;: &quot;February&quot;,
+ *              &quot;dimensionId&quot;: &quot;month&quot;
+ *          }],
+ *          &quot;results&quot;: [{
+ *              &quot;leftKey&quot;: &quot;grandtotal&quot;,
+ *              &quot;topKey&quot;: &quot;grandtotal&quot;,
+ *              &quot;values&quot;: {
+ *                  &quot;agg1&quot;: 100,
+ *                  &quot;agg2&quot;: 20
+ *              }
+ *          }, {
+ *              &quot;leftKey&quot;: &quot;john&quot;,
+ *              &quot;topKey&quot;: &quot;grandtotal&quot;,
+ *              &quot;values&quot;: {
+ *                  &quot;agg1&quot;: 100,
+ *                  &quot;agg2&quot;: 20
+ *              }
+ *          }, {
+ *              &quot;leftKey&quot;: &quot;john#_#usa&quot;,
+ *              &quot;topKey&quot;: &quot;grandtotal&quot;,
+ *              &quot;values&quot;: {
+ *                  &quot;agg1&quot;: 30,
+ *                  &quot;agg2&quot;: 7
+ *              }
+ *          }, {
+ *              &quot;leftKey&quot;: &quot;john#_#canada&quot;,
+ *              &quot;topKey&quot;: &quot;grandtotal&quot;,
+ *              &quot;values&quot;: {
+ *                  &quot;agg1&quot;: 70,
+ *                  &quot;agg2&quot;: 13
+ *              }
+ *          }, {
+ *              &quot;leftKey&quot;: &quot;grandtotal&quot;,
+ *              &quot;topKey&quot;: &quot;2014&quot;,
+ *              &quot;values&quot;: {
+ *                  &quot;agg1&quot;: 100,
+ *                  &quot;agg2&quot;: 20
+ *              }
+ *          }, {
+ *              &quot;leftKey&quot;: &quot;grandtotal&quot;,
+ *              &quot;topKey&quot;: &quot;2014#_#2&quot;,
+ *              &quot;values&quot;: {
+ *                  &quot;agg1&quot;: 50,
+ *                  &quot;agg2&quot;: 70
+ *              }
+ *          }, {
+ *              &quot;leftKey&quot;: &quot;john&quot;,
+ *              &quot;topKey&quot;: &quot;2014&quot;,
+ *              &quot;values&quot;: {
+ *                  &quot;agg1&quot;: 100,
+ *                  &quot;agg2&quot;: 20
+ *              }
+ *          }, {
+ *              &quot;leftKey&quot;: &quot;john&quot;,
+ *              &quot;topKey&quot;: &quot;2014#_#2&quot;,
+ *              &quot;values&quot;: {
+ *                  &quot;agg1&quot;: 100,
+ *                  &quot;agg2&quot;: 20
+ *              }
+ *          }, {
+ *              &quot;leftKey&quot;: &quot;john#_#usa&quot;,
+ *              &quot;topKey&quot;: &quot;2014&quot;,
+ *              &quot;values&quot;: {
+ *                  &quot;agg1&quot;: 70,
+ *                  &quot;agg2&quot;: 13
+ *              }
+ *          }, {
+ *              &quot;leftKey&quot;: &quot;john#_#usa&quot;,
+ *              &quot;topKey&quot;: &quot;2014#_#2&quot;,
+ *              &quot;values&quot;: {
+ *                  &quot;agg1&quot;: 70,
+ *                  &quot;agg2&quot;: 13
+ *              }
+ *          }, {
+ *              &quot;leftKey&quot;: &quot;john#_#canada&quot;,
+ *              &quot;topKey&quot;: &quot;2014&quot;,
+ *              &quot;values&quot;: {
+ *                  &quot;agg1&quot;: 30,
+ *                  &quot;agg2&quot;: 7
+ *              }
+ *          }, {
+ *              &quot;leftKey&quot;: &quot;john#_#canada&quot;,
+ *              &quot;topKey&quot;: &quot;2014#_#2&quot;,
+ *              &quot;values&quot;: {
+ *                  &quot;agg1&quot;: 30,
+ *                  &quot;agg2&quot;: 7
+ *              }
+ *          }]
+ *      }
+ *
+ *
+ * It is very important to use the dimension IDs that were sent to the backend
+ * instead of creating new ones.
+ *
+ * This class can also serve as an example for implementing various types of
+ * remote matrix.
+ *
+ *
+ */
+Ext.define('Ext.pivot.matrix.Remote', {
+    alternateClassName: [
+        'Mz.aggregate.matrix.Remote'
+    ],
+
+    extend: 'Ext.pivot.matrix.Base',
+    
+    alias:  'pivotmatrix.remote',
+
+<span id='Ext-pivot-matrix-Remote-event-beforerequest'>    /**
+</span>     * Fires before requesting data from the server side.
+     * Return false if you don't want to make the Ajax request.
+     *
+     * @event beforerequest
+     * @param {Ext.pivot.matrix.Remote} matrix Reference to the Matrix object
+     * @param {Object} params Params sent by the Ajax request
+     */
+
+<span id='Ext-pivot-matrix-Remote-event-requestexception'>    /**
+</span>     * Fires if there was any Ajax exception or the success value in the response was false.
+     *
+     * @event requestexception
+     * @param {Ext.pivot.matrix.Remote} matrix Reference to the Matrix object
+     * @param {Object} response The Ajax response object
+     */
+
+<span id='Ext-pivot-matrix-Remote-cfg-url'>    /**
+</span>     * @cfg {String} url
+     *
+     * URL on the server side where the calculations are performed.
+     */
+    url:        '',
+<span id='Ext-pivot-matrix-Remote-cfg-timeout'>    /**
+</span>     * @cfg {Number} timeout
+     *
+     * The timeout in miliseconds to be used for the server side request.
+     * Default to 30 seconds.
+     */
+    timeout:    3000,
+
+<span id='Ext-pivot-matrix-Remote-method-onBeforeRequest'>    /**
+</span>     * @method
+     *
+     * Template function called before doing the Ajax request
+     * You could change the request params in a subclass if you implement this method.
+     * Return false if you don't want to make the Ajax request.
+     *
+     * @param {Object} params
+     */
+    onBeforeRequest: Ext.emptyFn,
+    
+<span id='Ext-pivot-matrix-Remote-method-onRequestException'>    /**
+</span>     * @method
+     *
+     * Template function called if there was any Ajax exception or the success value
+     * in the response was false.
+     * You could handle the exception in a subclass if you implement this method.
+     *
+     * @param {Object} response
+     */
+    onRequestException: Ext.emptyFn,
+
+<span id='Ext-pivot-matrix-Remote-method-onInitialize'>    onInitialize: function(){
+</span>        var me = this;
+        
+        me.remoteDelayedTask = new Ext.util.DelayedTask(me.delayedProcess, me);
+        
+        me.callParent(arguments);
+    },
+    
+<span id='Ext-pivot-matrix-Remote-method-startProcess'>    startProcess: function(){
+</span>        var me = this;
+        
+        if(Ext.isEmpty(me.url)){
+            // nothing to do
+            return;
+        }
+        
+        me.clearData();
+        
+        // let's start the process
+        me.fireEvent('start', me);
+
+        me.statusInProgress = false;
+        
+        me.remoteDelayedTask.delay(5);
+    },
+    
+<span id='Ext-pivot-matrix-Remote-method-delayedProcess'>    delayedProcess: function(){
+</span>        var me = this,
+            leftAxis = [],
+            topAxis = [],
+            aggregate = [],
+            ret, params;
+        
+        me.leftAxis.dimensions.each(function(item){
+            leftAxis.push(item.serialize());
+        });
+        
+        me.topAxis.dimensions.each(function(item){
+            topAxis.push(item.serialize());
+        });
+        
+        me.aggregate.each(function(item){
+            aggregate.push(item.serialize());
+        });
+        
+        params = {
+            keysSeparator:  me.keysSeparator,
+            grandTotalKey:  me.grandTotalKey,
+            leftAxis:       leftAxis,
+            topAxis:        topAxis,
+            aggregate:      aggregate
+        };
+        
+        ret = me.fireEvent('beforerequest', me, params);
+        
+        if(ret !== false){
+            if(Ext.isFunction(me.onBeforeRequest)){
+                ret = me.onBeforeRequest(params);
+            }
+        }
+        
+        if(ret === false){
+            me.endProcess();        
+        }else{
+            // do an Ajax call to the configured URL and fetch the results
+            Ext.Ajax.request({
+                url:        me.url,
+                timeout:    me.timeout,
+                jsonData:   params,
+                callback:   me.processRemoteResults,
+                scope:      me
+            });
+        }
+    },
+    
+<span id='Ext-pivot-matrix-Remote-method-processRemoteResults'>    /**
+</span>     * Ajax request callback
+     *
+     * @private
+     */
+    processRemoteResults: function(options, success, response){
+        var me = this,
+            exception = !success,
+            data = Ext.JSON.decode(response.responseText, true);
+        
+        if(success){
+            exception = (!data || !data['success']);
+        }
+        
+        if(exception){
+            // handle exception
+            me.fireEvent('requestexception', me, response);
+            
+            if(Ext.isFunction(me.onRequestException)){
+                me.onRequestException(response);
+            }
+
+            me.endProcess();
+            return;
+        }
+        
+        Ext.Array.each(Ext.Array.from(data.leftAxis || []), function(item){
+            if(Ext.isObject(item)){
+                me.leftAxis.addItem(item);
+            }
+        });
+        
+        Ext.Array.each(Ext.Array.from(data.topAxis || []), function(item){
+            if(Ext.isObject(item)){
+                me.topAxis.addItem(item);
+            }
+        });
+        
+        Ext.Array.each(Ext.Array.from(data.results || []), function(item){
+            if(Ext.isObject(item)){
+                var result = me.results.add(item.leftKey || '', item.topKey || '');
+                Ext.Object.each(item.values || {}, result.addValue, result);
+            }
+        });
+        
+        me.endProcess();
+    }
+    
+});</pre>
+</body>
+</html>

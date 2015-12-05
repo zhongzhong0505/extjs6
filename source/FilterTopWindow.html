@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>The source code</title>
+  <link href="../resources/prettify/prettify.css" type="text/css" rel="stylesheet" />
+  <script type="text/javascript" src="../resources/prettify/prettify.js"></script>
+  <style type="text/css">
+    .highlight { display: block; background-color: #ddd; }
+  </style>
+  <script type="text/javascript">
+    function highlight() {
+      document.getElementById(location.hash.replace(/#/, "")).className = "highlight";
+    }
+  </script>
+</head>
+<body onload="prettyPrint(); highlight();">
+  <pre class="prettyprint lang-js"><span id='Ext-pivot-plugin-configurator-FilterTopWindow'>/**
+</span> *
+ * This is the window that allows configuring a top10 value filter
+ *
+ * @private
+ *
+ */
+Ext.define('Ext.pivot.plugin.configurator.FilterTopWindow',{
+    extend: 'Ext.window.Window',
+    
+    requires: [
+        'Ext.form.Panel',
+        'Ext.form.FieldContainer',
+        'Ext.form.field.Text',
+        'Ext.form.field.Hidden',
+        'Ext.form.field.ComboBox',
+        'Ext.layout.container.HBox'
+    ],
+    
+<span id='Ext-pivot-plugin-configurator-FilterTopWindow-cfg-modal'>    modal:          true,
+</span><span id='Ext-pivot-plugin-configurator-FilterTopWindow-cfg-closeAction'>    closeAction:    'destroy',
+</span>    
+<span id='Ext-pivot-plugin-configurator-FilterTopWindow-property-titleText'>    titleText:      'Top 10 filter ({0})',
+</span><span id='Ext-pivot-plugin-configurator-FilterTopWindow-property-fieldText'>    fieldText:      'Show',
+</span><span id='Ext-pivot-plugin-configurator-FilterTopWindow-property-sortResultsText'>    sortResultsText:'Sort results',
+</span>
+<span id='Ext-pivot-plugin-configurator-FilterTopWindow-method-initComponent'>    initComponent: function(){
+</span>        var me = this,
+            items = [];
+            
+        items.push({
+            xtype:          'combo',
+            editable:       false,
+            queryMode:      'local',
+            valueField:     'value',
+            store:          me.storeTopOrder,
+            name:           'topOrder'
+        },{
+            xtype:          'textfield',
+            margin:         '0 0 0 5',
+            name:           'value'
+        },{
+            xtype:          'combo',
+            margin:         '0 0 0 5',
+            editable:       false,
+            queryMode:      'local',
+            valueField:     'value',
+            store:          me.storeTopType,
+            name:           'topType'
+        },{
+            xtype:          'combo',
+            margin:         '0 0 0 5',
+            editable:       false,
+            queryMode:      'local',
+            valueField:     'value',
+            store:          me.storeAgg,
+            name:           'dimensionId'
+        });
+        
+        Ext.apply(me, {
+            title:      Ext.String.format(me.titleText, me.title),
+            layout:     'fit',
+            
+            items: [{
+                xtype:  'form',
+                bodyPadding:    5,
+                
+                defaults: {
+                    allowBlank: false
+                },
+                
+                items: [{
+                    xtype:  'hidden',
+                    name:   'type'
+                },{
+                    xtype:  'hidden',
+                    name:   'operator'
+                },{
+                    xtype:          'fieldcontainer',
+                    labelSeparator: '',
+                    fieldLabel:     me.fieldText,
+                    labelAlign:     'top',
+                    layout: {
+                        type: 'hbox',
+                        align: 'stretch'
+                    },
+                    
+                    defaults: {
+                        flex:       1,
+                        allowBlank: false
+                    },
+                    
+                    items: items 
+                },{
+                    xtype:          'checkbox',
+                    boxLabel:       me.sortResultsText,
+                    name:           'topSort'
+                }]
+            }],
+            
+            buttons: [{
+                text:       Ext.Msg.buttonText.ok,
+                handler:    me.applyFilter,
+                scope:      me
+            },{
+                text:       Ext.Msg.buttonText.cancel,
+                handler:    me.cancelFilter,
+                scope:      me
+            }]
+        });
+        
+        me.callParent(arguments);
+    },
+    
+<span id='Ext-pivot-plugin-configurator-FilterTopWindow-method-applyFilter'>    applyFilter: function(){
+</span>        var form = this.down('form').getForm();
+
+        if(form.isValid()){
+            this.fireEvent('filter', this, form.getValues());
+        }
+    },
+    
+<span id='Ext-pivot-plugin-configurator-FilterTopWindow-method-cancelFilter'>    cancelFilter: function(){
+</span>        this.close();
+    }
+});</pre>
+</body>
+</html>

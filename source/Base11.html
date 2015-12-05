@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>The source code</title>
+  <link href="../resources/prettify/prettify.css" type="text/css" rel="stylesheet" />
+  <script type="text/javascript" src="../resources/prettify/prettify.js"></script>
+  <style type="text/css">
+    .highlight { display: block; background-color: #ddd; }
+  </style>
+  <script type="text/javascript">
+    function highlight() {
+      document.getElementById(location.hash.replace(/#/, "")).className = "highlight";
+    }
+  </script>
+</head>
+<body onload="prettyPrint(); highlight();">
+  <pre class="prettyprint lang-js"><span id='Ext-pivot-result-Base'>/**
+</span> * Base implementation of a result object.
+ *
+ * The Result object stores all calculated values for the aggregate dimensions
+ * for a left/top item pair.
+ *
+ */
+Ext.define('Ext.pivot.result.Base', {
+
+    alias: 'pivotresult.base',
+
+    mixins: [
+        'Ext.mixin.Factoryable'
+    ],
+
+<span id='Ext-pivot-result-Base-cfg-leftKey'>    /**
+</span>     * @cfg {String} leftKey (required)
+     *
+     *  Key of left axis item or grandTotalKey
+     */
+    leftKey:        '',
+<span id='Ext-pivot-result-Base-cfg-topKey'>    /**
+</span>     * @cfg {String} topKey (required)
+     *
+     * Key of top axis item or grandTotalKey
+     */
+    topKey:         '',
+<span id='Ext-pivot-result-Base-property-dirty'>    /**
+</span>     * @property {Boolean} dirty
+     *
+     * Set this flag on true if you modified at least one record in this result.
+     * The grid cell will be marked as dirty in such a case.
+     */
+    dirty:          false,
+
+<span id='Ext-pivot-result-Base-property-values'>    /**
+</span>     * @property {Object} values
+     *
+     * Object that stores all calculated values for each pivot aggregate.
+     * The object keys are the dimension ids.
+     *
+     * @private
+     */
+    values:         null,
+<span id='Ext-pivot-result-Base-property-matrix'>    /**
+</span>     * @property {Ext.pivot.matrix.Base} matrix
+     * @readonly
+     *
+     * Reference to the matrix object
+     */
+    matrix:         null,
+
+<span id='Ext-pivot-result-Base-method-constructor'>    constructor: function(config){
+</span>        var me = this;
+
+        Ext.apply(me, config || {});
+        me.values = {};
+
+        return me.callParent(arguments);
+    },
+
+<span id='Ext-pivot-result-Base-method-destroy'>    destroy: function(){
+</span>        var me = this;
+
+        me.matrix = me.values = null;
+        me.leftAxisItem = me.topAxisItem = null;
+
+        return me.callParent(arguments);
+    },
+
+<span id='Ext-pivot-result-Base-method-calculate'>    /**
+</span>     * Calculate all pivot aggregate dimensions for the internal records. Useful when using a
+     * {@link Ext.pivot.matrix.Local Local} matrix.
+     *
+     */
+    calculate: Ext.emptyFn,
+
+<span id='Ext-pivot-result-Base-method-calculateByFn'>    /**
+</span>     * @method
+     *
+     * Besides the calculation functions defined on your aggregate dimension you could
+     * calculate values based on other store fields and custom functions.
+     *
+     * @param key The generated value will be stored in the result under this key for later extraction
+     * @param dataIndex The dataIndex that should be used on the records for doing calculations
+     * @param aggFn Your custom function
+     */
+    calculateByFn: Ext.emptyFn,
+
+<span id='Ext-pivot-result-Base-method-addValue'>    /**
+</span>     * Add the calculated value for an aggregate dimension to the internal values storage
+     *
+     * @param dimensionId
+     * @param value
+     */
+    addValue: function(dimensionId, value){
+        this.values[dimensionId] = value;
+    },
+
+<span id='Ext-pivot-result-Base-method-getValue'>    /**
+</span>     * Returns the calculated value for the specified aggregate dimension
+     *
+     * @param dimensionId
+     */
+    getValue: function(dimensionId){
+        return this.values[dimensionId];
+    },
+
+<span id='Ext-pivot-result-Base-method-getLeftAxisItem'>    /**
+</span>     * Returns the left axis item
+     *
+     * @returns {Ext.pivot.axis.Item}
+     */
+    getLeftAxisItem: function(){
+        return this.matrix.leftAxis.items.getByKey(this.leftKey);
+    },
+
+<span id='Ext-pivot-result-Base-method-getTopAxisItem'>    /**
+</span>     * Returns the top axis item
+     *
+     * @returns {Ext.pivot.axis.Item}
+     */
+    getTopAxisItem: function(){
+        return this.matrix.topAxis.items.getByKey(this.topKey);
+    }
+});</pre>
+</body>
+</html>

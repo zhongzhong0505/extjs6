@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>The source code</title>
+  <link href="../resources/prettify/prettify.css" type="text/css" rel="stylesheet" />
+  <script type="text/javascript" src="../resources/prettify/prettify.js"></script>
+  <style type="text/css">
+    .highlight { display: block; background-color: #ddd; }
+  </style>
+  <script type="text/javascript">
+    function highlight() {
+      document.getElementById(location.hash.replace(/#/, "")).className = "highlight";
+    }
+  </script>
+</head>
+<body onload="prettyPrint(); highlight();">
+  <pre class="prettyprint lang-js"><span id='Ext-grid-column-Column'>/**
+</span> * @class Ext.grid.column.Column
+ */
+
+<span id='Ext-grid-column-Column-css_var-S-grid-column-header-font-family'>/**
+</span> * @var {string}
+ * The font-family of grid column headers
+ */
+$grid-column-header-font-family: dynamic($font-family);
+
+<span id='Ext-grid-column-Column-css_var-S-grid-column-header-font-size'>/**
+</span> * @var {number}
+ * The font-size of grid column headers
+ */
+$grid-column-header-font-size: dynamic($font-size);
+
+<span id='Ext-grid-column-Column-css_var-S-grid-column-header-font-weight'>/**
+</span> * @var {string}
+ * The font-weight of grid column headers
+ */
+$grid-column-header-font-weight: dynamic($font-weight);
+
+<span id='Ext-grid-column-Column-css_var-S-grid-column-header-line-height'>/**
+</span> * @var {number}
+ * The line-height of grid column headers
+ */
+$grid-column-header-line-height: dynamic(round($grid-column-header-font-size * 1.15));
+
+// private
+$grid-column-header-font: dynamic($grid-column-header-font-weight #{$grid-column-header-font-size}/#{$grid-column-header-line-height} $grid-column-header-font-family);
+
+<span id='Ext-grid-column-Column-css_var-S-grid-column-text-overflow'>/**
+</span> * @var {string}
+ * The text-overflow of grid column headers
+ */
+$grid-column-text-overflow: dynamic(ellipsis);
+
+
+<span id='Ext-grid-column-Column-css_var-S-grid-column-header-color'>/**
+</span> * @var {color}
+ * The text color of grid column headers
+ */
+$grid-column-header-color: dynamic(#000);
+
+<span id='Ext-grid-column-Column-css_var-S-grid-column-header-border-width'>/**
+</span> * @var {number}
+ * The border-width of grid column headers
+ */
+$grid-column-header-border-width: dynamic(1px);
+
+<span id='Ext-grid-column-Column-css_var-S-grid-column-header-border-style'>/**
+</span> * @var {string}
+ * The border-style of grid column headers
+ */
+$grid-column-header-border-style: dynamic(solid);
+
+<span id='Ext-grid-column-Column-css_var-S-grid-column-header-focus-color'>/**
+</span> * @var {color}
+ * The text color of focused grid column headers
+ */
+$grid-column-header-focus-color: dynamic($grid-column-header-color);
+
+<span id='Ext-grid-column-Column-css_var-S-grid-column-header-focus-background-color'>/**
+</span> * @var {color}
+ * The background-color of focused grid column headers
+ */
+$grid-column-header-focus-background-color: dynamic('none');
+
+<span id='Ext-grid-column-Column-css_var-S-grid-column-header-focus-border-width'>/**
+</span> * @var {number}
+ * The border-width of focused grid column headers
+ */
+$grid-column-header-focus-border-width: dynamic(1px);
+
+<span id='Ext-grid-column-Column-css_var-S-grid-column-header-focus-border-style'>/**
+</span> * @var {string}
+ * The border-style of focused grid column headers
+ */
+$grid-column-header-focus-border-style: dynamic(solid);
+
+<span id='Ext-grid-column-Column-css_var-S-grid-column-header-focus-border-inset'>/**
+</span> * @var {number}
+ * The spacing between column header element border and inner focus border
+ */
+$grid-column-header-focus-border-inset: dynamic(0px);
+
+<span id='Ext-grid-column-Column-css_var-S-grid-column-header-focus-border-color'>/**
+</span> * @var {color}
+ * The border color of focused grid column headers
+ */
+$grid-column-header-focus-border-color: dynamic(#333);
+
+// private
+$grid-header-height: $grid-column-header-line-height + vertical($grid-header-padding);
+</pre>
+</body>
+</html>

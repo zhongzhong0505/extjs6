@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>The source code</title>
+  <link href="../resources/prettify/prettify.css" type="text/css" rel="stylesheet" />
+  <script type="text/javascript" src="../resources/prettify/prettify.js"></script>
+  <style type="text/css">
+    .highlight { display: block; background-color: #ddd; }
+  </style>
+  <script type="text/javascript">
+    function highlight() {
+      document.getElementById(location.hash.replace(/#/, "")).className = "highlight";
+    }
+  </script>
+</head>
+<body onload="prettyPrint(); highlight();">
+  <pre class="prettyprint lang-js"><span id='Ext-ProgressBar'>/** @class Ext.ProgressBar */
+</span>//
+
+$progress-bar-base-color: dynamic($base-color);
+$progress-border-color: dynamic(adjust-color($progress-bar-base-color, $hue: 0deg, $saturation: -3.08%, $lightness: -23.725%));
+$progress-background-color: dynamic(adjust-color($progress-bar-base-color, $hue: 0deg, $saturation: -11.37%, $lightness: 7.451%));
+$progress-bar-background-color: dynamic(adjust-color($progress-bar-base-color, $hue: 0deg, $saturation: 8.187%, $lightness: -17.647%));
+$progress-text-color-back: dynamic(adjust-color($progress-bar-base-color, $hue: 0deg, $saturation: -10.895%, $lightness: -43.725%));
+
+$progress-text-font-size: dynamic(ceil($font-size * .9));
+$progress-bar-background-gradient: dynamic('glossy');
+</pre>
+</body>
+</html>

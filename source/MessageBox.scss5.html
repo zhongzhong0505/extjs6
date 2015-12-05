@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>The source code</title>
+  <link href="../resources/prettify/prettify.css" type="text/css" rel="stylesheet" />
+  <script type="text/javascript" src="../resources/prettify/prettify.js"></script>
+  <style type="text/css">
+    .highlight { display: block; background-color: #ddd; }
+  </style>
+  <script type="text/javascript">
+    function highlight() {
+      document.getElementById(location.hash.replace(/#/, "")).className = "highlight";
+    }
+  </script>
+</head>
+<body onload="prettyPrint(); highlight();">
+  <pre class="prettyprint lang-js"><span id='Ext-window-MessageBox'>/**
+</span> * @class Ext.window.MessageBox
+ */
+
+<span id='Ext-window-MessageBox-css_var-S-messagebox-body-background-color'>/**
+</span> * @var {color}
+ * The background-color of the MessageBox body
+ */
+$messagebox-body-background-color: dynamic($window-body-background-color);
+
+<span id='Ext-window-MessageBox-css_var-S-messagebox-body-border-width'>/**
+</span> * @var {number}
+ * The border-width of the MessageBox body
+ */
+$messagebox-body-border-width: dynamic(0);
+
+<span id='Ext-window-MessageBox-css_var-S-messagebox-body-border-color'>/**
+</span> * @var {color}
+ * The border-color of the MessageBox body
+ */
+$messagebox-body-border-color: dynamic($window-body-border-color);
+
+<span id='Ext-window-MessageBox-css_var-S-messagebox-body-border-style'>/**
+</span> * @var {string}
+ * The border-style of the MessageBox body
+ */
+$messagebox-body-border-style: dynamic($window-body-border-style);
+
+<span id='Ext-window-MessageBox-css_var-S-messagebox-icon-background-position'>/**
+</span> * @var {list}
+ * The background-position of the MessageBox icon
+ */
+$messagebox-icon-background-position: dynamic(left top);
+
+<span id='Ext-window-MessageBox-css_var-S-messagebox-icon-size'>/**
+</span> * @var {number}
+ * The size of the MessageBox icon
+ */
+$messagebox-icon-size: dynamic(32px);
+
+<span id='Ext-window-MessageBox-css_var-S-messagebox-icon-spacing'>/**
+</span> * @var {number}
+ * The amount of space between the MessageBox icon and the message text
+ */
+$messagebox-icon-spacing: dynamic(10px);
+
+<span id='Ext-window-MessageBox-css_var-S-messagebox-glyph-font-size'>/**
+</span> * @var {number}
+ * The font size to use for MessageBox icons when {@link Global_CSS#$enable-font-icons} is `true`.
+ */
+$messagebox-glyph-font-size: dynamic($messagebox-icon-size);
+
+<span id='Ext-window-MessageBox-css_var-S-messagebox-info-glyph'>/**
+</span> * @var {string/list}
+ * Glyph for the &quot;info&quot; icon when {@link Global_CSS#$enable-font-icons} is `true`.
+ */
+$messagebox-info-glyph: dynamic($fa-var-info-circle $messagebox-glyph-font-size $font-icon-font-family);
+
+<span id='Ext-window-MessageBox-css_var-S-messagebox-info-glyph-color'>/**
+</span> * @var {color}
+ * The color to use for the &quot;info&quot; icon when {@link Global_CSS#$enable-font-icons} is `true`.
+ */
+$messagebox-info-glyph-color: dynamic(#808080);
+
+<span id='Ext-window-MessageBox-css_var-S-messagebox-warning-glyph'>/**
+</span> * @var {string/list}
+ * Glyph for the &quot;warning&quot; icon when {@link Global_CSS#$enable-font-icons} is `true`.
+ */
+$messagebox-warning-glyph: dynamic($fa-var-exclamation-triangle $messagebox-glyph-font-size $font-icon-font-family);
+
+<span id='Ext-window-MessageBox-css_var-S-messagebox-warning-glyph-color'>/**
+</span> * @var {color}
+ * The color to use for the &quot;warning&quot; icon when {@link Global_CSS#$enable-font-icons} is `true`.
+ */
+$messagebox-warning-glyph-color: dynamic(#f8d400);
+
+<span id='Ext-window-MessageBox-css_var-S-messagebox-question-glyph'>/**
+</span> * @var {string/list}
+ * Glyph for the &quot;question&quot; icon when {@link Global_CSS#$enable-font-icons} is `true`.
+ */
+$messagebox-question-glyph: dynamic($fa-var-question-circle $messagebox-glyph-font-size $font-icon-font-family);
+
+<span id='Ext-window-MessageBox-css_var-S-messagebox-question-glyph-color'>/**
+</span> * @var {color}
+ * The color to use for the &quot;question&quot; icon when {@link Global_CSS#$enable-font-icons} is `true`.
+ */
+$messagebox-question-glyph-color: dynamic(#808080);
+
+<span id='Ext-window-MessageBox-css_var-S-messagebox-error-glyph'>/**
+</span> * @var {string/list}
+ * Glyph for the &quot;error&quot; icon when {@link Global_CSS#$enable-font-icons} is `true`.
+ */
+$messagebox-error-glyph: dynamic($fa-var-times-circle $messagebox-glyph-font-size $font-icon-font-family);
+
+<span id='Ext-window-MessageBox-css_var-S-messagebox-error-glyph-color'>/**
+</span> * @var {color}
+ * The color to use for the &quot;error&quot; icon when {@link Global_CSS#$enable-font-icons} is `true`.
+ */
+$messagebox-error-glyph-color: dynamic(#ee611f);
+</pre>
+</body>
+</html>

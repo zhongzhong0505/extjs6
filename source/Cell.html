@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>The source code</title>
+  <link href="../resources/prettify/prettify.css" type="text/css" rel="stylesheet" />
+  <script type="text/javascript" src="../resources/prettify/prettify.js"></script>
+  <style type="text/css">
+    .highlight { display: block; background-color: #ddd; }
+  </style>
+  <script type="text/javascript">
+    function highlight() {
+      document.getElementById(location.hash.replace(/#/, "")).className = "highlight";
+    }
+  </script>
+</head>
+<body onload="prettyPrint(); highlight();">
+  <pre class="prettyprint lang-js"><span id='Ext-exporter-file-excel-Cell'>/**
+</span> * This class is used to create an xml Excel Cell.
+ *
+ * The data type of the cell value is automatically determined.
+ *
+ */
+Ext.define('Ext.exporter.file.excel.Cell', {
+    extend: 'Ext.exporter.file.Base',
+
+    config: {
+<span id='Ext-exporter-file-excel-Cell-cfg-dataType'>        /**
+</span>         * @cfg {String} dataType (required)
+         *
+         * Excel data type for the cell value
+         */
+        dataType: 'String',
+<span id='Ext-exporter-file-excel-Cell-cfg-formula'>        /**
+</span>         * @cfg {String} formula
+         *
+         * Specifies the formula stored in this cell. All formulas are persisted in R1C1 notation because they are
+         * significantly easier to parse and generate than A1-style formulas. The formula is calculated upon reload
+         * unless calculation is set to manual. Recalculation of the formula overrides the value in this cell's Value config.
+         *
+         * Examples:
+         *
+         * - &quot;=SUM(R1C1:R2C2)&quot;: sums up values from Row1/Column1 to Row2/Column2
+         * - &quot;=SUM(R[-2]C:R[-1]C[1])&quot;: sums up values from 2 rows above the current row and current column to
+         * values from 1 row above the current row and 1 column after the current column
+         * - &quot;=SUM(R[-1]C,R[-1]C[1])&quot;: sums up values from cell positioned one row above current row and current column,
+         * and the cell positioned one row above current row and next column
+         *
+         * Check Excel for more formulas.
+         */
+        formula: null,
+<span id='Ext-exporter-file-excel-Cell-cfg-index'>        /**
+</span>         * @cfg {Number} index
+         *
+         * Specifies the column index of this cell within the containing row. If this tag is not specified, the first
+         * instance of a Cell element within a row has an assumed Index=&quot;1&quot;. Each additional Cell element has an assumed
+         * Index that is one higher.
+         *
+         * Indices must appear in strictly increasing order. Failure to do so will result in an XML Spreadsheet
+         * document that is invalid. Indices do not need to be sequential, however. Omitted indices are formatted with
+         * either the default format, the column's format, or the table's format (depending on what has been specified).
+         *
+         * Indices must not overlap. If duplicates exist, the behavior is unspecified and the XML Spreadsheet document
+         * is considered invalid. If the previous cell is a merged cell and no index is specified on this cell, its
+         * start index is assumed to be the first cell after the merge.
+         */
+        index: null,
+<span id='Ext-exporter-file-excel-Cell-cfg-styleId'>        /**
+</span>         * @cfg {String} styleId
+         *
+         * Excel style attached to this cell
+         */
+        styleId: null,
+<span id='Ext-exporter-file-excel-Cell-cfg-mergeAcross'>        /**
+</span>         * @cfg {Number} mergeAcross
+         *
+         * Number of cells to merge to the right side of this cell
+         */
+        mergeAcross: null,
+<span id='Ext-exporter-file-excel-Cell-cfg-mergeDown'>        /**
+</span>         * @cfg {Number} mergeDown
+         *
+         * Number of cells to merge below this cell
+         */
+        mergeDown: null,
+<span id='Ext-exporter-file-excel-Cell-cfg-value'>        /**
+</span>         * @cfg {Number/Date/String} value (required)
+         *
+         * Value assigned to this cell
+         */
+        value: ''
+    },
+
+<span id='Ext-exporter-file-excel-Cell-property-tpl'>    tpl: [
+</span>        '               &lt;Cell',
+        '&lt;tpl if=&quot;this.exists(index)&quot;&gt; ss:Index=&quot;{index}&quot;&lt;/tpl&gt;',
+        '&lt;tpl if=&quot;this.exists(styleId)&quot;&gt; ss:StyleID=&quot;{styleId}&quot;&lt;/tpl&gt;',
+        '&lt;tpl if=&quot;this.exists(mergeAcross)&quot;&gt; ss:MergeAcross=&quot;{mergeAcross}&quot;&lt;/tpl&gt;',
+        '&lt;tpl if=&quot;this.exists(mergeDown)&quot;&gt; ss:MergeDown=&quot;{mergeDown}&quot;&lt;/tpl&gt;',
+        '&lt;tpl if=&quot;this.exists(formula)&quot;&gt; ss:Formula=&quot;{formula}&quot;&lt;/tpl&gt;',
+        '&gt;\n',
+        '                   &lt;Data ss:Type=&quot;{dataType}&quot;&gt;{[this.formatValue(values.value)]}&lt;/Data&gt;\n',
+        '               &lt;/Cell&gt;\n',
+        {
+            exists: function(value){
+                return !Ext.isEmpty(value);
+            },
+            formatValue: function(value){
+                var format = Ext.util.Format;
+                return (value instanceof Date ? Ext.Date.format(value, 'Y-m-d\\TH:i:s.u') : format.htmlEncode(format.htmlDecode(value)));
+            }
+        }
+    ],
+
+<span id='Ext-exporter-file-excel-Cell-method-render'>    render: function(){
+</span>        var me = this,
+            v = me.getValue();
+
+        // let's detect the data type
+        if(v instanceof Date){
+            me.setDataType('DateTime');
+        }else if(Ext.isNumeric(v)){
+            me.setDataType('Number');
+        }else{
+            me.setDataType('String');
+        }
+
+        return me.callParent(arguments);
+    }
+
+});</pre>
+</body>
+</html>

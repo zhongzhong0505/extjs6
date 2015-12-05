@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>The source code</title>
+  <link href="../resources/prettify/prettify.css" type="text/css" rel="stylesheet" />
+  <script type="text/javascript" src="../resources/prettify/prettify.js"></script>
+  <style type="text/css">
+    .highlight { display: block; background-color: #ddd; }
+  </style>
+  <script type="text/javascript">
+    function highlight() {
+      document.getElementById(location.hash.replace(/#/, "")).className = "highlight";
+    }
+  </script>
+</head>
+<body onload="prettyPrint(); highlight();">
+  <pre class="prettyprint lang-js">// in neptune we move the border for trigger fields from the input element to the trigger wrap
+// File fields need to have the border moved back to the input element
+.#{$prefix}form-file-wrap .#{$prefix}form-trigger-wrap {
+    border: 0;
+}
+
+.#{$prefix}form-file-wrap .#{$prefix}form-trigger-wrap .#{$prefix}form-text {
+    border: $form-field-border-width solid;
+    border-color: $form-field-border-color;
+    height: $form-field-height;
+}</pre>
+</body>
+</html>

@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>The source code</title>
+  <link href="../resources/prettify/prettify.css" type="text/css" rel="stylesheet" />
+  <script type="text/javascript" src="../resources/prettify/prettify.js"></script>
+  <style type="text/css">
+    .highlight { display: block; background-color: #ddd; }
+  </style>
+  <script type="text/javascript">
+    function highlight() {
+      document.getElementById(location.hash.replace(/#/, "")).className = "highlight";
+    }
+  </script>
+</head>
+<body onload="prettyPrint(); highlight();">
+  <pre class="prettyprint lang-js"><span id='Ext-pivot-result-Collection'>/**
+</span> * This class stores the matrix results. When the pivot component uses the
+ * {@link Ext.pivot.matrix.Local Local} matrix then this class does
+ * calculations in the browser.
+ *
+ */
+Ext.define('Ext.pivot.result.Collection', {
+    alternateClassName: [
+        'Mz.aggregate.matrix.Results'
+    ],
+
+    requires: [
+        'Ext.pivot.MixedCollection',
+        'Ext.pivot.result.Base'
+    ],
+
+<span id='Ext-pivot-result-Collection-cfg-resultType'>    /**
+</span>     * @cfg {String} resultType
+     *
+     * Define here what class to be used when creating {@link Ext.pivot.result.Base Result} objects
+     */
+    resultType: 'base',
+
+<span id='Ext-pivot-result-Collection-property-items'>    /**
+</span>     * @property {Ext.pivot.MixedCollection} items
+     *
+     * Collection of {@link Ext.pivot.result.Base Result} objects
+     *
+     * @private
+     */
+    items:  null,
+
+<span id='Ext-pivot-result-Collection-cfg-matrix'>    /**
+</span>     * @cfg {Ext.pivot.matrix.Base} matrix
+     *
+     * Reference to the matrix object
+     */
+    matrix: null,
+
+<span id='Ext-pivot-result-Collection-method-constructor'>    constructor: function(config){
+</span>        var me = this;
+
+        Ext.apply(me, config || {});
+
+        me.items = Ext.create('Ext.pivot.MixedCollection');
+        me.items.getKey = function(obj){
+            return obj.leftKey + '/' + obj.topKey;
+        };
+
+        return me.callParent(arguments);
+    },
+
+<span id='Ext-pivot-result-Collection-method-destroy'>    destroy: function(){
+</span>        var me = this;
+
+        Ext.destroy(me.items);
+        me.matrix = me.items = null;
+
+        me.callParent(arguments);
+    },
+
+<span id='Ext-pivot-result-Collection-method-clear'>    /**
+</span>     * Clear all calculated results.
+     *
+     */
+    clear: function(){
+        this.items.clear();
+    },
+
+<span id='Ext-pivot-result-Collection-method-add'>    /**
+</span>     * Add a new Result object by left/top axis keys.
+     *
+     * If there is already a Result object for the left/top axis pair then return that one.
+     *
+     * @param leftKey
+     * @param topKey
+     * @returns {Ext.pivot.result.Base}
+     */
+    add: function(leftKey, topKey){
+        var obj = this.get(leftKey, topKey);
+
+        if(!obj){
+
+            obj = this.items.add(Ext.Factory.pivotresult({
+                type:           this.resultType,
+                leftKey:        leftKey,
+                topKey:         topKey,
+                matrix:         this.matrix
+            }));
+        }
+
+        return obj;
+    },
+
+<span id='Ext-pivot-result-Collection-method-get'>    /**
+</span>     * Returns the Result object for the specified left/top axis keys
+     *
+     * @param leftKey
+     * @param topKey
+     * @returns {Ext.pivot.result.Base}
+     */
+    get: function(leftKey, topKey){
+        return this.items.getByKey(leftKey + '/' + topKey);
+    },
+
+<span id='Ext-pivot-result-Collection-method-getByLeftKey'>    /**
+</span>     * Return all Result objects for the specified leftKey
+     *
+     * @param leftKey
+     * @returns Array
+     */
+    getByLeftKey: function(leftKey){
+        var col = this.items.filterBy(function(item, key){
+            var keys = String(key).split('/');
+            return (leftKey == keys[0]);
+        });
+
+        return col.getRange();
+    },
+
+<span id='Ext-pivot-result-Collection-method-getByTopKey'>    /**
+</span>     * Return all Result objects for the specified leftKey
+     *
+     * @param leftKey
+     * @returns Array
+     */
+    getByTopKey: function(topKey){
+        var col = this.items.filterBy(function(item, key){
+            var keys = String(key).split('/');
+            return (keys.length &gt; 1 &amp;&amp; topKey == keys[1]);;
+        });
+
+        return col.getRange();
+    },
+
+<span id='Ext-pivot-result-Collection-method-calculate'>    /**
+</span>     * Calculate aggregate values for each available Result object
+     *
+     */
+    calculate: function(){
+        this.items.each(function(item){
+            item.calculate();
+        });
+    }
+});</pre>
+</body>
+</html>

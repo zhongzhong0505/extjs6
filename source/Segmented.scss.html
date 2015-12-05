@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>The source code</title>
+  <link href="../resources/prettify/prettify.css" type="text/css" rel="stylesheet" />
+  <script type="text/javascript" src="../resources/prettify/prettify.js"></script>
+  <style type="text/css">
+    .highlight { display: block; background-color: #ddd; }
+  </style>
+  <script type="text/javascript">
+    function highlight() {
+      document.getElementById(location.hash.replace(/#/, "")).className = "highlight";
+    }
+  </script>
+</head>
+<body onload="prettyPrint(); highlight();">
+  <pre class="prettyprint lang-js">.#{$prefix}segmented-button {
+    display: table;
+    table-layout: fixed;
+}
+
+.#{$prefix}segmented-button-item {
+    display: table-cell;
+    vertical-align: top;
+    @if $include-slicer-border-radius {
+        &gt; .#{$prefix}frame {
+            width: 100%;
+            height: 100%;
+        }
+    }
+    
+    @if $include-slicer-border-radius {
+        .#{$prefix}btn-mc {
+            width: 100%;
+        }
+    }
+}
+
+.#{$prefix}segmented-button-item-horizontal {
+    display: table-cell;
+
+    // IE8 needs height:100% or else the &quot;frame&quot; element will not stretch to fit the
+    // height of the button
+    height: 100%;
+
+    &amp;.#{$prefix}segmented-button-first {
+        border-top-right-radius: 0;
+        border-bottom-right-radius: 0;
+
+        @if $include-slicer-border-radius {
+            .#{$prefix}btn-tr,
+            .#{$prefix}btn-mr,
+            .#{$prefix}btn-br {
+                display: none;
+            }
+        }
+    }
+
+    &amp;.#{$prefix}segmented-button-middle {
+        border-radius: 0;
+        border-left: 0;
+
+        @if $include-slicer-border-radius {
+            .#{$prefix}btn-tl,
+            .#{$prefix}btn-tr,
+            .#{$prefix}btn-ml,
+            .#{$prefix}btn-mr,
+            .#{$prefix}btn-bl,
+            .#{$prefix}btn-br {
+                display: none;
+            }
+        }
+    }
+
+    &amp;.#{$prefix}segmented-button-last {
+        border-left: 0;
+        border-top-left-radius: 0;
+        border-bottom-left-radius: 0;
+
+        @if $include-slicer-border-radius {
+            .#{$prefix}btn-tl,
+            .#{$prefix}btn-ml,
+            .#{$prefix}btn-bl {
+                display: none;
+            }
+        }
+    }
+}
+
+.#{$prefix}segmented-button-row {
+    display: table-row;
+}
+
+.#{$prefix}segmented-button-item-vertical {
+    &amp;.#{$prefix}segmented-button-first {
+        border-bottom-right-radius: 0;
+        border-bottom-left-radius: 0;
+
+        @if $include-slicer-border-radius {
+            .#{$prefix}btn-bl,
+            .#{$prefix}btn-bc,
+            .#{$prefix}btn-br {
+                display: none;
+            }
+        }
+    }
+
+    &amp;.#{$prefix}segmented-button-middle {
+        border-radius: 0;
+        border-top: 0;
+
+        @if $include-slicer-border-radius {
+            .#{$prefix}btn-tl,
+            .#{$prefix}btn-tc,
+            .#{$prefix}btn-tr,
+            .#{$prefix}btn-bl,
+            .#{$prefix}btn-bc,
+            .#{$prefix}btn-br {
+                display: none;
+            }
+        }
+    }
+
+    &amp;.#{$prefix}segmented-button-last {
+        border-top: 0;
+        border-top-right-radius: 0;
+        border-top-left-radius: 0;
+
+        @if $include-slicer-border-radius {
+            .#{$prefix}btn-tl,
+            .#{$prefix}btn-tc,
+            .#{$prefix}btn-tr {
+                display: none;
+            }
+        }
+    }
+}
+</pre>
+</body>
+</html>

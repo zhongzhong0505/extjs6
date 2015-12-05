@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>The source code</title>
+  <link href="../resources/prettify/prettify.css" type="text/css" rel="stylesheet" />
+  <script type="text/javascript" src="../resources/prettify/prettify.js"></script>
+  <style type="text/css">
+    .highlight { display: block; background-color: #ddd; }
+  </style>
+  <script type="text/javascript">
+    function highlight() {
+      document.getElementById(location.hash.replace(/#/, "")).className = "highlight";
+    }
+  </script>
+</head>
+<body onload="prettyPrint(); highlight();">
+  <pre class="prettyprint lang-js"><span id='Ext-draw-sprite-AttributeParser'>/**
+</span> * @private
+ * @class Ext.draw.sprite.AttributeParser
+ *
+ * Parsers used for sprite attributes if they are {@link Ext.draw.sprite.AttributeDefinition#normalize normalized}
+ * (default) when being {@link Ext.draw.sprite.Sprite#setAttributes set}.
+ *
+ * Methods of the singleton correpond either to the processor functions themselves or processor factories.
+ */
+Ext.define('Ext.draw.sprite.AttributeParser', {
+    singleton: true,
+<span id='Ext-draw-sprite-AttributeParser-property-attributeRe'>    attributeRe: /^url\(#([a-zA-Z\-]+)\)$/,
+</span>    requires: [
+        'Ext.draw.Color',
+        'Ext.draw.gradient.GradientDefinition'
+    ],
+
+<span id='Ext-draw-sprite-AttributeParser-property-default'>    &quot;default&quot;: Ext.identityFn,
+</span>    
+<span id='Ext-draw-sprite-AttributeParser-method-string'>    string: function (n) {
+</span>        return String(n);
+    },
+    
+<span id='Ext-draw-sprite-AttributeParser-method-number'>    number: function (n) {
+</span>        if (Ext.isNumber(+n)) {
+            return n;
+        }
+    },
+
+<span id='Ext-draw-sprite-AttributeParser-method-angle'>    /**
+</span>     * Normalize angle to the [-180,180) interval.
+     * @param n Angle in radians.
+     * @returns {Number/undefined} Normalized angle or undefined.
+     */
+    angle: function (n) {
+        if (Ext.isNumber(n)) {
+            n %= Math.PI * 2;
+            if (n &lt; -Math.PI) {
+                n += Math.PI * 2;
+            } else if (n &gt;= Math.PI) {
+                n -= Math.PI * 2;
+            }
+            return n;
+        }
+    },
+    
+<span id='Ext-draw-sprite-AttributeParser-method-data'>    data: function (n) {
+</span>        if (Ext.isArray(n)) {
+            return n.slice();
+        } else if (n instanceof Float32Array) {
+            return new Float32Array(n);
+        }
+    },
+    
+<span id='Ext-draw-sprite-AttributeParser-method-bool'>    bool: function (n) {
+</span>        return !!n;
+    },
+    
+<span id='Ext-draw-sprite-AttributeParser-method-color'>    color: function (n) {
+</span>        if (n instanceof Ext.draw.Color) {
+            return n.toString();
+        } else if (n instanceof Ext.draw.gradient.Gradient) {
+            return n;
+        } else if (!n) {
+            return Ext.draw.Color.NONE;
+        } else if (Ext.isString(n)) {
+            if (n.substr(0, 3) === 'url') {
+                n = Ext.draw.gradient.GradientDefinition.get(n);
+                if (Ext.isString(n)) {
+                    return n;
+                }
+            } else {
+                return Ext.draw.Color.fly(n).toString();
+            }
+        }
+        if (n.type === 'linear') {
+            return Ext.create('Ext.draw.gradient.Linear', n);
+        } else if (n.type === 'radial') {
+            return Ext.create('Ext.draw.gradient.Radial', n);
+        } else if (n.type === 'pattern') {
+            return Ext.create('Ext.draw.gradient.Pattern', n);
+        } else {
+            return Ext.draw.Color.NONE;
+        }
+    },
+
+<span id='Ext-draw-sprite-AttributeParser-method-limited'>    limited: function (low, hi) {
+</span>        return function (n) {
+            n = +n;
+            return Ext.isNumber(n) ? Math.min(Math.max(n, low), hi) : undefined;
+        };
+    },
+    
+<span id='Ext-draw-sprite-AttributeParser-method-limited01'>    limited01: function (n) {
+</span>        n = +n;
+        return Ext.isNumber(n) ? Math.min(Math.max(n, 0), 1) : undefined;
+    },
+
+<span id='Ext-draw-sprite-AttributeParser-method-enums'>    /**
+</span>     * Generates a function that checks if a value matches
+     * one of the given attributes.
+     * @return {Function}
+     */
+    enums: function () {
+        var enums = {},
+            args = Array.prototype.slice.call(arguments, 0),
+            i, ln;
+
+        for (i = 0, ln = args.length; i &lt; ln; i++) {
+            enums[args[i]] = true;
+        }
+        return function (n) {
+            return n in enums ? n : undefined;
+        };
+    }
+});</pre>
+</body>
+</html>

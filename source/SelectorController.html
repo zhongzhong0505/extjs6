@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>The source code</title>
+  <link href="../resources/prettify/prettify.css" type="text/css" rel="stylesheet" />
+  <script type="text/javascript" src="../resources/prettify/prettify.js"></script>
+  <style type="text/css">
+    .highlight { display: block; background-color: #ddd; }
+  </style>
+  <script type="text/javascript">
+    function highlight() {
+      document.getElementById(location.hash.replace(/#/, "")).className = "highlight";
+    }
+  </script>
+</head>
+<body onload="prettyPrint(); highlight();">
+  <pre class="prettyprint lang-js"><span id='Ext-ux-colorpick-SelectorController'>/**
+</span> * @private
+ */
+Ext.define('Ext.ux.colorpick.SelectorController', {
+    extend : 'Ext.app.ViewController',
+    alias  : 'controller.colorpick-selectorcontroller',
+
+    requires: [
+        'Ext.ux.colorpick.ColorUtils'
+    ],
+
+<span id='Ext-ux-colorpick-SelectorController-method-initViewModel'>    initViewModel: function () {
+</span>        var me = this,
+            view = me.getView();
+
+        // And ensure that the
+        view.childViewModel.bind('{selectedColor}', function (color) {
+            view.setColor(color);
+        });
+    },
+
+<span id='Ext-ux-colorpick-SelectorController-method-destroy'>    destroy: function () {
+</span>        var me = this,
+            view = me.getView(),
+            childViewModel = view.childViewModel;
+
+        if (childViewModel) {
+            childViewModel.destroy();
+            view.childViewModel = null;
+        }
+
+        me.callParent();
+    },
+
+<span id='Ext-ux-colorpick-SelectorController-method-changeHSV'>    changeHSV: function (hsv) {
+</span>        var view = this.getView(),
+            color = view.getColor(),
+            rgb;
+
+        // Put in values we are not changing (like A, but also missing HSV values)
+        Ext.applyIf(hsv, color);
+
+        // Now that HSV is complete, recalculate RGB and combine them
+        rgb = Ext.ux.colorpick.ColorUtils.hsv2rgb(hsv.h, hsv.s, hsv.v);
+        Ext.apply(hsv, rgb);
+
+        view.setColor(hsv);
+    },
+
+<span id='Ext-ux-colorpick-SelectorController-method-onColorMapHandleDrag'>    // Updates Saturation/Value in the model based on ColorMap; params:
+</span>    // xPercent - where is the handle relative to the color map width
+    // yPercent - where is the handle relative to the color map height
+    onColorMapHandleDrag: function(xPercent, yPercent) {
+        this.changeHSV({
+            s: xPercent,
+            v: 1 - yPercent
+        });
+    },
+
+<span id='Ext-ux-colorpick-SelectorController-method-onValueSliderHandleDrag'>    // Updates HSV Value in the model and downstream RGB settings
+</span>    onValueSliderHandleDrag: function(yPercent) {
+        this.changeHSV({
+            v: 1 - yPercent
+        });
+    },
+
+<span id='Ext-ux-colorpick-SelectorController-method-onSaturationSliderHandleDrag'>    // Updates HSV Saturation in the model and downstream RGB settings
+</span>    onSaturationSliderHandleDrag: function(yPercent) {
+        this.changeHSV({
+            s: 1 - yPercent
+        });
+    },
+
+<span id='Ext-ux-colorpick-SelectorController-method-onHueSliderHandleDrag'>    // Updates Hue in the model and downstream RGB settings
+</span>    onHueSliderHandleDrag: function(yPercent) {
+        this.changeHSV({
+            h: 1 - yPercent
+        });
+    },
+
+<span id='Ext-ux-colorpick-SelectorController-method-onAlphaSliderHandleDrag'>    onAlphaSliderHandleDrag: function (yPercent) {
+</span>        var view = this.getView(),
+            color = view.getColor(),
+            newColor = Ext.applyIf({
+                a: 1 - yPercent
+            }, color);
+
+        view.setColor(newColor);
+        view.el.repaint();
+    },
+
+<span id='Ext-ux-colorpick-SelectorController-method-onPreviousColorSelected'>    onPreviousColorSelected: function (comp, color) {
+</span>        var view = this.getView();
+
+        view.setColor(color);
+    },
+
+<span id='Ext-ux-colorpick-SelectorController-method-onOK'>    onOK: function () {
+</span>        var me   = this,
+            view = me.getView();
+
+        view.fireEvent('ok', view, view.getValue());
+    },
+
+<span id='Ext-ux-colorpick-SelectorController-method-onCancel'>    onCancel: function () {
+</span>        this.fireViewEvent('cancel', this.getView());
+    },
+
+<span id='Ext-ux-colorpick-SelectorController-method-onResize'>    onResize: function() {
+</span>        var me   = this,
+            view = me.getView(),
+            vm   = view.childViewModel,
+            refs = me.getReferences(),
+            h, s, v, a;
+
+        // Skip initial rendering resize
+        if (!me.hasResizedOnce) {
+            me.hasResizedOnce = true;
+            return;
+        }
+
+        h = vm.get('hue');
+        s = vm.get('saturation');
+        v = vm.get('value');
+        a = vm.get('alpha');
+        // Reposition the colormap's &amp; sliders' drag handles
+        refs.colorMap.setPosition(vm.getData());
+        refs.hueSlider.setHue(h);
+        refs.satSlider.setSaturation(s);
+        refs.valueSlider.setValue(v);
+        refs.alphaSlider.setAlpha(a);
+    }
+});
+</pre>
+</body>
+</html>

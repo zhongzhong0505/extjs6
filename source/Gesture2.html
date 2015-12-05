@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>The source code</title>
+  <link href="../resources/prettify/prettify.css" type="text/css" rel="stylesheet" />
+  <script type="text/javascript" src="../resources/prettify/prettify.js"></script>
+  <style type="text/css">
+    .highlight { display: block; background-color: #ddd; }
+  </style>
+  <script type="text/javascript">
+    function highlight() {
+      document.getElementById(location.hash.replace(/#/, "")).className = "highlight";
+    }
+  </script>
+</head>
+<body onload="prettyPrint(); highlight();">
+  <pre class="prettyprint lang-js">//&lt;feature legacyBrowser&gt;
+Ext.define('Ext.overrides.event.publisher.Gesture', {
+    override: 'Ext.event.publisher.Gesture'
+}, function() {
+    if (Ext.isIE9m) {
+        this.override({
+            updateTouches: function(e, isEnd) {
+                var browserEvent = e.browserEvent,
+                    xy = e.getXY();
+
+                // I don't always set pageX and pageY on the event object, but when I do
+                // it's because the Gesture publisher expects an event object that has them.
+                browserEvent.pageX = xy[0];
+                browserEvent.pageY = xy[1];
+                this.callParent([e, isEnd]);
+            },
+
+            doDelegatedEvent: function(e) {
+                // Workaround IE's &quot;Member not found&quot; errors when accessing an event
+                // object asynchronously.  Needed for all gesture handlers because
+                // they use requestAnimationFrame (see enableIEAsync for more details)
+                this.callParent([Ext.event.Event.enableIEAsync(e)]);
+            }
+        });
+    }
+});
+//&lt;/feature&gt;
+</pre>
+</body>
+</html>

@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>The source code</title>
+  <link href="../resources/prettify/prettify.css" type="text/css" rel="stylesheet" />
+  <script type="text/javascript" src="../resources/prettify/prettify.js"></script>
+  <style type="text/css">
+    .highlight { display: block; background-color: #ddd; }
+  </style>
+  <script type="text/javascript">
+    function highlight() {
+      document.getElementById(location.hash.replace(/#/, "")).className = "highlight";
+    }
+  </script>
+</head>
+<body onload="prettyPrint(); highlight();">
+  <pre class="prettyprint lang-js"><span id='Global_CSS-css_mixin-border'>/**
+</span> * Creates a border on an element.
+ * If any of the parameters is specified as a list, or if any paramter is null,
+ * border-style, border-width, and border-color will be specified as separate properties,
+ * otherwise all will be collapsed into a single &quot;border&quot; property.
+ *
+ * @param {number/list} $width
+ * The border-width
+ *
+ * @param {string/list} $style
+ * The border-style
+ *
+ * @param {color/list} $color
+ * The border-color
+ * 
+ * @member Global_CSS
+ * @private
+ */
+@mixin border($width: null, $style: null, $color: null) {
+    @if $width != null and $style != null and $color != null and
+            length($width) == 1 and length($style) == 1 and length($color) == 1 {
+        border: $width $style $color;
+    } @else {
+        border-width: $width;
+        border-style: $style;
+        border-color: $color;
+    }
+}</pre>
+</body>
+</html>

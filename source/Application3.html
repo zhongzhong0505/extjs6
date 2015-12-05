@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>The source code</title>
+  <link href="../resources/prettify/prettify.css" type="text/css" rel="stylesheet" />
+  <script type="text/javascript" src="../resources/prettify/prettify.js"></script>
+  <style type="text/css">
+    .highlight { display: block; background-color: #ddd; }
+  </style>
+  <script type="text/javascript">
+    function highlight() {
+      document.getElementById(location.hash.replace(/#/, "")).className = "highlight";
+    }
+  </script>
+</head>
+<body onload="prettyPrint(); highlight();">
+  <pre class="prettyprint lang-js"><span id='Ext-overrides-app-Application'>/**
+</span> *
+ */
+Ext.define('Ext.overrides.app.Application', {
+    override: 'Ext.app.Application',
+    uses: [
+        'Ext.tip.QuickTipManager'
+    ],
+
+    // @cmd-auto-dependency {aliasPrefix: &quot;view.&quot;, mvc: true, requires: [&quot;Ext.plugin.Viewport&quot;]}
+<span id='Ext-app-Application-cfg-autoCreateViewport'>    /**
+</span>     * @cfg {Boolean/String} [autoCreateViewport=false]
+     * @deprecated 5.1 Instead use {@link #mainView}
+     * @member Ext.app.Application
+     */
+    autoCreateViewport: false,
+
+    config: {
+<span id='Ext-app-Application-cfg-enableQuickTips'>        /**
+</span>         * @cfg {Boolean} enableQuickTips
+         * True to automatically set up Ext.tip.QuickTip support.
+         * @member Ext.app.Application
+         */
+        enableQuickTips: true
+    },
+
+<span id='Ext-overrides-app-Application-method-applyMainView'>    applyMainView: function(mainView) {
+</span>        var view, proto, config, plugins;
+
+        if (typeof mainView === 'string') {
+            view = this.getView(mainView);
+        } else {
+            view = Ext.ClassManager.getByConfig(mainView);
+        }
+        proto = view.prototype;
+
+        if (!proto.isViewport) {
+            plugins = proto.plugins;
+            // Need to copy over any plugins defined on the prototype.
+            plugins = ['viewport'].concat(plugins ? Ext.Array.from(plugins, true) : []);
+            config = {
+                plugins: plugins
+            };
+        }
+
+        return view.create(config);
+    },
+
+<span id='Ext-overrides-app-Application-method-getDependencies'>    getDependencies: function(cls, data, requires) {
+</span>        var Controller = Ext.app.Controller,
+            proto = cls.prototype,
+            namespace = data.$namespace,
+            viewportClass = data.autoCreateViewport;
+
+        if (viewportClass) {
+            //&lt;debug&gt;
+            if (!namespace) {
+                Ext.raise(&quot;[Ext.app.Application] Can't resolve namespace for &quot; +
+                    data.$className + &quot;, did you forget to specify 'name' property?&quot;);
+            }
+            //&lt;/debug&gt;
+
+            if (viewportClass === true) {
+                viewportClass = 'Viewport';
+            } else {
+                requires.push('Ext.plugin.Viewport');
+            }
+
+            Controller.processDependencies(proto, requires, namespace, 'view', viewportClass);
+        }
+    },
+
+<span id='Ext-overrides-app-Application-method-onBeforeLaunch'>    onBeforeLaunch: function() {
+</span>        var me = this,
+            autoCreateViewport = me.autoCreateViewport;
+
+        if (me.getEnableQuickTips()) {
+            me.initQuickTips();
+        }
+
+        if(autoCreateViewport) {
+            me.initViewport();
+        }
+
+        this.callParent(arguments);
+    },
+
+<span id='Ext-app-Application-method-getViewportName'>    getViewportName: function () {
+</span>        var name = null,
+            autoCreate = this.autoCreateViewport;
+
+        if (autoCreate) {
+            name = (autoCreate === true) ? 'Viewport' : autoCreate;
+        }
+
+        return name;
+    },
+
+<span id='Ext-app-Application-method-initViewport'>    initViewport: function() {
+</span>        this.setMainView(this.getViewportName());
+    },
+
+<span id='Ext-app-Application-method-initQuickTips'>    initQuickTips: function() {
+</span>        Ext.tip.QuickTipManager.init();
+    }
+});</pre>
+</body>
+</html>

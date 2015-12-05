@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>The source code</title>
+  <link href="../resources/prettify/prettify.css" type="text/css" rel="stylesheet" />
+  <script type="text/javascript" src="../resources/prettify/prettify.js"></script>
+  <style type="text/css">
+    .highlight { display: block; background-color: #ddd; }
+  </style>
+  <script type="text/javascript">
+    function highlight() {
+      document.getElementById(location.hash.replace(/#/, "")).className = "highlight";
+    }
+  </script>
+</head>
+<body onload="prettyPrint(); highlight();">
+  <pre class="prettyprint lang-js"><span id='Ext-exporter-file-excel-Worksheet'>/**
+</span> * This class is used to create an xml Excel Worksheet
+ */
+Ext.define('Ext.exporter.file.excel.Worksheet', {
+    extend: 'Ext.exporter.file.Base',
+
+    config: {
+<span id='Ext-exporter-file-excel-Worksheet-cfg-name'>        /**
+</span>         * @cfg {String} name (required)
+         *
+         * This value must be unique within the list of sheet names in the workbook. Sheet names must conform to
+         * the legal names of Excel sheets and, thus, cannot contain /, \, ?, *, [, ] and are limited to 31 chars.
+         */
+        name:           'Sheet',
+<span id='Ext-exporter-file-excel-Worksheet-cfg-protection'>        /**
+</span>         * @cfg {Boolean} protection
+         *
+         * This attribute indicates whether or not the worksheet is protected. When the worksheet is
+         * not protected, cell-level protection has no effect.
+         */
+        protection:      null,
+<span id='Ext-exporter-file-excel-Worksheet-cfg-rightToLeft'>        /**
+</span>         * @cfg {Boolean} rightToLeft
+         *
+         * If this attribute is `true`, the window displays from right to left, but if this element is not
+         * specified (or `false`), the window displays from left to right. The Spreadsheet component does not
+         * support this attribute.
+         */
+        rightToLeft:    null,
+<span id='Ext-exporter-file-excel-Worksheet-cfg-showGridLines'>        /**
+</span>         * @cfg {Boolean} [showGridLines=true]
+         *
+         * Should grid lines be visible in this spreadsheet?
+         */
+        showGridLines:  true,
+<span id='Ext-exporter-file-excel-Worksheet-cfg-tables'>        /**
+</span>         * @cfg {Ext.exporter.file.excel.Table[]} tables
+         *
+         * Collection of tables available in this worksheet
+         */
+        tables:         []
+    },
+
+<span id='Ext-exporter-file-excel-Worksheet-method-getTables'>    /**
+</span>     * @method getTables
+     * @return {Ext.util.Collection}
+     *
+     * Returns the collection of tables available in this worksheet
+     */
+    
+    tpl: [
+        '   &lt;Worksheet ss:Name=&quot;{name:htmlEncode}&quot;',
+        '&lt;tpl if=&quot;this.exists(protection)&quot;&gt; ss:Protected=&quot;{protection:this.toNumber}&quot;&lt;/tpl&gt;',
+        '&lt;tpl if=&quot;this.exists(rightToLeft)&quot;&gt; ss:RightToLeft=&quot;{rightToLeft:this.toNumber}&quot;&lt;/tpl&gt;',
+        '&gt;\n',
+        '&lt;tpl for=&quot;tables&quot;&gt;{[values.render()]}&lt;/tpl&gt;',
+        '       &lt;WorksheetOptions xmlns=&quot;urn:schemas-microsoft-com:office:excel&quot;&gt;\n',
+        '          &lt;PageSetup&gt;\n',
+        '              &lt;Layout x:CenterHorizontal=&quot;1&quot; x:Orientation=&quot;Portrait&quot; /&gt;\n',
+        '              &lt;Header x:Margin=&quot;0.3&quot; /&gt;\n',
+        '              &lt;Footer x:Margin=&quot;0.3&quot; x:Data=&quot;Page &amp;amp;P of &amp;amp;N&quot; /&gt;\n',
+        '              &lt;PageMargins x:Bottom=&quot;0.75&quot; x:Left=&quot;0.7&quot; x:Right=&quot;0.7&quot; x:Top=&quot;0.75&quot; /&gt;\n',
+        '          &lt;/PageSetup&gt;\n',
+        '          &lt;FitToPage /&gt;\n',
+        '          &lt;Print&gt;\n',
+        '              &lt;PrintErrors&gt;Blank&lt;/PrintErrors&gt;\n',
+        '              &lt;FitWidth&gt;1&lt;/FitWidth&gt;\n',
+        '              &lt;FitHeight&gt;32767&lt;/FitHeight&gt;\n',
+        '              &lt;ValidPrinterInfo /&gt;\n',
+        '              &lt;VerticalResolution&gt;600&lt;/VerticalResolution&gt;\n',
+        '          &lt;/Print&gt;\n',
+        '          &lt;Selected /&gt;\n',
+        '&lt;tpl if=&quot;!showGridLines&quot;&gt;',
+        '          &lt;DoNotDisplayGridlines /&gt;\n',
+        '&lt;/tpl&gt;',
+        '          &lt;ProtectObjects&gt;False&lt;/ProtectObjects&gt;\n',
+        '          &lt;ProtectScenarios&gt;False&lt;/ProtectScenarios&gt;\n',
+        '      &lt;/WorksheetOptions&gt;\n',
+        '   &lt;/Worksheet&gt;\n',
+        {
+            exists: function(value){
+                return !Ext.isEmpty(value);
+            },
+            toNumber: function(value){
+                return Number(Boolean(value));
+            }
+        }
+    ],
+
+<span id='Ext-exporter-file-excel-Worksheet-method-destroy'>    destroy: function(){
+</span>        this.getTables().destroy();
+        return this.callParent(arguments);
+    },
+
+<span id='Ext-exporter-file-excel-Worksheet-method-applyTables'>    applyTables: function(data, dataCollection){
+</span>        return this.checkCollection(data, dataCollection, 'Ext.exporter.file.excel.Table');
+    },
+
+<span id='Ext-exporter-file-excel-Worksheet-method-addTable'>    /**
+</span>     * Convenience method to add tables. You can also use workbook.getTables().add(config).
+     * @param {Object/Array} config
+     * @return {Ext.exporter.file.excel.Table/Ext.exporter.file.excel.Table[]}
+     */
+    addTable: function(config){
+        return this.getTables().add(config || {});
+    },
+
+<span id='Ext-exporter-file-excel-Worksheet-method-getTable'>    /**
+</span>     * Convenience method to fetch a table by its id.
+     * @param id
+     * @return {Ext.exporter.file.excel.Table}
+     */
+    getTable: function(id){
+        return this.getTables().get(id);
+    },
+
+<span id='Ext-exporter-file-excel-Worksheet-method-applyName'>    applyName: function(value){
+</span>        // Excel limits the worksheet name to 31 chars
+        return Ext.String.ellipsis(String(value), 31);
+    },
+
+<span id='Ext-exporter-file-excel-Worksheet-method-getRenderData'>    getRenderData: function(){
+</span>        return Ext.apply(this.callParent(arguments), {
+            tables: this.getTables().getRange()
+        });
+    }
+
+});</pre>
+</body>
+</html>

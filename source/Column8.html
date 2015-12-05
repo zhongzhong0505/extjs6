@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>The source code</title>
+  <link href="../resources/prettify/prettify.css" type="text/css" rel="stylesheet" />
+  <script type="text/javascript" src="../resources/prettify/prettify.js"></script>
+  <style type="text/css">
+    .highlight { display: block; background-color: #ddd; }
+  </style>
+  <script type="text/javascript">
+    function highlight() {
+      document.getElementById(location.hash.replace(/#/, "")).className = "highlight";
+    }
+  </script>
+</head>
+<body onload="prettyPrint(); highlight();">
+  <pre class="prettyprint lang-js"><span id='Ext-exporter-file-excel-Column'>/**
+</span> * This class is used to create an xml Excel Column.
+ *
+ * Columns are usually created when you want to add a special style to them.
+ */
+Ext.define('Ext.exporter.file.excel.Column', {
+    extend: 'Ext.exporter.file.Base',
+
+    config: {
+<span id='Ext-exporter-file-excel-Column-cfg-autoFitWidth'>        /**
+</span>         * @cfg {Boolean} [autoFitWidth=false]
+         *
+         * Use 1 if you want this column to auto fit its width.
+         * Textual values do not autofit.
+         */
+        autoFitWidth: false,
+<span id='Ext-exporter-file-excel-Column-cfg-caption'>        /**
+</span>         * @cfg {String} caption
+         *
+         * Specifies the caption that should appear when the Component's custom row and column headers are showing.
+         */
+        caption: null,
+<span id='Ext-exporter-file-excel-Column-cfg-hidden'>        /**
+</span>         * @cfg {Boolean} hidden
+         *
+         * `true` specifies that this column is hidden. `false` (or omitted) specifies that this column is shown.
+         */
+        hidden: null,
+<span id='Ext-exporter-file-excel-Column-cfg-index'>        /**
+</span>         * @cfg {Number} index
+         *
+         * Index of this column in the Excel table.
+         *
+         * If this tag is not specified, the first instance has an assumed Index=&quot;1&quot;. Each additional Column element
+         * has an assumed Index that is one higher.
+         *
+         * Indices must appear in strictly increasing order. Failure to do so will result in an XML Spreadsheet
+         * document that is invalid. Indices do not need to be sequential, however. Omitted indices are formatted
+         * with the default style's format.
+         *
+         * Indices must not overlap. If duplicates exist, the behavior is unspecified and the XML Spreadsheet
+         * document is considered invalid. An easy way to create overlap is through careless use of the Span attribute.
+         */
+        index: null,
+<span id='Ext-exporter-file-excel-Column-cfg-span'>        /**
+</span>         * @cfg {Number} span
+         *
+         * Specifies the number of adjacent columns with the same formatting as this column. When a Span attribute
+         * is used, the spanned column elements are not written out.
+         *
+         * As mentioned in the index config, columns must not overlap. Doing so results in an XML Spreadsheet document
+         * that is invalid. Care must be taken with this attribute to ensure that the span does not include another
+         * column index that is specified.
+         */
+        span: null,
+<span id='Ext-exporter-file-excel-Column-cfg-styleId'>        /**
+</span>         * @cfg {String} styleId
+         *
+         * Excel style attached to this column
+         */
+        styleId: null,
+<span id='Ext-exporter-file-excel-Column-cfg-width'>        /**
+</span>         * @cfg {Number} width
+         *
+         * Specifies the width of a column in points. This value must be greater than or equal to 0.
+         */
+        width: null
+    },
+
+<span id='Ext-exporter-file-excel-Column-property-tpl'>    tpl: [
+</span>        '&lt;Column',
+            '&lt;tpl if=&quot;this.exists(index)&quot;&gt; ss:Index=&quot;{index}&quot;&lt;/tpl&gt;',
+            '&lt;tpl if=&quot;this.exists(caption)&quot;&gt; c:Caption=&quot;{caption}&quot;&lt;/tpl&gt;',
+            '&lt;tpl if=&quot;this.exists(styleId)&quot;&gt; ss:StyleID=&quot;{styleId}&quot;&lt;/tpl&gt;',
+            '&lt;tpl if=&quot;this.exists(hidden)&quot;&gt; ss:Hidden=&quot;{hidden}&quot;&lt;/tpl&gt;',
+            '&lt;tpl if=&quot;this.exists(span)&quot;&gt; ss:Span=&quot;{span}&quot;&lt;/tpl&gt;',
+            '&lt;tpl if=&quot;this.exists(width)&quot;&gt; ss:Width=&quot;{width}&quot;&lt;/tpl&gt;',
+            '&lt;tpl if=&quot;this.exists(autoFitWidth)&quot;&gt; ss:AutoFitWidth=&quot;{autoFitWidth:this.toNumber}&quot;&lt;/tpl&gt;',
+        '/&gt;\n',
+        {
+            exists: function(value){
+                return !Ext.isEmpty(value);
+            },
+            toNumber: function(value){
+                return Number(Boolean(value));
+            }
+        }
+    ]
+
+});</pre>
+</body>
+</html>

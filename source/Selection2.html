@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>The source code</title>
+  <link href="../resources/prettify/prettify.css" type="text/css" rel="stylesheet" />
+  <script type="text/javascript" src="../resources/prettify/prettify.js"></script>
+  <style type="text/css">
+    .highlight { display: block; background-color: #ddd; }
+  </style>
+  <script type="text/javascript">
+    function highlight() {
+      document.getElementById(location.hash.replace(/#/, "")).className = "highlight";
+    }
+  </script>
+</head>
+<body onload="prettyPrint(); highlight();">
+  <pre class="prettyprint lang-js"><span id='Ext-ux-colorpick-Selection'>/**
+</span> * @private
+ */
+Ext.define('Ext.ux.colorpick.Selection', {
+<span id='Ext-ux-colorpick-Selection-property-mixinId'>    mixinId: 'colorselection',
+</span>
+    config : {
+<span id='Ext-ux-colorpick-Selection-cfg-format'>        /**
+</span>         * @cfg {&quot;hex6&quot;,&quot;hex8&quot;,&quot;#hex6&quot;,&quot;#hex8&quot;,&quot;HEX6&quot;,&quot;HEX8&quot;,&quot;#HEX6&quot;,&quot;#HEX8&quot;} [format=hex6]
+         * The color format to for the `value` config. The `value` can be set using any
+         * supported format or named color, but the stored value will always be in this
+         * format.
+         *
+         * Supported formats are:
+         *
+         * - hex6 - For example &quot;ffaa00&quot; (Note: does not preserve transparency).
+         * - hex8 - For eaxmple &quot;ffaa00ff&quot; - the last 2 digits represent transparency
+         * - #hex6 - For example &quot;#ffaa00&quot; (same as &quot;hex6&quot; but with a leading &quot;#&quot;).
+         * - #hex8 - For example &quot;#ffaa00ff&quot; (same as &quot;hex8&quot; but with a leading &quot;#&quot;).
+         * - HEX6 - Same as &quot;hex6&quot; but upper case.
+         * - HEX8 - Same as &quot;hex8&quot; but upper case.
+         * - #HEX6 - Same as &quot;#hex6&quot; but upper case.
+         * - #HEX8 - Same as &quot;#hex8&quot; but upper case.
+         */
+        format: 'hex6',
+
+<span id='Ext-ux-colorpick-Selection-cfg-value'>        /**
+</span>         * @cfg {String} [value=FF0000]
+         * The initial color to highlight; see {@link #format} for supported formats.
+         */
+        value: 'FF0000',
+
+<span id='Ext-ux-colorpick-Selection-cfg-color'>        /**
+</span>         * @cfg {Object} color
+         * This config property is used internally by the UI to maintain the full color.
+         * Changes to this config are automatically reflected in `value` and vise-versa.
+         * Setting `value` can, however, cause the alpha to be dropped if the new value
+         * does not contain an alpha component.
+         * @private
+         */
+        color: null,
+<span id='Ext-ux-colorpick-Selection-cfg-previousColor'>        previousColor: null
+</span>    },
+
+<span id='Ext-ux-colorpick-Selection-method-applyColor'>    applyColor: function (color) {
+</span>        var c = color;
+        if (Ext.isString(c)) {
+            c = Ext.ux.colorpick.ColorUtils.parseColor(color);
+        }
+        return c;
+    },
+
+<span id='Ext-ux-colorpick-Selection-method-applyValue'>    applyValue: function (color) {
+</span>        // Transform whatever incoming color we get to the proper format
+        var c = Ext.ux.colorpick.ColorUtils.parseColor(color);
+        return this.formatColor(c);
+    },
+
+<span id='Ext-ux-colorpick-Selection-method-formatColor'>    formatColor: function (color) {
+</span>        return Ext.ux.colorpick.ColorUtils.formats[this.getFormat()](color);
+    },
+
+<span id='Ext-ux-colorpick-Selection-method-updateColor'>    updateColor: function (color) {
+</span>        var me = this;
+
+        // If the &quot;color&quot; is changed (via internal changes in the UI), update &quot;value&quot; as
+        // well. Since these are always tracking each other, we guard against the case
+        // where we are being updated *because* &quot;value&quot; is being set.
+        if (!me.syncing) {
+            me.syncing = true;
+            me.setValue(me.formatColor(color));
+            me.syncing = false;
+        }
+    },
+
+<span id='Ext-ux-colorpick-Selection-method-updateValue'>    updateValue: function (value, oldValue) {
+</span>        var me = this;
+
+        // If the &quot;value&quot; is changed, update &quot;color&quot; as well. Since these are always
+        // tracking each other, we guard against the case where we are being updated
+        // *because* &quot;color&quot; is being set.
+        if (!me.syncing) {
+            me.syncing = true;
+            me.setColor(value);
+            me.syncing = false;
+        }
+
+        this.fireEvent('change', me, value, oldValue);
+    }
+});
+</pre>
+</body>
+</html>

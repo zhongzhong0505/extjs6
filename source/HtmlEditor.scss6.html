@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>The source code</title>
+  <link href="../resources/prettify/prettify.css" type="text/css" rel="stylesheet" />
+  <script type="text/javascript" src="../resources/prettify/prettify.js"></script>
+  <style type="text/css">
+    .highlight { display: block; background-color: #ddd; }
+  </style>
+  <script type="text/javascript">
+    function highlight() {
+      document.getElementById(location.hash.replace(/#/, "")).className = "highlight";
+    }
+  </script>
+</head>
+<body onload="prettyPrint(); highlight();">
+  <pre class="prettyprint lang-js"><span id='Ext-form-field-HtmlEditor'>/**
+</span> * @class Ext.form.field.HtmlEditor
+ */
+
+<span id='Ext-form-field-HtmlEditor-css_var-S-html-editor-border-width'>/**
+</span> * @var {number}
+ * The border-width of the HtmlEditor
+ */
+$html-editor-border-width: dynamic(1px);
+
+<span id='Ext-form-field-HtmlEditor-css_var-S-html-editor-border-color'>/**
+</span> * @var {color}
+ * The border-color of the HtmlEditor
+ */
+$html-editor-border-color: dynamic($form-field-border-color);
+
+<span id='Ext-form-field-HtmlEditor-css_var-S-html-editor-background-color'>/**
+</span> * @var {color}
+ * The background-color of the HtmlEditor
+ */
+$html-editor-background-color: dynamic($form-field-background-color);
+
+<span id='Ext-form-field-HtmlEditor-css_var-S-html-editor-toolbar-icon-size'>/**
+</span> * @var {number}
+ * The size of the HtmlEditor toolbar icons
+ */
+$html-editor-toolbar-icon-size: dynamic(16px);
+
+<span id='Ext-form-field-HtmlEditor-css_var-S-html-editor-font-select-font-size'>/**
+</span> * @var {number}
+ * The font-size of the HtmlEditor's font selection control
+ */
+$html-editor-font-select-font-size: dynamic($form-field-font-size);
+
+<span id='Ext-form-field-HtmlEditor-css_var-S-html-editor-font-select-font-family'>/**
+</span> * @var {number}
+ * The font-family of the HtmlEditor's font selection control
+ */
+$html-editor-font-select-font-family: dynamic(inherit);
+
+<span id='Ext-form-field-HtmlEditor-css_var-S-html-editor-glyph-color'>/**
+</span> * @var {color}
+ * The color to use for the HtmlEditor's icons when {@link Global_CSS#$enable-font-icons} is `true`.
+ */
+$html-editor-glyph-color: dynamic($color);
+
+<span id='Ext-form-field-HtmlEditor-css_var-S-html-editor-glyph-font-size'>/**
+</span> * @var {number}
+ * The font size to use for the HtmlEditor's icons when {@link Global_CSS#$enable-font-icons} is `true`.
+ */
+$html-editor-glyph-font-size: dynamic(16px);
+
+<span id='Ext-form-field-HtmlEditor-css_var-S-html-editor-bold-glyph'>/**
+</span> * @var {string/list}
+ * Glyph for the &quot;bold&quot; icon when {@link Global_CSS#$enable-font-icons} is `true`.
+ */
+$html-editor-bold-glyph: dynamic($fa-var-bold $html-editor-glyph-font-size $font-icon-font-family);
+
+<span id='Ext-form-field-HtmlEditor-css_var-S-html-editor-italic-glyph'>/**
+</span> * @var {string/list}
+ * Glyph for the &quot;italic&quot; icon when {@link Global_CSS#$enable-font-icons} is `true`.
+ */
+$html-editor-italic-glyph: dynamic($fa-var-italic $html-editor-glyph-font-size $font-icon-font-family);
+
+<span id='Ext-form-field-HtmlEditor-css_var-S-html-editor-underline-glyph'>/**
+</span> * @var {string/list}
+ * Glyph for the &quot;underline&quot; icon when {@link Global_CSS#$enable-font-icons} is `true`.
+ */
+$html-editor-underline-glyph: dynamic($fa-var-underline $html-editor-glyph-font-size $font-icon-font-family);
+
+<span id='Ext-form-field-HtmlEditor-css_var-S-html-editor-forecolor-glyph'>/**
+</span> * @var {string/list}
+ * Glyph for the &quot;foreground color&quot; icon when {@link Global_CSS#$enable-font-icons} is `true`.
+ */
+$html-editor-forecolor-glyph: dynamic($ext-var-text-color $html-editor-glyph-font-size ExtJS);
+
+<span id='Ext-form-field-HtmlEditor-css_var-S-html-editor-backcolor-glyph'>/**
+</span> * @var {string/list}
+ * Glyph for the &quot;background color&quot; icon when {@link Global_CSS#$enable-font-icons} is `true`.
+ */
+$html-editor-backcolor-glyph: dynamic($ext-var-text-background-color $html-editor-glyph-font-size ExtJS);
+
+<span id='Ext-form-field-HtmlEditor-css_var-S-html-editor-alignleft-glyph'>/**
+</span> * @var {string/list}
+ * Glyph for the &quot;align left&quot; icon when {@link Global_CSS#$enable-font-icons} is `true`.
+ */
+$html-editor-alignleft-glyph: dynamic($fa-var-align-left $html-editor-glyph-font-size $font-icon-font-family);
+
+<span id='Ext-form-field-HtmlEditor-css_var-S-html-editor-aligncenter-glyph'>/**
+</span> * @var {string/list}
+ * Glyph for the &quot;align center&quot; icon when {@link Global_CSS#$enable-font-icons} is `true`.
+ */
+$html-editor-aligncenter-glyph: dynamic($fa-var-align-center $html-editor-glyph-font-size $font-icon-font-family);
+
+<span id='Ext-form-field-HtmlEditor-css_var-S-html-editor-alignright-glyph'>/**
+</span> * @var {string/list}
+ * Glyph for the &quot;align right&quot; icon when {@link Global_CSS#$enable-font-icons} is `true`.
+ */
+$html-editor-alignright-glyph: dynamic($fa-var-align-right $html-editor-glyph-font-size $font-icon-font-family);
+
+<span id='Ext-form-field-HtmlEditor-css_var-S-html-editor-numberedlist-glyph'>/**
+</span> * @var {string/list}
+ * Glyph for the &quot;numbered list&quot; icon when {@link Global_CSS#$enable-font-icons} is `true`.
+ */
+$html-editor-numberedlist-glyph: dynamic($fa-var-list-ol $html-editor-glyph-font-size $font-icon-font-family);
+
+<span id='Ext-form-field-HtmlEditor-css_var-S-html-editor-bulletlist-glyph'>/**
+</span> * @var {string/list}
+ * Glyph for the &quot;bullet list&quot; icon when {@link Global_CSS#$enable-font-icons} is `true`.
+ */
+$html-editor-bulletlist-glyph: dynamic($fa-var-list-ul $html-editor-glyph-font-size $font-icon-font-family);
+
+<span id='Ext-form-field-HtmlEditor-css_var-S-html-editor-growtext-glyph'>/**
+</span> * @var {string/list}
+ * Glyph for the &quot;grow text&quot; icon when {@link Global_CSS#$enable-font-icons} is `true`.
+ */
+$html-editor-growtext-glyph: dynamic($ext-var-text-increase $html-editor-glyph-font-size ExtJS);
+
+<span id='Ext-form-field-HtmlEditor-css_var-S-html-editor-shrinktext-glyph'>/**
+</span> * @var {string/list}
+ * Glyph for the &quot;shrink text&quot; icon when {@link Global_CSS#$enable-font-icons} is `true`.
+ */
+$html-editor-shrinktext-glyph: dynamic($ext-var-text-decrease $html-editor-glyph-font-size ExtJS);
+
+<span id='Ext-form-field-HtmlEditor-css_var-S-html-editor-sourceedit-glyph'>/**
+</span> * @var {string/list}
+ * Glyph for the &quot;source edit&quot; icon when {@link Global_CSS#$enable-font-icons} is `true`.
+ */
+$html-editor-sourceedit-glyph: dynamic($ext-var-edit-html $html-editor-glyph-font-size ExtJS);
+
+<span id='Ext-form-field-HtmlEditor-css_var-S-html-editor-hyperlink-glyph'>/**
+</span> * @var {string/list}
+ * Glyph for the &quot;hyperlink&quot; icon when {@link Global_CSS#$enable-font-icons} is `true`.
+ */
+$html-editor-hyperlink-glyph: dynamic($fa-var-link $html-editor-glyph-font-size $font-icon-font-family);
+</pre>
+</body>
+</html>

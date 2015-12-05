@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>The source code</title>
+  <link href="../resources/prettify/prettify.css" type="text/css" rel="stylesheet" />
+  <script type="text/javascript" src="../resources/prettify/prettify.js"></script>
+  <style type="text/css">
+    .highlight { display: block; background-color: #ddd; }
+  </style>
+  <script type="text/javascript">
+    function highlight() {
+      document.getElementById(location.hash.replace(/#/, "")).className = "highlight";
+    }
+  </script>
+</head>
+<body onload="prettyPrint(); highlight();">
+  <pre class="prettyprint lang-js"><span id='Ext-chart-MarkerHolder'>/**
+</span> * Mixin that provides the functionality to place markers.
+ */
+Ext.define('Ext.chart.MarkerHolder', {
+    extend: 'Ext.Mixin',
+
+<span id='Ext-chart-MarkerHolder-property-mixinConfig'>    mixinConfig: {
+</span>        id: 'markerHolder',
+        after: {
+            constructor: 'constructor',
+            preRender: 'preRender'
+        },
+        before: {
+            destroy: 'destroy'
+        }
+    },
+
+<span id='Ext-chart-MarkerHolder-property-isMarkerHolder'>    isMarkerHolder: true,
+</span>
+<span id='Ext-chart-MarkerHolder-property-surfaceMatrix'>    // The combined transformation applied to the sprite by its parents.
+</span>    // Does not include the transformation matrix of the sprite itself.
+    surfaceMatrix: null,
+<span id='Ext-chart-MarkerHolder-property-inverseSurfaceMatrix'>    // The inverse of the above transformation to go back to the original state.
+</span>    inverseSurfaceMatrix: null,
+
+<span id='Ext-chart-MarkerHolder-property-deprecated'>    deprecated: {
+</span>        6: {
+            methods: {
+<span id='Ext-chart-MarkerHolder-method-getBoundMarker'>                /**
+</span>                 * Returns the markers bound to the given name.
+                 * @param {String} name The name of the marker (e.g., &quot;items&quot;, &quot;labels&quot;, etc.).
+                 * @return {Ext.chart.Markers[]}
+                 * @method getBoundMarker
+                 * @deprecated 6.0 Use {@link #getMarker} instead.
+                 */
+                getBoundMarker: {
+                    message: &quot;Please use the 'getMarker' method instead.&quot;,
+                    fn: function (name) {
+                        var marker = this.boundMarkers[name];
+                        return marker ? [marker] : marker;
+                    }
+                }
+            }
+        }
+    },
+
+<span id='Ext-chart-MarkerHolder-method-constructor'>    constructor: function () {
+</span>        this.boundMarkers = {};
+        this.cleanRedraw = false;
+    },
+
+<span id='Ext-chart-MarkerHolder-method-bindMarker'>    /**
+</span>     * Registers the given marker with the marker holder under the specified name.
+     * @param {String} name The name of the marker (e.g., &quot;items&quot;, &quot;labels&quot;, etc.).
+     * @param {Ext.chart.Markers} marker
+     */
+    bindMarker: function (name, marker) {
+        var me = this,
+            markers = me.boundMarkers;
+
+        if (marker &amp;&amp; marker.isMarkers) {
+            //&lt;debug&gt;
+            if (markers[name] &amp;&amp; markers[name] === marker) {
+                Ext.log.warn(me.getId(), &quot; (MarkerHolder): the Markers instance '&quot;, marker.getId(), &quot;' is already bound under the name '&quot;, name, &quot;'.&quot;);
+            }
+            //&lt;/debug&gt;
+            me.releaseMarker(name);
+            markers[name] = marker;
+            marker.on('destroy', me.onMarkerDestroy, me);
+        }
+    },
+
+<span id='Ext-chart-MarkerHolder-method-onMarkerDestroy'>    onMarkerDestroy: function (marker) {
+</span>        this.releaseMarker(marker);
+    },
+
+<span id='Ext-chart-MarkerHolder-method-releaseMarker'>    /**
+</span>     * Unregisters the given marker or a marker with the given name.
+     * Providing a name of the marker is more efficient as it avoids lookup.
+     * @param marker {String/Ext.chart.Markers}
+     * @return {Ext.chart.Markers} Released marker or null.
+     */
+    releaseMarker: function (marker) {
+        var markers = this.boundMarkers,
+            name;
+
+        if (marker &amp;&amp; marker.isMarkers) {
+            for (name in markers) {
+                if (markers[name] === marker) {
+                    delete markers[name];
+                    break;
+                }
+            }
+        } else {
+            name = marker;
+            marker = markers[name];
+            delete markers[name];
+        }
+
+        return marker || null;
+    },
+
+<span id='Ext-chart-MarkerHolder-method-getMarker'>    /**
+</span>     * Returns the marker bound to the given name (or null). See {@link #bindMarker}.
+     * @param {String} name The name of the marker (e.g., &quot;items&quot;, &quot;labels&quot;, etc.).
+     * @return {Ext.chart.Markers}
+     */
+    getMarker: function (name) {
+        return this.boundMarkers[name] || null;
+    },
+
+<span id='Ext-chart-MarkerHolder-method-preRender'>    preRender: function () {
+</span>        var me = this,
+            id = me.getId(),
+            boundMarkers = me.boundMarkers,
+            parent = me.getParent(),
+            name, marker,
+            matrix;
+
+        if (me.surfaceMatrix) {
+            matrix = me.surfaceMatrix.set(1, 0, 0, 1, 0, 0);
+        } else {
+            matrix = me.surfaceMatrix = new Ext.draw.Matrix();
+        }
+
+        me.cleanRedraw = !me.attr.dirty;
+        if (!me.cleanRedraw) {
+            for (name in boundMarkers) {
+                marker = boundMarkers[name];
+                if (marker) {
+                    marker.clear(id);
+                }
+            }
+        }
+
+        // Parent can be either a sprite (like a composite or instancing)
+        // or a surface. First, climb up and apply transformations of the
+        // parent sprites.
+        while (parent &amp;&amp; parent.attr &amp;&amp; parent.attr.matrix) {
+            matrix.prependMatrix(parent.attr.matrix);
+            parent = parent.getParent();
+        }
+        // Finally, apply the transformation used by the surface.
+        matrix.prependMatrix(parent.matrix);
+        me.surfaceMatrix = matrix;
+        me.inverseSurfaceMatrix = matrix.inverse(me.inverseSurfaceMatrix);
+    },
+
+<span id='Ext-chart-MarkerHolder-method-putMarker'>    putMarker: function (name, attr, index, bypassNormalization, keepRevision) {
+</span>        var marker = this.boundMarkers[name],
+            id = this.getId();
+
+        if (marker) {
+            marker.putMarkerFor(id, attr, index, bypassNormalization, keepRevision);
+        }
+    },
+
+<span id='Ext-chart-MarkerHolder-method-getMarkerBBox'>    getMarkerBBox: function (name, index, isWithoutTransform) {
+</span>        var marker = this.boundMarkers[name],
+            id = this.getId();
+
+        if (marker) {
+            return marker.getMarkerBBoxFor(id, index, isWithoutTransform);
+        }
+    },
+
+<span id='Ext-chart-MarkerHolder-method-destroy'>    destroy: function () {
+</span>        var boundMarkers = this.boundMarkers,
+            name, marker;
+
+        for (name in boundMarkers) {
+            marker = boundMarkers[name];
+            marker.destroy();
+        }
+    }
+
+});
+</pre>
+</body>
+</html>

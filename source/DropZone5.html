@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>The source code</title>
+  <link href="../resources/prettify/prettify.css" type="text/css" rel="stylesheet" />
+  <script type="text/javascript" src="../resources/prettify/prettify.js"></script>
+  <style type="text/css">
+    .highlight { display: block; background-color: #ddd; }
+  </style>
+  <script type="text/javascript">
+    function highlight() {
+      document.getElementById(location.hash.replace(/#/, "")).className = "highlight";
+    }
+  </script>
+</head>
+<body onload="prettyPrint(); highlight();">
+  <pre class="prettyprint lang-js"><span id='Ext-pivot-plugin-configurator-DropZone'>/**
+</span> *
+ * This class is used for managing the drop zone for each container.
+ *
+ * @private
+ *
+ */
+Ext.define('Ext.pivot.plugin.configurator.DropZone', {
+    extend: 'Ext.dd.DropZone',
+    
+<span id='Ext-pivot-plugin-configurator-DropZone-property-proxyOffsets'>    proxyOffsets: [-4, -9],
+</span><span id='Ext-pivot-plugin-configurator-DropZone-property-configPanelCls'>    configPanelCls:     Ext.baseCSSPrefix + 'pivot-grid-config-container-body',
+</span><span id='Ext-pivot-plugin-configurator-DropZone-property-configColumnCls'>    configColumnCls:    Ext.baseCSSPrefix + 'pivot-grid-config-column',
+</span>
+<span id='Ext-pivot-plugin-configurator-DropZone-method-constructor'>    constructor: function(panel){
+</span>        this.panel = panel;
+        this.ddGroup = this.getDDGroup();
+        this.callParent([panel.id]);
+    },
+
+<span id='Ext-pivot-plugin-configurator-DropZone-method-disable'>    disable: function() {
+</span>        this.disabled = true;
+    },
+    
+<span id='Ext-pivot-plugin-configurator-DropZone-method-enable'>    enable: function() {
+</span>        this.disabled = false;
+    },
+
+<span id='Ext-pivot-plugin-configurator-DropZone-method-getDDGroup'>    getDDGroup: function() {
+</span>        // return the column header dd group so we can allow column droping inside the grouping panel
+        return 'configurator-' + this.panel.up('gridpanel').id;
+    },
+
+<span id='Ext-pivot-plugin-configurator-DropZone-method-getTargetFromEvent'>    getTargetFromEvent : function(e){
+</span>        return e.getTarget('.' + this.configColumnCls) || e.getTarget('.' + this.configPanelCls);
+    },
+
+<span id='Ext-pivot-plugin-configurator-DropZone-method-getTopIndicator'>    getTopIndicator: function() {
+</span>        if (!this.topIndicator) {
+            this.self.prototype.topIndicator = Ext.DomHelper.append(Ext.getBody(), {
+                cls: 'col-move-top ' + Ext.baseCSSPrefix + 'col-move-top',
+                html: &quot;&amp;#160;&quot;
+            }, true);
+            this.self.prototype.indicatorXOffset = Math.floor((this.topIndicator.dom.offsetWidth + 1) / 2);
+        }
+        return this.topIndicator;
+    },
+
+<span id='Ext-pivot-plugin-configurator-DropZone-method-getBottomIndicator'>    getBottomIndicator: function() {
+</span>        if (!this.bottomIndicator) {
+            this.self.prototype.bottomIndicator = Ext.DomHelper.append(Ext.getBody(), {
+                cls: 'col-move-bottom ' + Ext.baseCSSPrefix + 'col-move-bottom',
+                html: &quot;&amp;#160;&quot;
+            }, true);
+        }
+        return this.bottomIndicator;
+    },
+
+<span id='Ext-pivot-plugin-configurator-DropZone-method-getLocation'>    getLocation: function(e, t) {
+</span>        var x      = e.getXY()[0],
+            target = Ext.getCmp(t.id),
+            region,
+            pos;
+            
+        if(target instanceof Ext.pivot.plugin.configurator.Container){
+            // that means that the column is dragged above the grouping panel so find out if there are any columns already
+            if(target.items.getCount() &gt; 0){
+                // now fetch the position of the last item
+                region = Ext.fly(target.items.last().el).getRegion();
+            }else{
+                region = new Ext.util.Region(0, 1000000, 0, 0);
+            }
+        }else{
+            region = Ext.fly(t).getRegion();
+        }
+        
+        if ((region.right - x) &lt;= (region.right - region.left) / 2) {
+            pos = &quot;after&quot;;
+        } else {
+            pos = &quot;before&quot;;
+        }
+        return {
+            pos: pos,
+            header: Ext.getCmp(t.id),
+            node: t
+        };
+    },
+
+<span id='Ext-pivot-plugin-configurator-DropZone-method-positionIndicator'>    positionIndicator: function(data, node, e){
+</span>        var me = this,
+            dragHeader   = data.header,
+            dropLocation = me.getLocation(e, node),
+            targetHeader = dropLocation.header,
+            pos          = dropLocation.pos,
+            nextHd,
+            prevHd,
+            topIndicator, bottomIndicator, topAnchor, bottomAnchor,
+            topXY, bottomXY, headerCtEl, minX, maxX,
+            allDropZones, ln, i, dropZone;
+
+        // Avoid expensive CQ lookups and DOM calculations if dropPosition has not changed
+        if (targetHeader === me.lastTargetHeader &amp;&amp; pos === me.lastDropPos) {
+            return;
+        }
+        nextHd       = dragHeader.nextSibling('gridcolumn:not([hidden])');
+        prevHd       = dragHeader.previousSibling('gridcolumn:not([hidden])');
+        me.lastTargetHeader = targetHeader;
+        me.lastDropPos = pos;
+
+        data.dropLocation = dropLocation;
+
+        if ((dragHeader !== targetHeader) &amp;&amp;
+            ((pos === &quot;before&quot; &amp;&amp; nextHd !== targetHeader) ||
+            (pos === &quot;after&quot; &amp;&amp; prevHd !== targetHeader)) &amp;&amp;
+            !targetHeader.isDescendantOf(dragHeader)) {
+
+            // As we move in between different DropZones that are in the same
+            // group (such as the case when in a locked grid), invalidateDrop
+            // on the other dropZones.
+            allDropZones = Ext.dd.DragDropManager.getRelated(me);
+            ln = allDropZones.length;
+            i  = 0;
+
+            for (; i &lt; ln; i++) {
+                dropZone = allDropZones[i];
+                if (dropZone !== me &amp;&amp; dropZone.invalidateDrop) {
+                    dropZone.invalidateDrop();
+                }
+            }
+
+            me.valid = true;
+            topIndicator = me.getTopIndicator();
+            bottomIndicator = me.getBottomIndicator();
+            if (pos === 'before') {
+                topAnchor = 'bc-tl';
+                bottomAnchor = 'tc-bl';
+            } else {
+                topAnchor = 'bc-tr';
+                bottomAnchor = 'tc-br';
+            }
+            
+            // Calculate arrow positions. Offset them to align exactly with column border line
+            if(targetHeader instanceof Ext.pivot.plugin.configurator.Container &amp;&amp; targetHeader.items.getCount() &gt; 0){
+                // if dropping zone is the container then align the rows to the last column item
+                topXY = topIndicator.getAlignToXY(targetHeader.items.last().el, topAnchor);
+                bottomXY = bottomIndicator.getAlignToXY(targetHeader.items.last().el, bottomAnchor);
+            }else{
+                topXY = topIndicator.getAlignToXY(targetHeader.el, topAnchor);
+                bottomXY = bottomIndicator.getAlignToXY(targetHeader.el, bottomAnchor);
+            }
+
+            // constrain the indicators to the viewable section
+            headerCtEl = me.panel.el;
+            minX = headerCtEl.getX() - me.indicatorXOffset;
+            maxX = headerCtEl.getX() + headerCtEl.getWidth();
+
+            topXY[0] = Ext.Number.constrain(topXY[0], minX, maxX);
+            bottomXY[0] = Ext.Number.constrain(bottomXY[0], minX, maxX);
+
+            // position and show indicators
+            topIndicator.setXY(topXY);
+            bottomIndicator.setXY(bottomXY);
+            topIndicator.show();
+            bottomIndicator.show();
+
+        // invalidate drop operation and hide indicators
+        } else {
+            me.invalidateDrop();
+        }
+    },
+
+<span id='Ext-pivot-plugin-configurator-DropZone-method-invalidateDrop'>    invalidateDrop: function() {
+</span>        this.valid = false;
+        this.hideIndicators();
+    },
+
+<span id='Ext-pivot-plugin-configurator-DropZone-method-onNodeOver'>    onNodeOver: function(node, dragZone, e, data) {
+</span>        var me = this,
+            from = data.header,
+            doPosition,
+            to,
+            fromPanel,
+            toPanel;
+
+        doPosition = true;
+        if (data.header.el.dom === node) {
+            doPosition = false;
+        }
+        
+        if (doPosition) {
+            me.positionIndicator(data, node, e);
+        } else {
+            me.valid = false;
+        }
+        return me.valid ? me.dropAllowed : me.dropNotAllowed;
+    },
+
+<span id='Ext-pivot-plugin-configurator-DropZone-method-hideIndicators'>    hideIndicators: function() {
+</span>        var me = this;
+        
+        me.getTopIndicator().hide();
+        me.getBottomIndicator().hide();
+        me.lastTargetHeader = me.lastDropPos = null;
+
+    },
+
+<span id='Ext-pivot-plugin-configurator-DropZone-method-onNodeOut'>    onNodeOut: function() {
+</span>        this.hideIndicators();
+    },
+
+<span id='Ext-pivot-plugin-configurator-DropZone-method-onNodeDrop'>    onNodeDrop: function(node, dragZone, e, data) {
+</span>        //debugger;
+        var me = this,
+            dragColumn = data.header,
+            dropLocation = data.dropLocation,
+            newCol, pos, newPos;
+        
+        if (me.valid &amp;&amp; dropLocation){
+            /* 
+                there are 2 possibilities here:
+                1. a new grid column should be added to the grouping panel
+                2. an existing group column changes its position
+            */
+            
+            if(dragZone.id != me.panel.id){
+                pos = me.panel.getColumnPosition(dropLocation.header, dropLocation.pos);
+                newCol = dragColumn.serialize();
+                
+                // the field has to be removed from the dragZone
+                if(!me.panel.isAgg){
+                    dragZone.panel.remove(dragColumn);
+                }
+                
+                me.panel.addColumn(newCol.dimension, pos, true);
+            }else{
+                // 2nd possibility
+                me.panel.moveColumn(dragColumn.id, dropLocation.header instanceof Ext.pivot.plugin.configurator.Container ? dropLocation.header.items.last().id : dropLocation.header.id, dropLocation.pos);
+            }
+            
+        }
+        
+    }
+});</pre>
+</body>
+</html>

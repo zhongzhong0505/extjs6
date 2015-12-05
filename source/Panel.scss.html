@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>The source code</title>
+  <link href="../resources/prettify/prettify.css" type="text/css" rel="stylesheet" />
+  <script type="text/javascript" src="../resources/prettify/prettify.js"></script>
+  <style type="text/css">
+    .highlight { display: block; background-color: #ddd; }
+  </style>
+  <script type="text/javascript">
+    function highlight() {
+      document.getElementById(location.hash.replace(/#/, "")).className = "highlight";
+    }
+  </script>
+</head>
+<body onload="prettyPrint(); highlight();">
+  <pre class="prettyprint lang-js">.#{$prefix}panel,
+.#{$prefix}plain {
+    overflow: hidden;
+    position: relative;
+}
+
+.#{$prefix}panel {
+    outline: none;
+}
+
+@if $include-ie {
+    // Fix for IE8 clipping. EXTJSIV-1553
+    td.#{$prefix}frame-mc {
+        vertical-align: top;
+    }
+}
+
+.#{$prefix}panel-body {
+    overflow: hidden;
+    position: relative;
+}
+
+.#{$prefix}panel-header-plain,
+.#{$prefix}panel-body-plain {
+    border: 0;
+    padding: 0;
+}
+
+// If we're using framing on modern browsers, they are
+// part of the border/border-radius, but we also need to show
+// the collapsed splitter. In that case, just hide the panel so it
+// doesn't interfere with the positioning
+.#{$prefix}panel-collapsed-mini {
+    visibility: hidden;
+}
+</pre>
+</body>
+</html>

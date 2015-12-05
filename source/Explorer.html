@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>The source code</title>
+  <link href="../resources/prettify/prettify.css" type="text/css" rel="stylesheet" />
+  <script type="text/javascript" src="../resources/prettify/prettify.js"></script>
+  <style type="text/css">
+    .highlight { display: block; background-color: #ddd; }
+  </style>
+  <script type="text/javascript">
+    function highlight() {
+      document.getElementById(location.hash.replace(/#/, "")).className = "highlight";
+    }
+  </script>
+</head>
+<body onload="prettyPrint(); highlight();">
+  <pre class="prettyprint lang-js"><span id='Ext-ux-Explorer'>/**
+</span> * An explorer component for navigating hierarchical content.  Consists of a breadcrumb bar
+ * at the top, tree navigation on the left, and a center panel which displays the contents
+ * of a given node.
+ */
+Ext.define('Ext.ux.Explorer', {
+    extend: 'Ext.panel.Panel',
+    xtype: 'explorer',
+    requires: [
+        'Ext.layout.container.Border',
+        'Ext.toolbar.Breadcrumb',
+        'Ext.tree.Panel'
+    ],
+
+    config: {
+<span id='Ext-ux-Explorer-cfg-breadcrumb'>        /**
+</span>         * @cfg {Object} breadcrumb
+         * Configuration object for the breadcrumb toolbar
+         */
+        breadcrumb: {
+            dock: 'top',
+            xtype: 'breadcrumb',
+            reference: 'breadcrumb'
+        },
+
+<span id='Ext-ux-Explorer-cfg-contentView'>        /**
+</span>         * @cfg {Object} contentView
+         * Configuration object for the &quot;content&quot; data view
+         */
+        contentView: {
+            xtype: 'dataview',
+            reference: 'contentView',
+            region: 'center',
+            cls: Ext.baseCSSPrefix + 'explorer-view',
+            itemSelector: '.' + Ext.baseCSSPrefix + 'explorer-item',
+            tpl:
+                '&lt;tpl for=&quot;.&quot;&gt;' +
+                    '&lt;div class=&quot;' + Ext.baseCSSPrefix + 'explorer-item&quot;&gt;' +
+                        '&lt;div class=&quot;{iconCls}&quot;&gt;' +
+                            '&lt;div class=&quot;' + Ext.baseCSSPrefix + 'explorer-node-icon' +
+                                '{[values.leaf ? &quot; ' + Ext.baseCSSPrefix + 'explorer-leaf-icon' + '&quot; : &quot;&quot;]}' + '&quot;&gt;' +
+                            '&lt;/div&gt;' +
+                            '&lt;div class=&quot;' + Ext.baseCSSPrefix + 'explorer-item-text&quot;&gt;{text}&lt;/div&gt;' +
+                        '&lt;/div&gt;' +
+                    '&lt;/div&gt;' +
+                '&lt;/tpl&gt;'
+        },
+
+<span id='Ext-ux-Explorer-cfg-store'>        /**
+</span>         * @cfg {Ext.data.TreeStore} store
+         * The TreeStore to use as the data source
+         */
+        store: null,
+
+<span id='Ext-ux-Explorer-cfg-tree'>        /**
+</span>         * @cfg {Object} tree
+         * Configuration object for the tree
+         */
+        tree: {
+            xtype: 'treepanel',
+            reference: 'tree',
+            region: 'west',
+            width: 200
+        }
+    },
+
+<span id='Ext-ux-Explorer-property-renderConfig'>    renderConfig: {
+</span><span id='Ext-ux-Explorer-cfg-selection'>        /**
+</span>         * @cfg {Ext.data.TreeModel} selection
+         * The selected node
+         * @accessor
+         */
+        selection: null
+    },
+
+<span id='Ext-ux-Explorer-cfg-layout'>    layout: 'border',
+</span><span id='Ext-ux-Explorer-cfg-referenceHolder'>    referenceHolder: true,
+</span><span id='Ext-ux-Explorer-cfg-defaultListenerScope'>    defaultListenerScope: true,
+</span><span id='Ext-ux-Explorer-cfg-cls'>    cls: Ext.baseCSSPrefix + 'explorer',
+</span>
+<span id='Ext-ux-Explorer-method-initComponent'>    initComponent: function() {
+</span>        var me = this,
+            store = me.getStore();
+
+        //&lt;debug&gt;
+        if (!store) {
+            Ext.raise('Ext.ux.Explorer requires a store.');
+        }
+        //&lt;/debug&gt;
+
+        me.dockedItems = [ me.getBreadcrumb() ];
+
+        me.items = [ me.getTree(), me.getContentView() ];
+
+        me.callParent();
+    },
+
+<span id='Ext-ux-Explorer-method-applyBreadcrumb'>    applyBreadcrumb: function(breadcrumb) {
+</span>        var store = this.getStore();
+
+        breadcrumb = Ext.create(Ext.apply({
+            store: store,
+            selection: store.getRoot()
+        }, breadcrumb));
+
+        breadcrumb.on('selectionchange', '_onBreadcrumbSelectionChange', this);
+
+        return breadcrumb;
+    },
+
+<span id='Ext-ux-Explorer-method-applyContentView'>    applyContentView: function(contentView) {
+</span><span id='Ext-ux-Explorer-property-contentStore'>        /**
+</span>         * @property {Ext.data.Store} contentStore
+         * @private
+         * The backing store for the content view
+         */
+        var contentStore = this.contentStore = new Ext.data.Store({
+            model: this.getStore().model
+        });
+
+        contentView = Ext.create(Ext.apply({
+            store: contentStore
+        }, contentView));
+
+        return contentView;
+    },
+
+<span id='Ext-ux-Explorer-method-applyTree'>    applyTree: function(tree) {
+</span>        tree = Ext.create(Ext.apply({
+            store: this.getStore()
+        }, tree));
+
+        tree.on('selectionchange', '_onTreeSelectionChange', this);
+
+        return tree;
+    },
+
+<span id='Ext-ux-Explorer-method-updateSelection'>    updateSelection: function(node) {
+</span>        var me = this,
+            refs = me.getReferences(),
+            breadcrumb = refs.breadcrumb,
+            tree = refs.tree,
+            treeSelectionModel = tree.getSelectionModel(),
+            contentStore = me.contentStore,
+            parentNode, treeView;
+
+        if (breadcrumb.getSelection() !== node) {
+            breadcrumb.setSelection(node);
+        }
+
+        if (treeSelectionModel.getSelection()[0] !== node) {
+            treeSelectionModel.select([node]);
+            parentNode = node.parentNode;
+            if (parentNode) {
+                parentNode.expand();
+            }
+            treeView = tree.getView();
+            treeView.scrollRowIntoView(treeView.getRow(node));
+        }
+
+        contentStore.removeAll();
+        contentStore.add(node.hasChildNodes() ? node.childNodes : [node]);
+    },
+
+<span id='Ext-ux-Explorer-method-updateStore'>    updateStore: function(store) {
+</span>        this.getBreadcrumb().setStore(store);
+    },
+
+<span id='Ext-ux-Explorer-property-privates'>    privates: {
+</span><span id='Ext-ux-Explorer-method-_onTreeSelectionChange'>        /**
+</span>         * Handles the tree's selectionchange event
+         * @private
+         * @param {Ext.tree.Panel} tree
+         * @param {Ext.data.TreeModel[]} selection
+         */
+        _onTreeSelectionChange: function(tree, selection) {
+            this.setSelection(selection[0]);
+        },
+
+<span id='Ext-ux-Explorer-method-_onBreadcrumbSelectionChange'>        /**
+</span>         * Handles the breadcrumb bar's selectionchange event
+         */
+        _onBreadcrumbSelectionChange: function(breadcrumb, selection) {
+            this.setSelection(selection);
+        }
+    }
+});
+</pre>
+</body>
+</html>

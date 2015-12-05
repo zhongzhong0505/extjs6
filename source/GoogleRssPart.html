@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>The source code</title>
+  <link href="../resources/prettify/prettify.css" type="text/css" rel="stylesheet" />
+  <script type="text/javascript" src="../resources/prettify/prettify.js"></script>
+  <style type="text/css">
+    .highlight { display: block; background-color: #ddd; }
+  </style>
+  <script type="text/javascript">
+    function highlight() {
+      document.getElementById(location.hash.replace(/#/, "")).className = "highlight";
+    }
+  </script>
+</head>
+<body onload="prettyPrint(); highlight();">
+  <pre class="prettyprint lang-js"><span id='Ext-ux-dashboard-GoogleRssPart'>/**
+</span> * This `part` implements a Google RSS Feed for use in a `Dashboard`.
+ */
+Ext.define('Ext.ux.dashboard.GoogleRssPart', {
+    extend: 'Ext.dashboard.Part',
+
+    alias: 'part.google-rss',
+
+    requires: [
+        'Ext.window.MessageBox',
+        'Ext.ux.dashboard.GoogleRssView'
+    ],
+
+<span id='Ext-ux-dashboard-GoogleRssPart-cfg-viewTemplate'>    viewTemplate: {
+</span>        layout: 'fit',
+        items: {
+            xclass: 'Ext.ux.dashboard.GoogleRssView',
+            feedUrl: '{feedUrl}'
+        }
+    },
+
+<span id='Ext-ux-dashboard-GoogleRssPart-property-type'>    type: 'google-rss',
+</span>
+    config: {
+<span id='Ext-ux-dashboard-GoogleRssPart-cfg-suggestedFeed'>        suggestedFeed: 'http://rss.slashdot.org/Slashdot/slashdot'
+</span>    },
+
+<span id='Ext-ux-dashboard-GoogleRssPart-property-formTitleAdd'>    formTitleAdd: 'Add RSS Feed',
+</span>
+<span id='Ext-ux-dashboard-GoogleRssPart-property-formTitleEdit'>    formTitleEdit: 'Edit RSS Feed',
+</span>
+<span id='Ext-ux-dashboard-GoogleRssPart-property-formLabel'>    formLabel: 'RSS Feed URL',
+</span>
+<span id='Ext-ux-dashboard-GoogleRssPart-method-displayForm'>    displayForm: function (instance, currentConfig, callback, scope) {
+</span>        var me = this,
+            suggestion = currentConfig ? currentConfig.feedUrl : me.getSuggestedFeed(),
+            title = instance ? me.formTitleEdit : me.formTitleAdd;
+
+        Ext.Msg.prompt(title, me.formLabel, function (btn, text) {
+            if (btn === 'ok') {
+                callback.call(scope || me, { feedUrl: text });
+            }
+        }, me, false, suggestion);
+    }
+});
+</pre>
+</body>
+</html>

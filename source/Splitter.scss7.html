@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>The source code</title>
+  <link href="../resources/prettify/prettify.css" type="text/css" rel="stylesheet" />
+  <script type="text/javascript" src="../resources/prettify/prettify.js"></script>
+  <style type="text/css">
+    .highlight { display: block; background-color: #ddd; }
+  </style>
+  <script type="text/javascript">
+    function highlight() {
+      document.getElementById(location.hash.replace(/#/, "")).className = "highlight";
+    }
+  </script>
+</head>
+<body onload="prettyPrint(); highlight();">
+  <pre class="prettyprint lang-js"><span id='Ext-resizer-Splitter'>/**
+</span> * @class Ext.resizer.Splitter
+ */
+
+<span id='Ext-resizer-Splitter-css_var-S-splitter-size'>/**
+</span> * @var {number}
+ * The size of the Splitter
+ */
+$splitter-size: dynamic(5px);
+
+<span id='Ext-resizer-Splitter-css_var-S-splitter-active-background-color'>/**
+</span> * @var {color}
+ * The background-color of the active Splitter (the Splitter currently being dragged)
+ */
+$splitter-active-background-color: dynamic(#b4b4b4);
+
+<span id='Ext-resizer-Splitter-css_var-S-splitter-active-opacity'>/**
+</span> * @var {number}
+ * The opacity of the active Splitter (the Splitter currently being dragged)
+ */
+$splitter-active-opacity: dynamic(.8);
+
+<span id='Ext-resizer-Splitter-css_var-S-splitter-active-collapse-tool-opacity'>/**
+</span> * @var {number}
+ * The opacity of the collapse tool on the active Splitter (the Splitter currently being dragged)
+ */
+$splitter-active-collapse-tool-opacity: dynamic(.3);
+
+<span id='Ext-resizer-Splitter-css_var-S-splitter-focus-outline-color'>/**
+</span> * @var {color}
+ * The color of the outline around the splitter when it is focused
+ */
+$splitter-focus-outline-color: dynamic($base-color);
+
+<span id='Ext-resizer-Splitter-css_var-S-splitter-focus-outline-style'>/**
+</span> * @var {string}
+ * The outline-style of the splitter when it is focused
+ */
+$splitter-focus-outline-style: dynamic(solid);
+
+<span id='Ext-resizer-Splitter-css_var-S-splitter-focus-outline-width'>/**
+</span> * @var {number}
+ * The outline-width of the splitter when it is focused
+ */
+$splitter-focus-outline-width: dynamic(1px);
+
+<span id='Ext-resizer-Splitter-css_var-S-splitter-focus-outline-offset'>/**
+</span> * @var {number}
+ * The outline-offset of the splitter when it is focused
+ */
+$splitter-focus-outline-offset: dynamic(-$splitter-focus-outline-width);
+
+<span id='Ext-resizer-Splitter-css_var-S-collapse-tool-cursor'>/**
+</span> * @var {string}
+ * The the type of cursor to display when the cursor is over the collapse tool
+ */
+$collapse-tool-cursor: dynamic(pointer);
+
+<span id='Ext-resizer-Splitter-css_var-S-collapse-tool-size'>/**
+</span> * @var {number}
+ * The size of the collapse tool. This becomes the width of the collapse tool for
+ * horizontal splitters, and the height for vertical splitters.
+ */
+$collapse-tool-size: dynamic(35px);
+
+<span id='Ext-resizer-Splitter-css_var-S-collapse-tool-opacity'>/**
+</span> * @var {number}
+ * The opacity of the collapse tool.
+ */
+$collapse-tool-opacity: dynamic(1);
+
+<span id='Ext-resizer-Splitter-css_var-S-splitter-collapse-tool-border-color'>/**
+</span> * @var {string/list}
+ * The border-color of the collapse tool.
+ */
+$splitter-collapse-tool-border-color: dynamic(#fff);
+
+<span id='Ext-resizer-Splitter-css_var-S-splitter-collapse-tool-background-color'>/**
+</span> * @var {string/list}
+ * The background-color of the collapse tool.
+ */
+$splitter-collapse-tool-background-color: dynamic(transparent);
+
+<span id='Ext-resizer-Splitter-css_var-S-splitter-collapse-tool-border-width'>/**
+</span> * @var {number}
+ * The border-width of the collapse tool.
+ */
+$splitter-collapse-tool-border-width: dynamic(0);
+
+<span id='Ext-resizer-Splitter-css_var-S-splitter-collapse-tool-border-style'>/**
+</span> * @var {number}
+ * The border-style of the collapse tool.
+ */
+$splitter-collapse-tool-border-style: dynamic(solid);
+
+<span id='Ext-resizer-Splitter-css_var-S-splitter-collapse-tool-glyph-color'>/**
+</span> * @var {color}
+ * The color to use for the collapse tool when {@link Global_CSS#$enable-font-icons} is `true`.
+ */
+$splitter-collapse-tool-glyph-color: dynamic($neutral-color);
+
+<span id='Ext-resizer-Splitter-css_var-S-splitter-collapse-tool-glyph-font-size'>/**
+</span> * @var {number}
+ * The font size to use the collapse tool when {@link Global_CSS#$enable-font-icons} is `true`.
+ */
+$splitter-collapse-tool-glyph-font-size: dynamic(16px);
+
+<span id='Ext-resizer-Splitter-css_var-S-splitter-collapse-tool-top-glyph'>/**
+</span> * @var {string/list}
+ * Glyph for the &quot;top&quot; collapse tool when {@link Global_CSS#$enable-font-icons} is `true`.
+ */
+$splitter-collapse-tool-top-glyph: dynamic($fa-var-caret-up $splitter-collapse-tool-glyph-font-size $font-icon-font-family);
+
+<span id='Ext-resizer-Splitter-css_var-S-splitter-collapse-tool-right-glyph'>/**
+</span> * @var {string/list}
+ * Glyph for the &quot;right&quot; collapse tool when {@link Global_CSS#$enable-font-icons} is `true`.
+ */
+$splitter-collapse-tool-right-glyph: dynamic($fa-var-caret-right $splitter-collapse-tool-glyph-font-size $font-icon-font-family);
+
+<span id='Ext-resizer-Splitter-css_var-S-splitter-collapse-tool-bottom-glyph'>/**
+</span> * @var {string/list}
+ * Glyph for the &quot;bottom&quot; collapse tool when {@link Global_CSS#$enable-font-icons} is `true`.
+ */
+$splitter-collapse-tool-bottom-glyph: dynamic($fa-var-caret-down $splitter-collapse-tool-glyph-font-size $font-icon-font-family);
+
+<span id='Ext-resizer-Splitter-css_var-S-splitter-collapse-tool-left-glyph'>/**
+</span> * @var {string/list}
+ * Glyph for the &quot;left&quot; collapse tool when {@link Global_CSS#$enable-font-icons} is `true`.
+ */
+$splitter-collapse-tool-left-glyph: dynamic($fa-var-caret-left $splitter-collapse-tool-glyph-font-size $font-icon-font-family);
+
+<span id='Ext-resizer-Splitter-css_var-S-splitter-collapse-tool-top-glyph-padding'>/**
+</span> * @var {number/list}
+ * The padding of the &quot;top&quot; collapse tool's glyph element when {@link Global_CSS#$enable-font-icons} is `true`.
+ * Use to achieve precise alignment of the collapse tool.
+ */
+$splitter-collapse-tool-top-glyph-padding: dynamic(0);
+
+<span id='Ext-resizer-Splitter-css_var-S-splitter-collapse-tool-right-glyph-padding'>/**
+</span> * @var {number/list}
+ * The padding of the &quot;right&quot; collapse tool's glyph element when {@link Global_CSS#$enable-font-icons} is `true`.
+ * Use to achieve precise alignment of the collapse tool.
+ */
+$splitter-collapse-tool-right-glyph-padding: dynamic(0);
+
+<span id='Ext-resizer-Splitter-css_var-S-splitter-collapse-tool-bottom-glyph-padding'>/**
+</span> * @var {number/list}
+ * The padding of the &quot;bottom&quot; collapse tool's glyph element when {@link Global_CSS#$enable-font-icons} is `true`.
+ * Use to achieve precise alignment of the collapse tool.
+ */
+$splitter-collapse-tool-bottom-glyph-padding: dynamic(0);
+
+<span id='Ext-resizer-Splitter-css_var-S-splitter-collapse-tool-left-glyph-padding'>/**
+</span> * @var {number/list}
+ * The padding of the &quot;left&quot; collapse tool's glyph element when {@link Global_CSS#$enable-font-icons} is `true`.
+ * Use to achieve precise alignment of the collapse tool.
+ */
+$splitter-collapse-tool-left-glyph-padding: dynamic(0);
+</pre>
+</body>
+</html>

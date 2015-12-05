@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>The source code</title>
+  <link href="../resources/prettify/prettify.css" type="text/css" rel="stylesheet" />
+  <script type="text/javascript" src="../resources/prettify/prettify.js"></script>
+  <style type="text/css">
+    .highlight { display: block; background-color: #ddd; }
+  </style>
+  <script type="text/javascript">
+    function highlight() {
+      document.getElementById(location.hash.replace(/#/, "")).className = "highlight";
+    }
+  </script>
+</head>
+<body onload="prettyPrint(); highlight();">
+  <pre class="prettyprint lang-js"><span id='Ext-view-BoundList'>/**
+</span> * @class Ext.view.BoundList
+ */
+
+<span id='Ext-view-BoundList-css_var-S-boundlist-background-color'>/**
+</span> * @var {color}
+ * The background-color of the BoundList
+ */
+$boundlist-background-color: dynamic(#fff);
+
+
+<span id='Ext-view-BoundList-css_var-S-boundlist-border-color'>/**
+</span> * @var {color}
+ * The border-color of the BoundList
+ */
+$boundlist-border-color: dynamic($neutral-color);
+
+<span id='Ext-view-BoundList-css_var-S-boundlist-border-width'>/**
+</span> * @var {number}
+ * The border-width of the BoundList
+ */
+$boundlist-border-width: dynamic(1px);
+
+<span id='Ext-view-BoundList-css_var-S-boundlist-border-style'>/**
+</span> * @var {string}
+ * The border-style of the BoundList
+ */
+$boundlist-border-style: dynamic(solid);
+
+<span id='Ext-view-BoundList-css_var-S-boundlist-item-height'>/**
+</span> * @var {number}
+ * The height of BoundList items
+ */
+$boundlist-item-height: dynamic(22px);
+
+<span id='Ext-view-BoundList-css_var-S-boundlist-item-font-family'>/**
+</span> * @var {string}
+ * The font family of the BoundList items
+ */
+$boundlist-item-font-family: dynamic($font-family);
+
+<span id='Ext-view-BoundList-css_var-S-boundlist-item-font-size'>/**
+</span> * @var {number}
+ * The font size of the BoundList items
+ */
+$boundlist-item-font-size: dynamic($font-size);
+
+<span id='Ext-view-BoundList-css_var-S-boundlist-item-font-weight'>/**
+</span> * @var {string}
+ * The font-weight of the BoundList items
+ */
+$boundlist-item-font-weight: dynamic(normal);
+
+<span id='Ext-view-BoundList-css_var-S-boundlist-item-text-color'>/**
+</span> * @var {color}
+ * The text color of the BoundList items
+ */
+$boundlist-item-text-color: dynamic($color);
+
+<span id='Ext-view-BoundList-css_var-S-boundlist-item-over-text-color'>/**
+</span> * @var {color}
+ * The text color of hovered BoundList items
+ */
+$boundlist-item-over-text-color: dynamic($boundlist-item-text-color);
+
+<span id='Ext-view-BoundList-css_var-S-boundlist-item-selected-text-color'>/**
+</span> * @var {color}
+ * The text color of selected BoundList items
+ */
+$boundlist-item-selected-text-color: dynamic($boundlist-item-text-color);
+
+<span id='Ext-view-BoundList-css_var-S-boundlist-item-padding'>/**
+</span> * @var {number/list}
+ * The padding of BoundList items
+ */
+$boundlist-item-padding: dynamic(0 3px);
+
+<span id='Ext-view-BoundList-css_var-S-boundlist-item-border-width'>/**
+</span> * @var {number}
+ * The border-width of BoundList items
+ */
+$boundlist-item-border-width: dynamic(1px);
+
+<span id='Ext-view-BoundList-css_var-S-boundlist-item-border-style'>/**
+</span> * @var {string}
+ * The border-style of BoundList items
+ */
+$boundlist-item-border-style: dynamic(dotted);
+
+<span id='Ext-view-BoundList-css_var-S-boundlist-item-border-color'>/**
+</span> * @var {color}
+ * The border-color of BoundList items
+ */
+$boundlist-item-border-color: dynamic($boundlist-background-color);
+
+<span id='Ext-view-BoundList-css_var-S-boundlist-item-over-border-color'>/**
+</span> * @var {color}
+ * The border-color of hovered BoundList items
+ */
+$boundlist-item-over-border-color: dynamic($base-color);
+
+<span id='Ext-view-BoundList-css_var-S-boundlist-item-selected-border-color'>/**
+</span> * @var {color}
+ * The border-color of selected BoundList items
+ */
+$boundlist-item-selected-border-color: dynamic($base-color);
+
+<span id='Ext-view-BoundList-css_var-S-boundlist-item-over-background-color'>/**
+</span> * @var {color}
+ * The background-color of hovered BoundList items
+ */
+$boundlist-item-over-background-color: dynamic($base-color);
+
+<span id='Ext-view-BoundList-css_var-S-boundlist-item-selected-background-color'>/**
+</span> * @var {color}
+ * The background-color of selected BoundList items
+ */
+$boundlist-item-selected-background-color: dynamic($base-color);
+</pre>
+</body>
+</html>

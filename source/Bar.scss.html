@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>The source code</title>
+  <link href="../resources/prettify/prettify.css" type="text/css" rel="stylesheet" />
+  <script type="text/javascript" src="../resources/prettify/prettify.js"></script>
+  <style type="text/css">
+    .highlight { display: block; background-color: #ddd; }
+  </style>
+  <script type="text/javascript">
+    function highlight() {
+      document.getElementById(location.hash.replace(/#/, "")).className = "highlight";
+    }
+  </script>
+</head>
+<body onload="prettyPrint(); highlight();">
+  <pre class="prettyprint lang-js">.#{$prefix}tab-bar {
+    z-index: 0;
+    position: relative;
+}
+
+.#{$prefix}tab-bar-strip {
+    position: absolute;
+    line-height: 0;
+    font-size: 0;
+    z-index: 2;
+
+    .#{$prefix}tab-bar-top &gt; &amp; {
+        bottom: 0;
+    }
+
+    .#{$prefix}tab-bar-bottom &gt; &amp;{
+        top: 0;
+    }
+
+    .#{$prefix}tab-bar-left &gt; &amp; {
+        right: 0;
+
+        @if $include-rtl {
+           &amp;.#{$prefix}rtl {
+                right: auto;
+                left: 0;
+            }
+        }
+    }
+
+    .#{$prefix}tab-bar-right &gt; &amp; {
+        left: 0;
+
+        @if $include-rtl {
+            &amp;.#{$prefix}rtl {
+                left: auto;
+                right: 0;
+            }
+        }
+    }
+}
+
+.#{$prefix}tab-bar-horizontal .#{$prefix}tab-bar-strip {
+    width: 100%;
+    left: 0;
+}
+
+.#{$prefix}tab-bar-vertical {
+    // vertical tabbars use display:table-cell so that they doen't expand to fill their
+    // container when rendered outside of a tabpanel. (display:table doesn't work in IE9
+    // because getComputedStyle doesn't return the correct border/padding info)
+    display: table-cell;
+
+    .#{$prefix}tab-bar-strip {
+        height: 100%;
+        top: 0;
+    }
+}
+
+.#{$prefix}tab-bar-plain {
+    background: transparent !important;
+}
+
+.#{$prefix}box-scroller-plain {
+    background-color: transparent !important;
+}</pre>
+</body>
+</html>

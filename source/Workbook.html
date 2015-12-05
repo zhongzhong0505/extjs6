@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>The source code</title>
+  <link href="../resources/prettify/prettify.css" type="text/css" rel="stylesheet" />
+  <script type="text/javascript" src="../resources/prettify/prettify.js"></script>
+  <style type="text/css">
+    .highlight { display: block; background-color: #ddd; }
+  </style>
+  <script type="text/javascript">
+    function highlight() {
+      document.getElementById(location.hash.replace(/#/, "")).className = "highlight";
+    }
+  </script>
+</head>
+<body onload="prettyPrint(); highlight();">
+  <pre class="prettyprint lang-js"><span id='Ext-exporter-file-excel-Workbook'>/**
+</span> * This class generates an Excel XML workbook.
+ *
+ * The workbook is the top level object of an xml Excel file.
+ * It should have at least one Worksheet before rendering.
+ *
+ * This is how an xml Excel file looks like:
+ *
+ *  - Workbook
+ *      - Style[]
+ *      - Worksheet[]
+ *          - Table[]
+ *              - Column[]
+ *              - Row[]
+ *                  - Cell[]
+ *
+ *
+ * Check Microsoft's website for more info about Excel XML:
+ * https://msdn.microsoft.com/en-us/Library/aa140066(v=office.10).aspx
+ *
+ *
+ * Here is an example of how to create an Excel XML document:
+ *
+ *      var workbook = Ext.create('Ext.exporter.file.excel.Workbook', {
+ *              title:  'My document',
+ *              author: 'John Doe'
+ *          }),
+ *          table = workbook.addWorksheet({
+ *              name:   'Sheet 1'
+ *          }).addTable();
+ *
+ *      // add formatting to the first two columns of the spreadsheet
+ *      table.addColumn({
+ *          width:  120,
+ *          styleId: workbook.addStyle({
+ *              format: 'Long Time'
+ *          }).getId()
+ *      });
+ *      table.addColumn({
+ *          width:  100,
+ *          styleId: workbook.addStyle({
+ *              format: 'Currency'
+ *          }).getId()
+ *      });
+ *
+ *      // add rows and cells with data
+ *      table.addRow().addCell([{
+ *          value: 'Date'
+ *      },{
+ *          value: 'Value'
+ *      }]);
+ *      table.addRow().addCell([{
+ *          value: new Date('06/17/2015')
+ *      },{
+ *          value: 15
+ *      }]);
+ *      table.addRow().addCell([{
+ *          value: new Date('06/18/2015')
+ *      },{
+ *          value: 30
+ *      }]);
+ *
+ *      //add a formula on the 4th row which sums up the previous 2 rows
+ *      table.addRow().addCell({
+ *          index: 2,
+ *          formula: '=SUM(R[-2]C:R[-1]C)'
+ *      });
+ *
+ *      // save the document in the browser
+ *      Ext.exporter.File.saveAs(workbook.render(), 'document.xml', 'UTF-8');
+ *
+ */
+Ext.define('Ext.exporter.file.excel.Workbook', {
+    extend: 'Ext.exporter.file.Base',
+
+    requires: [
+        'Ext.exporter.file.excel.Worksheet',
+        'Ext.exporter.file.excel.Table',
+        'Ext.exporter.file.excel.Style',
+        'Ext.exporter.file.excel.Row',
+        'Ext.exporter.file.excel.Column',
+        'Ext.exporter.file.excel.Cell'
+    ],
+
+    config: {
+<span id='Ext-exporter-file-excel-Workbook-cfg-title'>        /**
+</span>         * @cfg {String} [title=&quot;Workbook&quot;]
+         *
+         * The title of the workbook
+         */
+        title: &quot;Workbook&quot;,
+
+<span id='Ext-exporter-file-excel-Workbook-cfg-author'>        /**
+</span>         * @cfg {String} [author=&quot;Sencha&quot;]
+         *
+         * The author of the generated Excel file
+         */
+        author: 'Sencha',
+
+<span id='Ext-exporter-file-excel-Workbook-cfg-windowHeight'>        /**
+</span>         * @cfg {Number} [windowHeight=9000]
+         *
+         * Excel window height
+         */
+        windowHeight: 9000,
+
+<span id='Ext-exporter-file-excel-Workbook-cfg-windowWidth'>        /**
+</span>         * @cfg {Number} [windowWidth=50000]
+         *
+         * Excel window width
+         */
+        windowWidth: 50000,
+
+<span id='Ext-exporter-file-excel-Workbook-cfg-protectStructure'>        /**
+</span>         * @cfg {Boolean} [protectStructure=false]
+         *
+         * Protect structure
+         */
+        protectStructure: false,
+
+<span id='Ext-exporter-file-excel-Workbook-cfg-protectWindows'>        /**
+</span>         * @cfg {Boolean} [protectWindows=false]
+         *
+         * Protect windows
+         */
+        protectWindows: false,
+
+<span id='Ext-exporter-file-excel-Workbook-cfg-styles'>        /**
+</span>         * @cfg {Ext.exporter.file.excel.Style[]} styles
+         *
+         * Collection of styles available in this workbook
+         */
+        styles: [],
+
+<span id='Ext-exporter-file-excel-Workbook-cfg-worksheets'>        /**
+</span>         * @cfg {Ext.exporter.file.excel.Worksheet[]} worksheets
+         *
+         * Collection of worksheets available in this workbook
+         */
+        worksheets: []
+    },
+
+<span id='Ext-exporter-file-excel-Workbook-method-getStyles'>    /**
+</span>     * @method getStyles
+     * @returns {Ext.util.Collection}
+     *
+     * Returns the collection of styles available in this workbook
+     */
+
+<span id='Ext-exporter-file-excel-Workbook-method-getWorksheets'>    /**
+</span>     * @method getWorksheets
+     * @returns {Ext.util.Collection}
+     *
+     * Returns the collection of worksheets available in this workbook
+     */
+
+    tpl:[
+        '&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;\n',
+        '&lt;?mso-application progid=&quot;Excel.Sheet&quot;?&gt;\n',
+        '&lt;Workbook ',
+        'xmlns=&quot;urn:schemas-microsoft-com:office:spreadsheet&quot; ',
+        'xmlns:o=&quot;urn:schemas-microsoft-com:office:office&quot; ',
+        'xmlns:x=&quot;urn:schemas-microsoft-com:office:excel&quot; ',
+        'xmlns:ss=&quot;urn:schemas-microsoft-com:office:spreadsheet&quot; ',
+        'xmlns:html=&quot;http://www.w3.org/TR/REC-html40&quot;&gt;\n',
+        '   &lt;DocumentProperties xmlns=&quot;urn:schemas-microsoft-com:office:office&quot;&gt;\n',
+        '       &lt;Title&gt;{title:htmlEncode}&lt;/Title&gt;\n',
+        '       &lt;Author&gt;{author:htmlEncode}&lt;/Author&gt;\n',
+        '       &lt;Created&gt;{createdAt}&lt;/Created&gt;\n',
+        '   &lt;/DocumentProperties&gt;\n',
+        '   &lt;ExcelWorkbook xmlns=&quot;urn:schemas-microsoft-com:office:excel&quot;&gt;\n',
+        '       &lt;WindowHeight&gt;{windowHeight}&lt;/WindowHeight&gt;\n',
+        '       &lt;WindowWidth&gt;{windowWidth}&lt;/WindowWidth&gt;\n',
+        '       &lt;ProtectStructure&gt;{protectStructure}&lt;/ProtectStructure&gt;\n',
+        '       &lt;ProtectWindows&gt;{protectWindows}&lt;/ProtectWindows&gt;\n',
+        '   &lt;/ExcelWorkbook&gt;\n',
+        '   &lt;Styles&gt;\n',
+        '&lt;tpl for=&quot;styles&quot;&gt;{[values.render()]}&lt;/tpl&gt;',
+        '   &lt;/Styles&gt;\n',
+        '&lt;tpl for=&quot;worksheets&quot;&gt;{[values.render()]}&lt;/tpl&gt;',
+        '&lt;/Workbook&gt;'
+    ],
+
+<span id='Ext-exporter-file-excel-Workbook-method-destroy'>    destroy: function(){
+</span>        this.getStyles().destroy();
+        this.getWorksheets().destroy();
+        return this.callParent(arguments);
+    },
+
+<span id='Ext-exporter-file-excel-Workbook-method-getRenderData'>    getRenderData: function(){
+</span>        return Ext.apply(this.callParent(arguments), {
+            worksheets: this.getWorksheets().getRange(),
+            styles: this.getStyles().getRange()
+        });
+    },
+
+<span id='Ext-exporter-file-excel-Workbook-method-applyStyles'>    applyStyles: function(data, dataCollection){
+</span>        return this.checkCollection(data, dataCollection, 'Ext.exporter.file.excel.Style');
+    },
+
+<span id='Ext-exporter-file-excel-Workbook-method-applyWorksheets'>    applyWorksheets: function(data, dataCollection){
+</span>        return this.checkCollection(data, dataCollection, 'Ext.exporter.file.excel.Worksheet');
+    },
+
+<span id='Ext-exporter-file-excel-Workbook-method-addStyle'>    /**
+</span>     * Convenience method to add styles. You can also use workbook.getStyles().add(config).
+     * @param {Object/Array} config
+     * @returns {Ext.exporter.file.excel.Style/Ext.exporter.file.excel.Style[]}
+     */
+    addStyle: function (config) {
+        return this.getStyles().add(config || {});
+    },
+
+<span id='Ext-exporter-file-excel-Workbook-method-getStyle'>    /**
+</span>     * Convenience method to fetch a style by its id.
+     * @param id
+     * @returns {Ext.exporter.file.excel.Style}
+     */
+    getStyle: function(id){
+        return this.getStyles().get(id);
+    },
+
+<span id='Ext-exporter-file-excel-Workbook-method-addWorksheet'>    /**
+</span>     * Convenience method to add worksheets. You can also use workbook.getWorksheets().add(config).
+     * @param {Object/Array} config
+     * @returns {Ext.exporter.file.excel.Worksheet/Ext.exporter.file.excel.Worksheet[]}
+     */
+    addWorksheet: function(config){
+        return this.getWorksheets().add(config || {});
+    },
+
+<span id='Ext-exporter-file-excel-Workbook-method-getWorksheet'>    /**
+</span>     * Convenience method to fetch a worksheet by its id.
+     * @param id
+     * @returns {Ext.exporter.file.excel.Worksheet}
+     */
+    getWorksheet: function(id){
+        return this.getWorksheets().get(id);
+    }
+
+});</pre>
+</body>
+</html>

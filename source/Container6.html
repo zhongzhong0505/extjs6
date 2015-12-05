@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>The source code</title>
+  <link href="../resources/prettify/prettify.css" type="text/css" rel="stylesheet" />
+  <script type="text/javascript" src="../resources/prettify/prettify.js"></script>
+  <style type="text/css">
+    .highlight { display: block; background-color: #ddd; }
+  </style>
+  <script type="text/javascript">
+    function highlight() {
+      document.getElementById(location.hash.replace(/#/, "")).className = "highlight";
+    }
+  </script>
+</head>
+<body onload="prettyPrint(); highlight();">
+  <pre class="prettyprint lang-js"><span id='Ext-pivot-plugin-configurator-Container'>/**
+</span> *
+ * This class is used for managing all fields for an axis.
+ *
+ * @private
+ *
+ */
+Ext.define('Ext.pivot.plugin.configurator.Container', {
+    extend: 'Ext.panel.Panel',
+
+    requires: [
+        'Ext.pivot.plugin.configurator.Column',
+        'Ext.pivot.plugin.configurator.DragZone',
+        'Ext.pivot.plugin.configurator.DropZone'
+    ],
+    
+    alias: 'widget.pivotconfigcontainer',
+    
+<span id='Ext-pivot-plugin-configurator-Container-cfg-childEls'>    childEls:       ['innerCt', 'targetEl'],
+</span><span id='Ext-pivot-plugin-configurator-Container-property-handleSorting'>    handleSorting:  false,
+</span><span id='Ext-pivot-plugin-configurator-Container-property-handleFiltering'>    handleFiltering:false,
+</span><span id='Ext-pivot-plugin-configurator-Container-property-position'>    position:       'top',
+</span><span id='Ext-pivot-plugin-configurator-Container-property-isAgg'>    isAgg:          false,
+</span><span id='Ext-pivot-plugin-configurator-Container-cfg-border'>    border:         false,
+</span>
+<span id='Ext-pivot-plugin-configurator-Container-property-dragDropText'>    dragDropText:   'Drop Column Fields Here',
+</span>
+<span id='Ext-pivot-plugin-configurator-Container-cfg-cls'>    cls:                    Ext.baseCSSPrefix + 'pivot-grid-config-container-body',
+</span><span id='Ext-pivot-plugin-configurator-Container-property-dockedTopRightCls'>    dockedTopRightCls:      Ext.baseCSSPrefix + 'pivot-grid-config-container-body-tr',
+</span><span id='Ext-pivot-plugin-configurator-Container-property-dockedBottomLeftCls'>    dockedBottomLeftCls:    Ext.baseCSSPrefix + 'pivot-grid-config-container-body-bl',
+</span><span id='Ext-pivot-plugin-configurator-Container-property-hintTextCls'>    hintTextCls:            Ext.baseCSSPrefix + 'pivot-grid-config-container-hint',
+</span>
+<span id='Ext-pivot-plugin-configurator-Container-method-initComponent'>    initComponent: function(){
+</span>        var me = this;
+
+        if(me.position == 'top' || me.position == 'bottom'){
+            Ext.apply(me, {
+                style:          'overflow:hidden',
+                layout:         'column',
+                height:         'auto'
+            });
+        }else{
+            Ext.apply(me, {
+                layout: {
+                    type: 'vbox',
+                    align:  'stretch'
+                }
+            });
+        }
+
+        if(me.position == 'top' || me.position == 'right') {
+            me.cls += ' ' + me.dockedTopRightCls;
+        }else{
+            me.cls += ' ' + me.dockedBottomLeftCls;
+        }
+
+        me.callParent(arguments);
+    },
+
+<span id='Ext-pivot-plugin-configurator-Container-method-destroy'>    destroy: function(){
+</span>        var me = this;
+        
+        Ext.destroyMembers(me, 'dragZone', 'dropZone', 'relayers', 'targetEl');
+        me.dragZone = me.dropZone = me.relayers = me.targetEl = null;
+        
+        me.callParent();
+    },
+    
+<span id='Ext-pivot-plugin-configurator-Container-method-enable'>    enable: function(){
+</span>        var me = this;
+        
+        if(me.dragZone){
+            me.dragZone.enable();
+        }
+        if(me.dropZone){
+            me.dropZone.enable();
+        }
+    },
+    
+<span id='Ext-pivot-plugin-configurator-Container-method-disable'>    disable: function(){
+</span>        var me = this;
+        
+        if(me.dragZone){
+            me.dragZone.disable();
+        }
+        if(me.dropZone){
+            me.dropZone.disable();
+        }
+    },
+
+<span id='Ext-pivot-plugin-configurator-Container-method-afterRender'>    afterRender: function(){
+</span>        var me = this;
+        
+        me.callParent();
+
+        me.dragZone = new Ext.pivot.plugin.configurator.DragZone(me);
+        me.dropZone = new Ext.pivot.plugin.configurator.DropZone(me);
+
+        me.mon(me, 'afterlayout', me.showGroupByText, me);
+    },
+    
+<span id='Ext-pivot-plugin-configurator-Container-method-addColumn'>    /**
+</span>     * This is used for adding a new config field to this container.
+     *
+     * @private
+     */
+    addColumn: function(config, pos, notify){
+        var me = this,
+            cfg = {xtype: 'pivotconfigcolumn'},
+            itemFound = me.items.findIndex('dimensionId', new RegExp('^' + config.id + '$', 'i')) &gt;= 0,
+            newCol;
+        
+        if(!me.isAgg){
+            // if column found then don't do anything
+            if(itemFound){
+                if (notify === true) {
+                    me.notifyGroupChange();
+                }
+                return;
+            }
+        }else{
+            if(itemFound){
+                config.id = Ext.id();
+            }
+        }
+
+        if(me.items.getCount() == 0){
+            me.hideGroupByText();
+        }
+        
+        Ext.apply(cfg, {
+            dimension:      config,
+            dimensionId:    config.id,
+            header:         config.header,
+            isCustomizable: me.isCustomizable,
+            isAgg:          me.isAgg
+        });
+        
+        if(me.isAgg){
+            config.aggregator = config.aggregator || 'sum';
+        }
+        
+        if(pos != -1){
+            newCol = me.insert(pos, cfg);
+        }else{
+            newCol = me.add(cfg);
+        }
+        me.updateColumnIndexes();
+        newCol.relayers = me.relayEvents(newCol, ['sortchange', 'filterchange', 'configchange']);
+
+        if(notify === true){
+            me.notifyGroupChange();
+        }
+    },
+    
+<span id='Ext-pivot-plugin-configurator-Container-method-getColumnPosition'>    /**
+</span>     * This is used for calculating column position in this container.
+     *
+     * @private
+     */
+    getColumnPosition: function(column, position){
+        var me = this,
+            pos;
+        
+        if(column instanceof Ext.pivot.plugin.configurator.Column){
+            //we have to insert before or after this column
+            pos = me.items.findIndex('id', column.id);
+            pos = (position === 'before') ? pos : pos + 1;
+        }else{
+            pos = -1;
+        }
+        return pos;
+    },
+    
+<span id='Ext-pivot-plugin-configurator-Container-method-moveColumn'>    /**
+</span>     * This is used for moving a column inside this container.
+     *
+     * @private
+     */
+    moveColumn: function(idFrom, idTo, position){
+        var me = this,
+            pos = me.items.findIndex('id', idFrom),
+            newPos = me.items.findIndex('id', idTo);
+        
+        if(pos != newPos){
+            if(newPos &gt; pos){
+                newPos = (position === 'before') ? Math.max(newPos - 1, 0) : newPos;                        
+            }else{
+                newPos = (position === 'before') ? newPos : newPos + 1;
+            }
+            
+            me.move(pos, newPos);
+            me.updateColumnIndexes();
+            me.notifyGroupChange();
+        }
+    },
+    
+<span id='Ext-pivot-plugin-configurator-Container-method-updateColumnIndexes'>    /**
+</span>     * After a column is moved the indexes has to be updated.
+     *
+     * @private
+     */
+    updateColumnIndexes: function(){
+        this.items.each(function(item, index, all){
+            item.index = index;
+        });
+    },
+    
+<span id='Ext-pivot-plugin-configurator-Container-method-notifyGroupChange'>    /**
+</span>     * This is used for firing the 'configchange' event
+     *
+     * @private
+     */
+    notifyGroupChange: function(){
+        this.fireEvent('configchange');
+    },
+    
+<span id='Ext-pivot-plugin-configurator-Container-method-showGroupByText'>    /**
+</span>     * The container has an info text displayed inside. This function makes it visible.
+     *
+     * @private
+     */
+    showGroupByText: function(){
+        var me = this;
+        
+        if(me.items.getCount() === 0){
+            me.innerCt.setHeight(me.minHeight);
+            if(me.targetEl){
+                me.targetEl.setHtml('&lt;div class=&quot;' + me.hintTextCls + '&quot;&gt;' + me.dragDropText + '&lt;/div&gt;');
+            }else{
+                me.targetEl = me.innerCt.createChild();
+            }
+        }
+    },
+    
+<span id='Ext-pivot-plugin-configurator-Container-method-hideGroupByText'>    /**
+</span>     * The container has an info text displayed inside. This function hides it.
+     *
+     * @private
+     */
+    hideGroupByText: function(){
+        if(this.targetEl){
+            this.targetEl.setHtml('');
+        }
+    }
+    
+    
+});</pre>
+</body>
+</html>

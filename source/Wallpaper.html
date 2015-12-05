@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>The source code</title>
+  <link href="../resources/prettify/prettify.css" type="text/css" rel="stylesheet" />
+  <script type="text/javascript" src="../resources/prettify/prettify.js"></script>
+  <style type="text/css">
+    .highlight { display: block; background-color: #ddd; }
+  </style>
+  <script type="text/javascript">
+    function highlight() {
+      document.getElementById(location.hash.replace(/#/, "")).className = "highlight";
+    }
+  </script>
+</head>
+<body onload="prettyPrint(); highlight();">
+  <pre class="prettyprint lang-js">/*!
+ * Ext JS Library
+ * Copyright(c) 2006-2014 Sencha Inc.
+ * licensing@sencha.com
+ * http://www.sencha.com/license
+ */
+
+<span id='Ext-ux-desktop-Wallpaper'>/**
+</span> * @class Ext.ux.desktop.Wallpaper
+ * @extends Ext.Component
+ * &lt;p&gt;This component renders an image that stretches to fill the component.&lt;/p&gt;
+ */
+Ext.define('Ext.ux.desktop.Wallpaper', {
+    extend: 'Ext.Component',
+
+    alias: 'widget.wallpaper',
+
+<span id='Ext-ux-desktop-Wallpaper-cfg-cls'>    cls: 'ux-wallpaper',
+</span><span id='Ext-ux-desktop-Wallpaper-cfg-html'>    html: '&lt;img src=&quot;'+Ext.BLANK_IMAGE_URL+'&quot;&gt;',
+</span>
+<span id='Ext-ux-desktop-Wallpaper-property-stretch'>    stretch: false,
+</span><span id='Ext-ux-desktop-Wallpaper-property-wallpaper'>    wallpaper: null,
+</span><span id='Ext-ux-desktop-Wallpaper-cfg-stateful'>    stateful  : true,
+</span><span id='Ext-ux-desktop-Wallpaper-cfg-stateId'>    stateId  : 'desk-wallpaper',
+</span>
+<span id='Ext-ux-desktop-Wallpaper-method-afterRender'>    afterRender: function () {
+</span>        var me = this;
+        me.callParent();
+        me.setWallpaper(me.wallpaper, me.stretch);
+    },
+
+<span id='Ext-ux-desktop-Wallpaper-method-applyState'>    applyState: function () {
+</span>        var me = this, old = me.wallpaper;
+        me.callParent(arguments);
+        if (old != me.wallpaper) {
+            me.setWallpaper(me.wallpaper);
+        }
+    },
+
+<span id='Ext-ux-desktop-Wallpaper-method-getState'>    getState: function () {
+</span>        return this.wallpaper &amp;&amp; { wallpaper: this.wallpaper };
+    },
+
+<span id='Ext-ux-desktop-Wallpaper-method-setWallpaper'>    setWallpaper: function (wallpaper, stretch) {
+</span>        var me = this, imgEl, bkgnd;
+
+        me.stretch = (stretch !== false);
+        me.wallpaper = wallpaper;
+
+        if (me.rendered) {
+            imgEl = me.el.dom.firstChild;
+
+            if (!wallpaper || wallpaper == Ext.BLANK_IMAGE_URL) {
+                Ext.fly(imgEl).hide();
+            } else if (me.stretch) {
+                imgEl.src = wallpaper;
+
+                me.el.removeCls('ux-wallpaper-tiled');
+                Ext.fly(imgEl).setStyle({
+                    width: '100%',
+                    height: '100%'
+                }).show();
+            } else {
+                Ext.fly(imgEl).hide();
+
+                bkgnd = 'url('+wallpaper+')';
+                me.el.addCls('ux-wallpaper-tiled');
+            }
+
+            me.el.setStyle({
+                backgroundImage: bkgnd || ''
+            });
+            if(me.stateful) {
+                me.saveState();
+            }
+        }
+        return me;
+    }
+});
+</pre>
+</body>
+</html>

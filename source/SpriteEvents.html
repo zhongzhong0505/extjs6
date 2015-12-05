@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>The source code</title>
+  <link href="../resources/prettify/prettify.css" type="text/css" rel="stylesheet" />
+  <script type="text/javascript" src="../resources/prettify/prettify.js"></script>
+  <style type="text/css">
+    .highlight { display: block; background-color: #ddd; }
+  </style>
+  <script type="text/javascript">
+    function highlight() {
+      document.getElementById(location.hash.replace(/#/, "")).className = "highlight";
+    }
+  </script>
+</head>
+<body onload="prettyPrint(); highlight();">
+  <pre class="prettyprint lang-js"><span id='Ext-draw-plugin-SpriteEvents'>/**
+</span> * A draw container {@link Ext.AbstractPlugin plugin} that adds ability to listen
+ * to sprite events. For example:
+ *
+ *     var drawContainer = Ext.create('Ext.draw.Container', {
+ *          plugins: ['spriteevents'],
+ *          renderTo: Ext.getBody(),
+ *          width: 200,
+ *          height: 200,
+ *          sprites: [{
+ *               type: 'circle',
+ *               fillStyle: '#79BB3F',
+ *               r: 50,
+ *               x: 100,
+ *               y: 100
+ *          }],
+ *          listeners: {
+ *              spriteclick: function (item, event) {
+ *                  var sprite = item &amp;&amp; item.sprite;
+ *                  if (sprite) {
+ *                      sprite.setAttributes({fillStyle: 'red'});
+                        sprite.getSurface().renderFrame();
+ *                  }
+ *              }
+ *          }
+ *     });
+ */
+Ext.define('Ext.draw.plugin.SpriteEvents', {
+    extend: 'Ext.plugin.Abstract',
+    alias: 'plugin.spriteevents',
+
+    requires: ['Ext.draw.PathUtil'],
+
+<span id='Ext-draw-plugin-SpriteEvents-event-spritemousemove'>    /**
+</span>     * @event spritemousemove
+     * Fires when the mouse is moved on a sprite.
+     * @param {Object} sprite
+     * @param {Event} event
+     */
+
+<span id='Ext-draw-plugin-SpriteEvents-event-spritemouseup'>    /**
+</span>     * @event spritemouseup
+     * Fires when a mouseup event occurs on a sprite.
+     * @param {Object} sprite
+     * @param {Event} event
+     */
+
+<span id='Ext-draw-plugin-SpriteEvents-event-spritemousedown'>    /**
+</span>     * @event spritemousedown
+     * Fires when a mousedown event occurs on a sprite.
+     * @param {Object} sprite
+     * @param {Event} event
+     */
+
+<span id='Ext-draw-plugin-SpriteEvents-event-spritemouseover'>    /**
+</span>     * @event spritemouseover
+     * Fires when the mouse enters a sprite.
+     * @param {Object} sprite
+     * @param {Event} event
+     */
+
+<span id='Ext-draw-plugin-SpriteEvents-event-spritemouseout'>    /**
+</span>     * @event spritemouseout
+     * Fires when the mouse exits a sprite.
+     * @param {Object} sprite
+     * @param {Event} event
+     */
+
+<span id='Ext-draw-plugin-SpriteEvents-event-spriteclick'>    /**
+</span>     * @event spriteclick
+     * Fires when a click event occurs on a sprite.
+     * @param {Object} sprite
+     * @param {Event} event
+     */
+
+<span id='Ext-draw-plugin-SpriteEvents-event-spritedblclick'>    /**
+</span>     * @event spritedblclick
+     * Fires when a double click event occurs on a sprite.
+     * @param {Object} sprite
+     * @param {Event} event
+     */
+
+<span id='Ext-draw-plugin-SpriteEvents-event-spritetap'>    /**
+</span>     * @event spritetap
+     * Fires when a tap event occurs on a sprite.
+     * @param {Object} sprite
+     * @param {Event} event
+     */
+
+    mouseMoveEvents: {
+        mousemove: true,
+        mouseover: true,
+        mouseout: true
+    },
+
+<span id='Ext-draw-plugin-SpriteEvents-property-spriteMouseMoveEvents'>    spriteMouseMoveEvents: {
+</span>        spritemousemove: true,
+        spritemouseover: true,
+        spritemouseout: true
+    },
+
+<span id='Ext-draw-plugin-SpriteEvents-method-init'>    init: function (drawContainer) {
+</span>        var handleEvent = 'handleEvent';
+
+        this.drawContainer = drawContainer;
+
+        drawContainer.addElementListener({
+            click: handleEvent,
+            dblclick: handleEvent,
+            mousedown: handleEvent,
+            mousemove: handleEvent,
+            mouseup: handleEvent,
+            mouseover: handleEvent,
+            mouseout: handleEvent,
+            // run our handlers before user code
+            priority: 1001,
+            scope: this
+        });
+    },
+
+<span id='Ext-draw-plugin-SpriteEvents-method-hasSpriteMouseMoveListeners'>    hasSpriteMouseMoveListeners: function () {
+</span>        var listeners = this.drawContainer.hasListeners,
+            name;
+
+        for (name in this.spriteMouseMoveEvents) {
+            if (name in listeners) {
+                return true;
+            }
+        }
+        return false;
+    },
+
+<span id='Ext-draw-plugin-SpriteEvents-method-hitTestEvent'>    hitTestEvent: function (e) {
+</span>        var items = this.drawContainer.getItems(),
+            surface, sprite, i;
+
+        for (i = items.length - 1; i &gt;= 0; i--) {
+            surface = items.get(i);
+            sprite = surface.hitTestEvent(e);
+            if (sprite) {
+                return sprite;
+            }
+        }
+
+        return null;
+    },
+
+<span id='Ext-draw-plugin-SpriteEvents-method-handleEvent'>    handleEvent: function (e) {
+</span>        var me = this,
+            drawContainer = me.drawContainer,
+            isMouseMoveEvent = e.type in me.mouseMoveEvents,
+            lastSprite = me.lastSprite,
+            sprite;
+
+        if (isMouseMoveEvent &amp;&amp; !me.hasSpriteMouseMoveListeners()) {
+            return;
+        }
+
+        sprite = me.hitTestEvent(e);
+
+        if (isMouseMoveEvent &amp;&amp; !Ext.Object.equals(sprite, lastSprite)) {
+            if (lastSprite) {
+                drawContainer.fireEvent('spritemouseout', lastSprite, e);
+            }
+            if (sprite) {
+                drawContainer.fireEvent('spritemouseover', sprite, e);
+            }
+        }
+
+        if (sprite) {
+            drawContainer.fireEvent('sprite' + e.type, sprite, e);
+        }
+
+        me.lastSprite = sprite;
+    }
+});</pre>
+</body>
+</html>

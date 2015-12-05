@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>The source code</title>
+  <link href="../resources/prettify/prettify.css" type="text/css" rel="stylesheet" />
+  <script type="text/javascript" src="../resources/prettify/prettify.js"></script>
+  <style type="text/css">
+    .highlight { display: block; background-color: #ddd; }
+  </style>
+  <script type="text/javascript">
+    function highlight() {
+      document.getElementById(location.hash.replace(/#/, "")).className = "highlight";
+    }
+  </script>
+</head>
+<body onload="prettyPrint(); highlight();">
+  <pre class="prettyprint lang-js"><span id='Ext-pivot-filter-Base'>/**
+</span> * Base implementation of a filter. It handles common type of filters.
+ *
+ */
+Ext.define('Ext.pivot.filter.Base', {
+    alternateClassName: [
+        'Mz.aggregate.filter.Abstract'
+    ],
+
+    alias: 'pivotfilter.base',
+
+    mixins: [
+        'Ext.mixin.Factoryable'
+    ],
+
+<span id='Ext-pivot-filter-Base-cfg-mztype'>    /**
+</span>     * @cfg {String} mztype
+     *
+     * @deprecated 6.0 Use {@link #type} instead. The old type config was renamed to {@link #operator}.
+     */
+
+<span id='Ext-pivot-filter-Base-cfg-operator'>    /**
+</span>     * @cfg {String} operator (required)
+     *
+     * Operator to use to compare labels/values to this Filter's {@link #value}.
+     *
+     * The `between` and `not between` operators expect this filter's {@link #value} to be an array with two values.
+     *
+     * Possible values are:
+     *
+     *    * `&lt;`
+     *    * `&lt;=`
+     *    * `=`
+     *    * `&gt;=`
+     *    * `&gt;`
+     *    * `!=`
+     *    * `between`
+     *    * `not between`
+     */
+    operator:       null,
+    
+<span id='Ext-pivot-filter-Base-cfg-from'>    /**
+</span>     * @cfg {String} from
+     * @deprecated 6.0 Use {@link #value} instead as an array with 2 values.
+     *
+     * Used in case of a 'between/not between' type of filter
+     *
+     */
+
+<span id='Ext-pivot-filter-Base-cfg-to'>    /**
+</span>     * @cfg {String} to
+     * @deprecated 6.0 Use {@link #value} instead as an array with 2 values.
+     *
+     * Used in case of a 'between/not between' operator
+     *
+     */
+
+<span id='Ext-pivot-filter-Base-cfg-value'>    /**
+</span>     * @cfg {String/Array} value (required)
+     *
+     * Value to filter by. For 'between' and 'not between' operators this should be an array of values.
+     */
+    value:          null,
+
+<span id='Ext-pivot-filter-Base-cfg-caseSensitive'>    /**
+</span>     * @cfg {Boolean} [caseSensitive=true]
+     *
+     * During filtering should we use case sensitive comparison?
+     *
+     */
+    caseSensitive:  true,
+
+<span id='Ext-pivot-filter-Base-property-parent'>    /**
+</span>     * @property {Ext.pivot.dimension.Item} parent Reference to the parent dimension object.
+     * @readonly
+     *
+     * @private
+     */
+    parent:         null,
+    
+<span id='Ext-pivot-filter-Base-method-constructor'>    constructor: function(config){
+</span>        Ext.apply(this, config || {});
+        return this.callParent(arguments);
+    },
+
+<span id='Ext-pivot-filter-Base-method-destroy'>    destroy: function(){
+</span>        this.parent = null;
+        return this.callParent(arguments);
+    },
+    
+<span id='Ext-pivot-filter-Base-method-serialize'>    /**
+</span>     * Returns the serialized filter data as an object.
+     *
+     * @returns {Object}
+     */
+    serialize: function(){
+        var me = this;
+        
+        return Ext.apply({
+            type:           me.type,
+            operator:       me.operator,
+            value:          me.value,
+            caseSensitive:  me.caseSensitive
+        }, me.getSerialArgs() || {});
+    },
+    
+<span id='Ext-pivot-filter-Base-method-getSerialArgs'>    /**
+</span>     * Template method to be implemented by all subclasses that is used to
+     * get and return serialized filter data.
+     *
+     * Defaults to Ext.emptyFn.
+     *
+     */
+    getSerialArgs: Ext.emptyFn,
+    
+<span id='Ext-pivot-filter-Base-method-isMatch'>    /**
+</span>     * Check if the specified value matches the filter.
+     *
+     * @returns Boolean True if the value matches the filter
+     * @param value
+     *
+     */
+    isMatch: function(value){
+        var me = this,
+            sorter = Ext.pivot.matrix.Base.prototype.naturalSort,
+            v = me.value,
+            ret, retFrom, retTo, from, to;
+        
+        v = (Ext.isArray(v) ? v[0] : v) || '';
+        ret = (me.caseSensitive ? sorter(value || '', v) : sorter(String(value || '').toLowerCase(), String(v).toLowerCase()));
+
+        if(me.operator == '='){
+            return (ret === 0);
+        }
+
+        if(me.operator == '!='){
+            return (ret !== 0);
+        }
+
+        if(me.operator == '&gt;'){
+            return (ret &gt; 0);
+        }
+
+        if(me.operator == '&gt;='){
+            return (ret &gt;= 0);
+        }
+
+        if(me.operator == '&lt;'){
+            return (ret &lt; 0);
+        }
+
+        if(me.operator == '&lt;='){
+            return (ret &lt;= 0);
+        }
+
+        v = me.value;
+        from = (Ext.isArray(v) ? v[0] : v) || '';
+        to = (Ext.isArray(v) ? v[1] : v) || '';
+        retFrom = (me.caseSensitive ? sorter(String(value || '').toLowerCase(), String(from).toLowerCase()) : sorter(value || '', from));
+        retTo = (me.caseSensitive ? sorter(String(value || '').toLowerCase(), String(to).toLowerCase()) : sorter(value || '', to));
+
+        if(me.operator == 'between'){
+            return (retFrom &gt;= 0 &amp;&amp; retTo &lt;= 0);
+        }
+
+        if(me.operator == 'not between'){
+            return !(retFrom &gt;= 0 &amp;&amp; retTo &lt;= 0);
+        }
+        
+        // no valid operator was specified. ignore filtering
+        return true;
+    }
+});</pre>
+</body>
+</html>

@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>The source code</title>
+  <link href="../resources/prettify/prettify.css" type="text/css" rel="stylesheet" />
+  <script type="text/javascript" src="../resources/prettify/prettify.js"></script>
+  <style type="text/css">
+    .highlight { display: block; background-color: #ddd; }
+  </style>
+  <script type="text/javascript">
+    function highlight() {
+      document.getElementById(location.hash.replace(/#/, "")).className = "highlight";
+    }
+  </script>
+</head>
+<body onload="prettyPrint(); highlight();">
+  <pre class="prettyprint lang-js"><span id='Ext-grid-column-Check'>/**
+</span> * @class Ext.grid.column.Check
+ */
+
+<span id='Ext-grid-column-Check-css_var-S-grid-checkcolumn-disabled-opacity'>/**
+</span> * @var {number}
+ * Opacity of disabled CheckColumns
+ */
+$grid-checkcolumn-disabled-opacity: dynamic(0.3);
+
+<span id='Ext-grid-column-Check-css_var-S-grid-checkcolumn-glyph-color'>/**
+</span> * @var {color}
+ * The color to use for the checkbox when {@link Global_CSS#$enable-font-icons} is `true`.
+ */
+$grid-checkcolumn-glyph-color: dynamic($form-checkbox-glyph-color);
+
+<span id='Ext-grid-column-Check-css_var-S-grid-checkcolumn-glyph'>/**
+</span> * @var {string/list}
+ * The glyph for the checkbox when {@link Global_CSS#$enable-font-icons} is `true`.
+ */
+$grid-checkcolumn-glyph: dynamic($form-checkbox-glyph);
+
+<span id='Ext-grid-column-Check-css_var-S-grid-checkcolumn-checked-glyph'>/**
+</span> * @var {string/list}
+ * The glyph for the checkbox in &quot;checked&quot; state when {@link Global_CSS#$enable-font-icons} is `true`.
+ */
+$grid-checkcolumn-checked-glyph: dynamic($form-checkbox-checked-glyph);
+
+$grid-checkcolumn-cell-padding:
+    max(ceil(($grid-row-height - $form-checkbox-size) / 2), 0)
+    right($grid-cell-inner-padding)
+    max(floor(($grid-row-height - $form-checkbox-size) / 2), 0)
+    left($grid-cell-inner-padding)
+</pre>
+</body>
+</html>

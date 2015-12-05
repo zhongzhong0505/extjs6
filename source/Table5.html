@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>The source code</title>
+  <link href="../resources/prettify/prettify.css" type="text/css" rel="stylesheet" />
+  <script type="text/javascript" src="../resources/prettify/prettify.js"></script>
+  <style type="text/css">
+    .highlight { display: block; background-color: #ddd; }
+  </style>
+  <script type="text/javascript">
+    function highlight() {
+      document.getElementById(location.hash.replace(/#/, "")).className = "highlight";
+    }
+  </script>
+</head>
+<body onload="prettyPrint(); highlight();">
+  <pre class="prettyprint lang-js"><span id='Ext-exporter-file-excel-Table'>/**
+</span> * This class is used to create an xml Excel Table
+ */
+Ext.define('Ext.exporter.file.excel.Table', {
+    extend: 'Ext.exporter.file.Base',
+
+    config: {
+<span id='Ext-exporter-file-excel-Table-cfg-expandedColumnCount'>        /**
+</span>         * This attribute specifies the total number of columns in this table. If specified, this attribute
+         * must be in sync with the table. Columns indices in the table should begin at 1 and go to
+         * ExpandedColumnCount. If this value is out-of-sync with the table, the specified XML Spreadsheet
+         * document is invalid.
+         *
+         * @private
+         */
+        expandedColumnCount: null,
+<span id='Ext-exporter-file-excel-Table-cfg-expandedRowCount'>        /**
+</span>         * Specifies the total number of rows in this table without regard for sparseness. This attribute defines
+         * the overall size of the table, if the specified rows and columns were expanded to full size.
+         * If specified, this attribute must be in sync with the table. Row indices in the table should begin
+         * at 1 and go to ExpandedRowCount. If this value is out-of-sync with the table, the specified XML
+         * Spreadsheet document is invalid.
+         *
+         * @private
+         */
+        expandedRowCount: null,
+<span id='Ext-exporter-file-excel-Table-cfg-fullColumns'>        /**
+</span>         * WebCalc will set x:FullColumns to 1 when the data in the table represents full columns of data.
+         * Excel will save x:FullColumns to 1 if the Table extends the full height. This attribute is ignored
+         * on file load, but on XML Spreadsheet paste it is taken to indicate that the source clip has full columns.
+         *
+         * @private
+         */
+        fullColumns: 1,
+<span id='Ext-exporter-file-excel-Table-cfg-fullRows'>        /**
+</span>         * WebCalc will set x:FullRows to 1 when the data in the table represents full rows of data. Excel will
+         * save x:FullRows to 1 if the Table extends the full width. This attribute is ignored on file load, but on
+         * XML Spreadsheet paste it is taken to indicate that the source clip has full rows.
+         *
+         * @private
+         */
+        fullRows: 1,
+<span id='Ext-exporter-file-excel-Table-cfg-defaultColumnWidth'>        /**
+</span>         * @cfg {Number} [defaultColumnWidth=48]
+         *
+         * Specifies the default width of columns in this table. This attribute is specified in points.
+         */
+        defaultColumnWidth: 48,
+<span id='Ext-exporter-file-excel-Table-cfg-defaultRowHeight'>        /**
+</span>         * @cfg {Number} [defaultRowHeight=12.75]
+         *
+         * Specifies the default height of rows in this table. This attribute is specified in points.
+         */
+        defaultRowHeight: 12.75,
+<span id='Ext-exporter-file-excel-Table-cfg-styleId'>        /**
+</span>         * @cfg {String} styleId
+         *
+         * Excel style attached to this table
+         */
+        styleId: null,
+<span id='Ext-exporter-file-excel-Table-cfg-leftCell'>        /**
+</span>         * @cfg {Number} [leftCell=1]
+         *
+         * Specifies the column index that this table should be placed at. This value must be greater than zero.
+         */
+        leftCell: 1,
+<span id='Ext-exporter-file-excel-Table-cfg-topCell'>        /**
+</span>         * @cfg {Number} [topCell=1]
+         *
+         * Specifies the row index that this table should be placed at. This value must be greater than zero.
+         */
+        topCell: 1,
+<span id='Ext-exporter-file-excel-Table-cfg-columns'>        /**
+</span>         * @cfg {Ext.exporter.file.excel.Column[]} columns
+         *
+         * Collection of column definitions available on this table
+         */
+        columns: [],
+<span id='Ext-exporter-file-excel-Table-cfg-rows'>        /**
+</span>         * @cfg {Ext.exporter.file.excel.Row[]} rows
+         *
+         * Collection of row definitions available on this table
+         */
+        rows: []
+    },
+
+<span id='Ext-exporter-file-excel-Table-method-getColumns'>    /**
+</span>     * @method getColumns
+     * @return {Ext.util.Collection}
+     *
+     * Returns the collection of columns available in this table
+     */
+
+<span id='Ext-exporter-file-excel-Table-method-getRows'>    /**
+</span>     * @method getRows
+     * @return {Ext.util.Collection}
+     *
+     * Returns the collection of rows available in this table
+     */
+
+    tpl: [
+        '       &lt;Table x:FullColumns=&quot;{fullColumns}&quot; x:FullRows=&quot;{fullRows}&quot;',
+        '&lt;tpl if=&quot;this.exists(expandedRowCount)&quot;&gt; ss:ExpandedRowCount=&quot;{expandedRowCount}&quot;&lt;/tpl&gt;',
+        '&lt;tpl if=&quot;this.exists(expandedColumnCount)&quot;&gt; ss:ExpandedColumnCount=&quot;{expandedColumnCount}&quot;&lt;/tpl&gt;',
+        '&lt;tpl if=&quot;this.exists(defaultRowHeight)&quot;&gt; ss:DefaultRowHeight=&quot;{defaultRowHeight}&quot;&lt;/tpl&gt;',
+        '&lt;tpl if=&quot;this.exists(defaultColumnWidth)&quot;&gt; ss:DefaultColumnWidth=&quot;{defaultColumnWidth}&quot;&lt;/tpl&gt;',
+        '&lt;tpl if=&quot;this.exists(leftCell)&quot;&gt; ss:LeftCell=&quot;{leftCell}&quot;&lt;/tpl&gt;',
+        '&lt;tpl if=&quot;this.exists(topCell)&quot;&gt; ss:TopCell=&quot;{topCell}&quot;&lt;/tpl&gt;',
+        '&lt;tpl if=&quot;this.exists(styleId)&quot;&gt; ss:StyleID=&quot;{styleId}&quot;&lt;/tpl&gt;',
+        '&gt;\n',
+        '&lt;tpl for=&quot;columns&quot;&gt;{[values.render()]}&lt;/tpl&gt;',
+        '&lt;tpl if=&quot;this.exists(rows)&quot;&gt;',
+        '&lt;tpl for=&quot;rows&quot;&gt;{[values.render()]}&lt;/tpl&gt;',
+        '&lt;tpl else&gt;         &lt;Row ss:AutoFitHeight=&quot;0&quot;/&gt;\n&lt;/tpl&gt;',
+        '       &lt;/Table&gt;\n',
+        {
+            exists: function(value){
+                return !Ext.isEmpty(value);
+            }
+        }
+    ],
+
+<span id='Ext-exporter-file-excel-Table-method-destroy'>    destroy: function(){
+</span>        this.getColumns().destroy();
+        this.getRows().destroy();
+        return this.callParent(arguments);
+    },
+
+<span id='Ext-exporter-file-excel-Table-method-applyColumns'>    applyColumns: function(data, dataCollection){
+</span>        return this.checkCollection(data, dataCollection, 'Ext.exporter.file.excel.Column');
+    },
+
+<span id='Ext-exporter-file-excel-Table-method-applyRows'>    applyRows: function(data, dataCollection){
+</span>        return this.checkCollection(data, dataCollection, 'Ext.exporter.file.excel.Row');
+    },
+
+<span id='Ext-exporter-file-excel-Table-method-addColumn'>    /**
+</span>     * Convenience method to add columns. You can also use workbook.getColumns().add(config).
+     * @param {Object/Array} config
+     * @return {Ext.exporter.file.excel.Column/Ext.exporter.file.excel.Column[]}
+     */
+    addColumn: function(config){
+        return this.getColumns().add(config || {});
+    },
+
+<span id='Ext-exporter-file-excel-Table-method-getColumn'>    /**
+</span>     * Convenience method to fetch a column by its id.
+     * @param id
+     * @return {Ext.exporter.file.excel.Column}
+     */
+    getColumn: function(id){
+        return this.getColumns().get(id);
+    },
+
+<span id='Ext-exporter-file-excel-Table-method-addRow'>    /**
+</span>     * Convenience method to add rows. You can also use workbook.getRows().add(config).
+     * @param {Object/Array} config
+     * @return {Ext.exporter.file.excel.Row/Ext.exporter.file.excel.Row[]}
+     */
+    addRow: function(config){
+        return this.getRows().add(config || {});
+    },
+
+<span id='Ext-exporter-file-excel-Table-method-getRow'>    /**
+</span>     * Convenience method to fetch a row by its id.
+     * @param id
+     * @return {Ext.exporter.file.excel.Row}
+     */
+    getRow: function(id){
+        return this.getRows().get(id);
+    },
+
+<span id='Ext-exporter-file-excel-Table-method-getRenderData'>    getRenderData: function(){
+</span>        return Ext.apply(this.callParent(arguments), {
+            columns: this.getColumns().getRange(),
+            rows: this.getRows().getRange()
+        });
+    }
+
+});</pre>
+</body>
+</html>

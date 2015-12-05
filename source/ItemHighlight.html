@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>The source code</title>
+  <link href="../resources/prettify/prettify.css" type="text/css" rel="stylesheet" />
+  <script type="text/javascript" src="../resources/prettify/prettify.js"></script>
+  <style type="text/css">
+    .highlight { display: block; background-color: #ddd; }
+  </style>
+  <script type="text/javascript">
+    function highlight() {
+      document.getElementById(location.hash.replace(/#/, "")).className = "highlight";
+    }
+  </script>
+</head>
+<body onload="prettyPrint(); highlight();">
+  <pre class="prettyprint lang-js"><span id='Ext-chart-interactions-ItemHighlight'>/**
+</span> * @class Ext.chart.interactions.ItemHighlight
+ * @extends Ext.chart.interactions.Abstract
+ *
+ * The 'itemhighlight' interaction allows the user to highlight series items in the chart.
+ */
+Ext.define('Ext.chart.interactions.ItemHighlight', {
+
+    extend: 'Ext.chart.interactions.Abstract',
+
+<span id='Ext-chart-interactions-ItemHighlight-property-type'>    type: 'itemhighlight',
+</span>    alias: 'interaction.itemhighlight',
+
+<span id='Ext-chart-interactions-ItemHighlight-property-isItemHighlight'>    isItemHighlight: true,
+</span>
+    config: {
+
+<span id='Ext-chart-interactions-ItemHighlight-cfg-gestures'>        gestures: {
+</span>            tap: 'onTapGesture',
+            mousemove: 'onMouseMoveGesture',
+            mousedown: 'onMouseDownGesture',
+            mouseup: 'onMouseUpGesture',
+            mouseleave: 'onMouseUpGesture'
+        },
+
+<span id='Ext-chart-interactions-ItemHighlight-cfg-sticky'>        /**
+</span>         * @cfg {Boolean} [sticky=false]
+         * Disables mouse tracking.
+         * Series items will only be highlighted/unhighlighted on mouse click.
+         * This config has no effect on touch devices.
+         */
+        sticky: false
+    },
+
+<span id='Ext-chart-interactions-ItemHighlight-property-stickyHighlightItem'>    stickyHighlightItem: null,
+</span>
+<span id='Ext-chart-interactions-ItemHighlight-method-onMouseMoveGesture'>    onMouseMoveGesture: function (e) {
+</span>        var me = this,
+            tipItem = me.tipItem,
+            isMousePointer = e.pointerType === 'mouse',
+            item, tooltip, chart;
+
+        if (me.getSticky()) {
+            return true;
+        }
+
+        if (me.isDragging) {
+            if (tipItem &amp;&amp; isMousePointer) {
+                tipItem.series.hideTooltip(tipItem);
+                me.tipItem = null;
+            }
+        } else if (!me.stickyHighlightItem) {
+            item = me.getItemForEvent(e);
+            chart = me.getChart();
+            if (item !== chart.getHighlightItem()) {
+                me.highlight(item);
+                me.sync();
+            }
+
+            if (isMousePointer) {
+                if ( tipItem &amp;&amp; (!item || tipItem.field !== item.field || tipItem.record !== item.record) ) {
+                    tipItem.series.hideTooltip(tipItem);
+                    me.tipItem = tipItem = null;
+                }
+                if (item &amp;&amp; (tooltip = item.series.getTooltip())) {
+                    if (tooltip.trackMouse || !tipItem) {
+                        item.series.showTooltip(item, e.getXY());
+                    }
+                    me.tipItem = item;
+                }
+            }
+            return false;
+        }
+    },
+
+<span id='Ext-chart-interactions-ItemHighlight-method-highlight'>    highlight: function (item) {
+</span>        // This is its own function to make it easier for subclasses
+        // to enhance the behavior. An alternative would be to listen
+        // for the chart's 'itemhighlight' event.
+        this.getChart().setHighlightItem(item);
+    },
+
+<span id='Ext-chart-interactions-ItemHighlight-method-showTooltip'>    showTooltip: function (e, item) {
+</span>        item.series.showTooltip(item, e.getXY());
+        this.tipItem = item;
+    },
+
+<span id='Ext-chart-interactions-ItemHighlight-method-onMouseDownGesture'>    onMouseDownGesture: function () {
+</span>        this.isDragging = true;
+    },
+
+<span id='Ext-chart-interactions-ItemHighlight-method-onMouseUpGesture'>    onMouseUpGesture: function () {
+</span>        this.isDragging = false;
+    },
+
+<span id='Ext-chart-interactions-ItemHighlight-method-onTapGesture'>    onTapGesture: function (e) {
+</span>        var me = this;
+
+        // A click/tap on an item makes its highlight sticky.
+        // It requires another click/tap to unhighlight.
+        if (e.pointerType === 'mouse' &amp;&amp; !me.getSticky()) {
+            return;
+        }
+
+        var item = me.getItemForEvent(e);
+
+        if (me.stickyHighlightItem &amp;&amp; item &amp;&amp; (me.stickyHighlightItem.index === item.index)) {
+            item = null;
+        }
+        me.stickyHighlightItem = item;
+        me.highlight(item);
+    }
+});
+</pre>
+</body>
+</html>

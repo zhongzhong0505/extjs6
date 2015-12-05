@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>The source code</title>
+  <link href="../resources/prettify/prettify.css" type="text/css" rel="stylesheet" />
+  <script type="text/javascript" src="../resources/prettify/prettify.js"></script>
+  <style type="text/css">
+    .highlight { display: block; background-color: #ddd; }
+  </style>
+  <script type="text/javascript">
+    function highlight() {
+      document.getElementById(location.hash.replace(/#/, "")).className = "highlight";
+    }
+  </script>
+</head>
+<body onload="prettyPrint(); highlight();">
+  <pre class="prettyprint lang-js">/*!
+* Ext JS Library
+* Copyright(c) 2006-2015 Sencha Inc.
+* licensing@sencha.com
+* http://www.sencha.com/license
+*/
+
+<span id='Ext-ux-desktop-Video'>/**
+</span> * From code originally written by David Davis
+ * &lt;http://www.sencha.com/blog/html5-video-canvas-and-ext-js&gt;
+ *
+ * For HTML5 video to work, your server must
+ * send the right content type, for more info see:
+ * &lt;http://developer.mozilla.org/En/HTML/Element/Video&gt;
+ */
+Ext.define('Ext.ux.desktop.Video', {
+    extend: 'Ext.panel.Panel',
+
+    alias: 'widget.video',
+<span id='Ext-ux-desktop-Video-cfg-layout'>    layout: 'fit',
+</span><span id='Ext-ux-desktop-Video-property-autoplay'>    autoplay: false,
+</span><span id='Ext-ux-desktop-Video-property-controls'>    controls: true,
+</span><span id='Ext-ux-desktop-Video-cfg-bodyStyle'>    bodyStyle: 'background-color:#000;color:#fff',
+</span><span id='Ext-ux-desktop-Video-cfg-html'>    html: '',
+</span><span id='Ext-ux-desktop-Video-cfg-tpl'>    tpl: [
+</span>        '&lt;video id=&quot;{id}-video&quot; autoPlay=&quot;{autoplay}&quot; controls=&quot;{controls}&quot; poster=&quot;{poster}&quot; start=&quot;{start}&quot; loopstart=&quot;{loopstart}&quot; loopend=&quot;{loopend}&quot; autobuffer=&quot;{autobuffer}&quot; loop=&quot;{loop}&quot; style=&quot;width:100%;height:100%&quot;&gt;',
+            '&lt;tpl for=&quot;src&quot;&gt;',
+                '&lt;source src=&quot;{src}&quot; type=&quot;{type}&quot;/&gt;',
+            '&lt;/tpl&gt;',
+            '{html}',
+        '&lt;/video&gt;'
+    ],
+
+<span id='Ext-ux-desktop-Video-method-initComponent'>    initComponent: function () {
+</span>
+        var me = this,
+            fallback,
+            size,
+            cfg,
+            el;
+
+        if (me.fallbackHTML) {
+            fallback = me.fallbackHTML;
+        } else {
+            fallback = &quot;Your browser does not support HTML5 Video. &quot;;
+
+            if (Ext.isChrome) {
+                fallback += 'Upgrade Chrome.';
+            } else if (Ext.isGecko) {
+                fallback += 'Upgrade to Firefox 3.5 or newer.';
+            } else {
+                var chrome = '&lt;a href=&quot;http://www.google.com/chrome&quot;&gt;Chrome&lt;/a&gt;';
+                fallback += 'Please try &lt;a href=&quot;http://www.mozilla.com&quot;&gt;Firefox&lt;/a&gt;';
+
+                if (Ext.isIE) {
+                    fallback += ', ' + chrome +
+                        ' or &lt;a href=&quot;http://www.apple.com/safari/&quot;&gt;Safari&lt;/a&gt;.';
+                } else {
+                    fallback += ' or ' + chrome + '.';
+                }
+            }
+        }
+        me.fallbackHTML = fallback;
+
+        cfg = me.data = Ext.copyTo({
+            tag   : 'video',
+            html: fallback
+        },
+        me, 'id,poster,start,loopstart,loopend,playcount,autobuffer,loop');
+
+        // just having the params exist enables them
+        if (me.autoplay) {
+            cfg.autoplay = 1;
+        }
+        if (me.controls) {
+            cfg.controls = 1;
+        }
+
+        // handle multiple sources
+        if (Ext.isArray(me.src)) {
+            cfg.src  = me.src;
+        } else {
+            cfg.src  = [ {src: me.src} ];
+        }
+        me.callParent();
+    },
+
+<span id='Ext-ux-desktop-Video-method-afterRender'>    afterRender: function() {
+</span>        var me = this;
+        me.callParent();
+        me.video = me.body.getById(me.id + '-video');
+        el = me.video.dom;
+        me.supported = (el &amp;&amp; el.tagName.toLowerCase() == 'video');
+        if (me.supported) {
+            me.video.on('error', me.onVideoError, me);
+        }
+    },
+    
+<span id='Ext-ux-desktop-Video-method-getFallback'>    getFallback: function() {
+</span>        return '&lt;h1 style=&quot;background-color:#ff4f4f;padding: 10px;&quot;&gt;' + this.fallbackHTML + '&lt;/h1&gt;';
+    },
+
+<span id='Ext-ux-desktop-Video-method-onVideoError'>    onVideoError: function() {
+</span>        var me = this;
+
+        me.video.remove();
+        me.supported = false;
+        me.body.createChild(me.getFallback());
+    },
+
+<span id='Ext-ux-desktop-Video-method-onDestroy'>    onDestroy: function () {
+</span>        var me = this;
+
+        var video = me.video;
+        if (me.supported &amp;&amp; video) {
+            var videoDom = video.dom;
+            if (videoDom &amp;&amp; videoDom.pause) {
+                videoDom.pause();
+            }
+            video.remove();
+            me.video = null;
+        }
+
+        me.callParent();
+    }
+});</pre>
+</body>
+</html>

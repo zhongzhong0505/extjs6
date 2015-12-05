@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>The source code</title>
+  <link href="../resources/prettify/prettify.css" type="text/css" rel="stylesheet" />
+  <script type="text/javascript" src="../resources/prettify/prettify.js"></script>
+  <style type="text/css">
+    .highlight { display: block; background-color: #ddd; }
+  </style>
+  <script type="text/javascript">
+    function highlight() {
+      document.getElementById(location.hash.replace(/#/, "")).className = "highlight";
+    }
+  </script>
+</head>
+<body onload="prettyPrint(); highlight();">
+  <pre class="prettyprint lang-js"><span id='Ext-ux-colorpick-SliderAlpha'>/**
+</span> * Used for &quot;Alpha&quot; slider.
+ * @private
+ */
+Ext.define('Ext.ux.colorpick.SliderAlpha', {
+    extend : 'Ext.ux.colorpick.Slider',
+    alias  : 'widget.colorpickerslideralpha',
+<span id='Ext-ux-colorpick-SliderAlpha-cfg-cls'>    cls    : Ext.baseCSSPrefix + 'colorpicker-alpha',
+</span>
+    requires: [
+        'Ext.XTemplate'
+    ],
+
+<span id='Ext-ux-colorpick-SliderAlpha-property-gradientStyleTpl'>    gradientStyleTpl: Ext.create('Ext.XTemplate',
+</span>        Ext.isIE &amp;&amp; Ext.ieVersion &lt; 10
+        ? 'filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0, startColorstr=\'#FF{hex}\', endColorstr=\'#00{hex}\');' /* IE6-9 */
+        : 'background: -moz-linear-gradient(top, rgba({r}, {g}, {b}, 1) 0%, rgba({r}, {g}, {b}, 0) 100%);' +   /* FF3.6+ */
+          'background: -webkit-linear-gradient(top,rgba({r}, {g}, {b}, 1) 0%, rgba({r}, {g}, {b}, 0) 100%);' + /* Chrome10+,Safari5.1+ */
+          'background: -o-linear-gradient(top, rgba({r}, {g}, {b}, 1) 0%, rgba({r}, {g}, {b}, 0) 100%);' +      /* Opera 11.10+ */
+          'background: -ms-linear-gradient(top, rgba({r}, {g}, {b}, 1) 0%, rgba({r}, {g}, {b}, 0) 100%);' +     /* IE10+ */
+          'background: linear-gradient(to bottom, rgba({r}, {g}, {b}, 1) 0%, rgba({r}, {g}, {b}, 0) 100%);'     /* W3C */
+    ),
+
+<span id='Ext-ux-colorpick-SliderAlpha-method-setAlpha'>    // Called via data binding whenever selectedColor.a changes; param is 0-100
+</span>    setAlpha: function (value) {
+        var me              = this,
+            container       = me.getDragContainer(),
+            dragHandle      = me.getDragHandle(),
+            containerEl     = container.getEl(),
+            containerHeight = containerEl.getHeight(),
+            el, top;
+
+        // Too early in the render cycle? Skip event
+        if (!dragHandle.dd || !dragHandle.dd.constrain) {
+            return;
+        }
+
+        // User actively dragging? Skip event
+        if (typeof dragHandle.dd.dragEnded !== 'undefined' &amp;&amp; !dragHandle.dd.dragEnded) {
+            return;
+        }
+
+        // y-axis of slider with value 0-1 translates to reverse of &quot;value&quot;
+        top = containerHeight * (1 - (value / 100));
+
+        // Position dragger
+        el = dragHandle.getEl();
+        el.setStyle({
+            top: top
+        });
+    },
+
+<span id='Ext-ux-colorpick-SliderAlpha-method-setColor'>    // Called via data binding whenever selectedColor.h changes; hue param is 0-1
+</span>    setColor: function(color) {
+        var me = this,
+            container = me.getDragContainer(),
+            hex, el;
+
+        // Too early in the render cycle? Skip event
+        if (!me.getEl()) {
+            return;
+        }
+
+        // Determine HEX for new hue and set as background based on template
+        hex = Ext.ux.colorpick.ColorUtils.rgb2hex(color.r, color.g, color.b);
+
+        el = container.getEl().first();
+        el.applyStyles(me.gradientStyleTpl.apply({hex: hex, r: color.r, g: color.g, b: color.b}));
+    }
+});
+</pre>
+</body>
+</html>

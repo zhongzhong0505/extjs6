@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>The source code</title>
+  <link href="../resources/prettify/prettify.css" type="text/css" rel="stylesheet" />
+  <script type="text/javascript" src="../resources/prettify/prettify.js"></script>
+  <style type="text/css">
+    .highlight { display: block; background-color: #ddd; }
+  </style>
+  <script type="text/javascript">
+    function highlight() {
+      document.getElementById(location.hash.replace(/#/, "")).className = "highlight";
+    }
+  </script>
+</head>
+<body onload="prettyPrint(); highlight();">
+  <pre class="prettyprint lang-js"><span id='Ext-pivot-plugin-configurator-Column'>/**
+</span> *
+ * This class is used for creating a configuration field.
+ *
+ * @private
+ *
+ */
+Ext.define('Ext.pivot.plugin.configurator.Column',{
+    extend: 'Ext.Component',
+    
+    requires: [
+        'Ext.menu.Menu',
+        'Ext.pivot.plugin.configurator.FilterLabelWindow',
+        'Ext.pivot.plugin.configurator.FilterValueWindow',
+        'Ext.pivot.plugin.configurator.FilterTopWindow'
+    ],
+    
+    alias: 'widget.pivotconfigcolumn',
+    
+<span id='Ext-pivot-plugin-configurator-Column-cfg-childEls'>    childEls: ['textCol', 'filterCol', 'sortCol'],
+</span>
+<span id='Ext-pivot-plugin-configurator-Column-cfg-renderTpl'>    renderTpl:
+</span>        '&lt;div id=&quot;{id}-configCol&quot; class=&quot;' + Ext.baseCSSPrefix + 'pivot-grid-config-column-inner&quot;&gt;' +
+            '&lt;tpl if=&quot;isCustomizable&quot;&gt;' +
+                '&lt;span id={id}-customCol class=&quot;' + Ext.baseCSSPrefix + 'pivot-grid-config-column-btn-customize ' + Ext.baseCSSPrefix + 'border-box ' + Ext.baseCSSPrefix + 'pivot-grid-config-column-btn ' + Ext.baseCSSPrefix + 'pivot-grid-config-column-btn-image&quot;&gt;&lt;/span&gt;' +
+            '&lt;/tpl&gt;' +
+            '&lt;span id={id}-sortCol data-ref=&quot;sortCol&quot; class=&quot;' + Ext.baseCSSPrefix + 'border-box ' + Ext.baseCSSPrefix + 'pivot-grid-config-column-btn&quot;&gt;&lt;/span&gt;' +
+            '&lt;span id={id}-filterCol data-ref=&quot;filterCol&quot; class=&quot;' + Ext.baseCSSPrefix + 'border-box ' + Ext.baseCSSPrefix + 'pivot-grid-config-column-btn&quot;&gt;&lt;/span&gt;' +
+            '&lt;span id=&quot;{id}-textCol&quot; data-ref=&quot;textCol&quot; data-qtip=&quot;{header}{aggregator}&quot; class=&quot;' + Ext.baseCSSPrefix + 'pivot-grid-config-column-text ' + Ext.baseCSSPrefix + 'column-header-text ' + Ext.baseCSSPrefix + 'border-box&quot;&gt;' +
+                '{header}{aggregator}' +
+            '&lt;/span&gt;' +
+        '&lt;/div&gt;',
+        
+<span id='Ext-pivot-plugin-configurator-Column-property-header'>    header:         '&amp;#160;',
+</span><span id='Ext-pivot-plugin-configurator-Column-property-isCustomizable'>    isCustomizable: false,
+</span><span id='Ext-pivot-plugin-configurator-Column-property-dimension'>    dimension:      null,
+</span><span id='Ext-pivot-plugin-configurator-Column-property-isAgg'>    isAgg:          false,
+</span>
+<span id='Ext-pivot-plugin-configurator-Column-property-sumText'>    sumText:                    'Sum',
+</span><span id='Ext-pivot-plugin-configurator-Column-property-avgText'>    avgText:                    'Avg',
+</span><span id='Ext-pivot-plugin-configurator-Column-property-countText'>    countText:                  'Count',
+</span><span id='Ext-pivot-plugin-configurator-Column-property-minText'>    minText:                    'Min',
+</span><span id='Ext-pivot-plugin-configurator-Column-property-maxText'>    maxText:                    'Max',
+</span><span id='Ext-pivot-plugin-configurator-Column-property-groupSumPercentageText'>    groupSumPercentageText:     'Group sum percentage',
+</span><span id='Ext-pivot-plugin-configurator-Column-property-groupCountPercentageText'>    groupCountPercentageText:   'Group count percentage',
+</span><span id='Ext-pivot-plugin-configurator-Column-property-varText'>    varText:                    'Var',
+</span><span id='Ext-pivot-plugin-configurator-Column-property-varPText'>    varPText:                   'Varp',
+</span><span id='Ext-pivot-plugin-configurator-Column-property-stdDevText'>    stdDevText:                 'StdDev',
+</span><span id='Ext-pivot-plugin-configurator-Column-property-stdDevPText'>    stdDevPText:                'StdDevp',
+</span>
+<span id='Ext-pivot-plugin-configurator-Column-property-sortAscText'>    sortAscText:                'Sort A to Z',
+</span><span id='Ext-pivot-plugin-configurator-Column-property-sortDescText'>    sortDescText:               'Sort Z to A',
+</span><span id='Ext-pivot-plugin-configurator-Column-property-sortClearText'>    sortClearText:              'Disable sorting',
+</span><span id='Ext-pivot-plugin-configurator-Column-property-clearFilterText'>    clearFilterText:            'Clear filter from &quot;{0}&quot;',
+</span><span id='Ext-pivot-plugin-configurator-Column-property-labelFiltersText'>    labelFiltersText:           'Label filters',
+</span><span id='Ext-pivot-plugin-configurator-Column-property-valueFiltersText'>    valueFiltersText:           'Value filters',
+</span><span id='Ext-pivot-plugin-configurator-Column-property-equalsText'>    equalsText:                 'Equals...',
+</span><span id='Ext-pivot-plugin-configurator-Column-property-doesNotEqualText'>    doesNotEqualText:           'Does not equal...',
+</span><span id='Ext-pivot-plugin-configurator-Column-property-beginsWithText'>    beginsWithText:             'Begins with...',
+</span><span id='Ext-pivot-plugin-configurator-Column-property-doesNotBeginWithText'>    doesNotBeginWithText:       'Does not begin with...',
+</span><span id='Ext-pivot-plugin-configurator-Column-property-endsWithText'>    endsWithText:               'Ends with...',
+</span><span id='Ext-pivot-plugin-configurator-Column-property-doesNotEndWithText'>    doesNotEndWithText:         'Does not end with...',
+</span><span id='Ext-pivot-plugin-configurator-Column-property-containsText'>    containsText:               'Contains...',
+</span><span id='Ext-pivot-plugin-configurator-Column-property-doesNotContainText'>    doesNotContainText:         'Does not contain...',
+</span><span id='Ext-pivot-plugin-configurator-Column-property-greaterThanText'>    greaterThanText:            'Greater than...',
+</span><span id='Ext-pivot-plugin-configurator-Column-property-greaterThanOrEqualToText'>    greaterThanOrEqualToText:   'Greater than or equal to...',
+</span><span id='Ext-pivot-plugin-configurator-Column-property-lessThanText'>    lessThanText:               'Less than...',
+</span><span id='Ext-pivot-plugin-configurator-Column-property-lessThanOrEqualToText'>    lessThanOrEqualToText:      'Less than or equal to...',
+</span><span id='Ext-pivot-plugin-configurator-Column-property-betweenText'>    betweenText:                'Between...',
+</span><span id='Ext-pivot-plugin-configurator-Column-property-notBetweenText'>    notBetweenText:             'Not between...',
+</span><span id='Ext-pivot-plugin-configurator-Column-property-top10Text'>    top10Text:                  'Top 10...',
+</span>
+<span id='Ext-pivot-plugin-configurator-Column-property-equalsLText'>    equalsLText:                'equals',
+</span><span id='Ext-pivot-plugin-configurator-Column-property-doesNotEqualLText'>    doesNotEqualLText:          'does not equal',
+</span><span id='Ext-pivot-plugin-configurator-Column-property-beginsWithLText'>    beginsWithLText:            'begins with',
+</span><span id='Ext-pivot-plugin-configurator-Column-property-doesNotBeginWithLText'>    doesNotBeginWithLText:      'does not begin with',
+</span><span id='Ext-pivot-plugin-configurator-Column-property-endsWithLText'>    endsWithLText:              'ends with',
+</span><span id='Ext-pivot-plugin-configurator-Column-property-doesNotEndWithLText'>    doesNotEndWithLText:        'does not end with',
+</span><span id='Ext-pivot-plugin-configurator-Column-property-containsLText'>    containsLText:              'contains',
+</span><span id='Ext-pivot-plugin-configurator-Column-property-doesNotContainLText'>    doesNotContainLText:        'does not contain',
+</span><span id='Ext-pivot-plugin-configurator-Column-property-greaterThanLText'>    greaterThanLText:           'is greater than',
+</span><span id='Ext-pivot-plugin-configurator-Column-property-greaterThanOrEqualToLText'>    greaterThanOrEqualToLText:  'is greater than or equal to',
+</span><span id='Ext-pivot-plugin-configurator-Column-property-lessThanLText'>    lessThanLText:              'is less than',
+</span><span id='Ext-pivot-plugin-configurator-Column-property-lessThanOrEqualToLText'>    lessThanOrEqualToLText:     'is less than or equal to',
+</span><span id='Ext-pivot-plugin-configurator-Column-property-betweenLText'>    betweenLText:               'is between',
+</span><span id='Ext-pivot-plugin-configurator-Column-property-notBetweenLText'>    notBetweenLText:            'is not between',
+</span><span id='Ext-pivot-plugin-configurator-Column-property-top10LText'>    top10LText:                 'Top 10...',
+</span><span id='Ext-pivot-plugin-configurator-Column-property-topOrderTopText'>    topOrderTopText:            'Top',
+</span><span id='Ext-pivot-plugin-configurator-Column-property-topOrderBottomText'>    topOrderBottomText:         'Bottom',
+</span><span id='Ext-pivot-plugin-configurator-Column-property-topTypeItemsText'>    topTypeItemsText:           'Items',
+</span><span id='Ext-pivot-plugin-configurator-Column-property-topTypePercentText'>    topTypePercentText:         'Percent',
+</span><span id='Ext-pivot-plugin-configurator-Column-property-topTypeSumText'>    topTypeSumText:             'Sum',
+</span>
+<span id='Ext-pivot-plugin-configurator-Column-cfg-baseCls'>    baseCls:            Ext.baseCSSPrefix + 'pivot-grid-config-column',
+</span><span id='Ext-pivot-plugin-configurator-Column-property-btnIconCls'>    btnIconCls:         Ext.baseCSSPrefix + 'pivot-grid-config-column-btn-image',
+</span><span id='Ext-pivot-plugin-configurator-Column-property-setFilterIconCls'>    setFilterIconCls:   Ext.baseCSSPrefix + 'pivot-grid-config-column-btn-filter-set',
+</span><span id='Ext-pivot-plugin-configurator-Column-property-clearFilterIconCls'>    clearFilterIconCls: Ext.baseCSSPrefix + 'pivot-grid-config-column-btn-filter-clear',
+</span><span id='Ext-pivot-plugin-configurator-Column-property-ascSortIconCls'>    ascSortIconCls:     Ext.baseCSSPrefix + 'pivot-grid-config-column-btn-sort-asc',
+</span><span id='Ext-pivot-plugin-configurator-Column-property-descSortIconCls'>    descSortIconCls:    Ext.baseCSSPrefix + 'pivot-grid-config-column-btn-sort-desc',
+</span><span id='Ext-pivot-plugin-configurator-Column-property-clearSortIconCls'>    clearSortIconCls:   Ext.baseCSSPrefix + 'pivot-grid-config-column-btn-sort-clear',
+</span>    
+<span id='Ext-pivot-plugin-configurator-Column-event-sortchange'>    /**
+</span>     * Fires when user changes sorting on this field
+     *
+     * @event sortchange
+     * @param {Ext.pivot.plugin.configurator.Column} col
+     * @param {String} direction
+     * @private
+     */
+
+<span id='Ext-pivot-plugin-configurator-Column-event-filterchange'>    /**
+</span>     * Fires when user changes the filter on this field
+     *
+     * @event filterchange
+     * @param {Ext.pivot.plugin.configurator.Column} col
+     * @param {Object} filter
+     * @private
+     */
+
+
+    destroy: function(){
+        var me = this;
+        
+        Ext.destroyMembers(me, 'relayers', 'menu');
+        me.dimension = me.relayers = me.menu = null;
+
+        me.callParent(arguments);
+    },
+    
+<span id='Ext-pivot-plugin-configurator-Column-method-initRenderData'>    initRenderData: function() {
+</span>        var me = this;
+
+        return Ext.apply(me.callParent(arguments), {
+            header:         me.dimension.header,
+            aggregator:     me.isAgg ? ' (' + me.dimension.aggregator + ')' : '',
+            dimension:      me.dimension,
+            isCustomizable: me.isCustomizable
+        });
+    },
+    
+<span id='Ext-pivot-plugin-configurator-Column-method-afterRender'>    afterRender: function(){
+</span>        var me = this;
+        
+        me.callParent();
+
+        if(me.isCustomizable){
+            if( !me.isAgg &amp;&amp; ( !Ext.isDefined(me.dimension.sortable) || me.dimension.sortable) ){
+                me.addSortCls(me.dimension.direction);
+            }
+            
+            if(me.dimension.filter){
+                me.addFilterCls();
+            }
+
+            me.mon(me.getTargetEl(), {
+                scope: me,
+                click: me.handleColClick
+            });
+        } 
+        
+    },
+
+<span id='Ext-pivot-plugin-configurator-Column-method-handleColClick'>    handleColClick: function(e, t){
+</span>        // handles grid column sorting
+        var me = this;
+        
+        if(me.isAgg){
+            me.showAggMenu();
+            e.stopEvent();
+        }else{
+            me.showColMenu();
+        }
+    },
+    
+<span id='Ext-pivot-plugin-configurator-Column-method-handleMenuClick'>    handleMenuClick: function(item, e){
+</span>        var me = this,
+            method;
+        
+        me.dimension.aggregator = item.aggregator;
+        if(me.textCol){
+            method = me.textCol.setHtml ? 'setHtml' : 'setHTML';
+            me.textCol[method](me.header + ' (' + me.dimension.aggregator + ')');
+        }
+        me.ownerCt.updateLayout();
+        me.fireEvent('configchange');
+    },
+    
+<span id='Ext-pivot-plugin-configurator-Column-method-addSortCls'>    addSortCls: function(direction){
+</span>        var me = this;
+        
+        if(!me.sortCol){
+            return;
+        }
+        
+        if(direction === 'ASC' || !direction){
+            me.sortCol.addCls(me.ascSortIconCls);
+            me.sortCol.removeCls(me.descSortIconCls);
+        }else{
+            me.sortCol.addCls(me.descSortIconCls);
+            me.sortCol.removeCls(me.ascSortIconCls);
+        }
+        me.sortCol.addCls(me.btnIconCls);
+    },
+    
+<span id='Ext-pivot-plugin-configurator-Column-method-removeSortCls'>    removeSortCls: function(direction){
+</span>        var me = this;
+        
+        if(!me.sortCol){
+            return;
+        }
+        
+        if(direction === 'ASC'){
+            me.sortCol.removeCls(me.ascSortIconCls);
+        }else{
+            me.sortCol.removeCls(me.descSortIconCls);
+        }
+        me.sortCol.removeCls(me.btnIconCls);
+
+    },
+    
+<span id='Ext-pivot-plugin-configurator-Column-method-addFilterCls'>    addFilterCls: function(){
+</span>        var me = this;
+        
+        if(me.filterCol &amp;&amp; !me.filterCol.hasCls(me.setFilterIconCls)){
+            me.filterCol.addCls(me.setFilterIconCls);
+            me.filterCol.addCls(me.btnIconCls);
+        }
+    },
+    
+<span id='Ext-pivot-plugin-configurator-Column-method-removeFilterCls'>    removeFilterCls: function(){
+</span>        var me = this;
+        
+        if(me.filterCol){
+            me.filterCol.removeCls(me.setFilterIconCls);
+            me.filterCol.removeCls(me.btnIconCls);
+        }
+    },
+
+<span id='Ext-pivot-plugin-configurator-Column-method-serialize'>    serialize: function(){
+</span>        var me = this;
+        
+        return Ext.applyIf({
+            idColumn:       me.id
+        }, me.initialConfig);
+    },
+    
+<span id='Ext-pivot-plugin-configurator-Column-method-showAggMenu'>    showAggMenu: function(){
+</span>        var me = this,
+            aggregator = me.dimension.aggregator;
+        
+        //create a menu with possible aggregate functions
+        Ext.destroy(me.menu);
+        me.menu = Ext.create('Ext.menu.Menu', {
+            floating:   true,
+            defaults: {
+                handler:    me.handleMenuClick,
+                scope:      me,
+                xtype:      'menucheckitem',
+                group:      'aggregator'
+            },
+            items: [{
+                text:       me.sumText,
+                aggregator: 'sum',
+                checked:    aggregator == 'sum'
+            },{
+                text:       me.avgText,
+                aggregator: 'avg',
+                checked:    aggregator == 'avg'
+            },{
+                text:       me.countText,
+                aggregator: 'count',
+                checked:    aggregator == 'count'
+            },{
+                text:       me.maxText,
+                aggregator: 'max',
+                checked:    aggregator == 'max'
+            },{
+                text:       me.minText,
+                aggregator: 'min',
+                checked:    aggregator == 'min'
+            },{
+                text:       me.groupSumPercentageText,
+                aggregator: 'groupSumPercentage',
+                checked:    aggregator == 'groupSumPercentage'
+            },{
+                text:       me.groupCountPercentageText,
+                aggregator: 'groupCountPercentage',
+                checked:    aggregator == 'groupCountPercentage'
+            },{
+                text:       me.stdDevText,
+                aggregator: 'stdDev',
+                checked:    aggregator == 'stdDev'
+            },{
+                text:       me.stdDevPText,
+                aggregator: 'stdDevP',
+                checked:    aggregator == 'stdDevP'
+            },{
+                text:       me.varText,
+                aggregator: 'variance',
+                checked:    aggregator == 'variance'
+            },{
+                text:       me.varPText,
+                aggregator: 'varianceP',
+                checked:    aggregator == 'varianceP'
+            }]
+        });
+        me.menu.showBy(me);
+    },
+    
+<span id='Ext-pivot-plugin-configurator-Column-method-showColMenu'>    showColMenu: function(){
+</span>        var me = this,
+            items = [], 
+            labelItems, valueItems, commonItems, i,
+            filter = me.dimension.filter;
+
+        Ext.destroy(me.menu);
+        
+        // check if the dimension is sortable
+        items.push({
+            text:       me.sortAscText,
+            direction:  'ASC',
+            iconCls:    me.ascSortIconCls,
+            handler:    me.sortMe
+        }, {
+            text:       me.sortDescText,
+            direction:  'DESC',
+            iconCls:    me.descSortIconCls,
+            handler:    me.sortMe
+        }, {
+            text:       me.sortClearText,
+            direction:  '',
+            disabled:   me.dimension.sortable === false,
+            iconCls:    me.clearSortIconCls,
+            handler:    me.sortMe
+        },{
+            xtype:  'menuseparator'
+        });
+        
+        commonItems = [{
+            text:       me.equalsText,
+            operator:   '='
+        },{
+            text:       me.doesNotEqualText,
+            operator:   '!='
+        },{
+            xtype:  'menuseparator'
+        },{
+            text:       me.greaterThanText,
+            operator:   '&gt;'
+        },{
+            text:       me.greaterThanOrEqualToText,
+            operator:   '&gt;='
+        },{
+            text:       me.lessThanText,
+            operator:   '&lt;'
+        },{
+            text:       me.lessThanOrEqualToText,
+            operator:   '&lt;='
+        },{
+            xtype:  'menuseparator'
+        },{
+            text:       me.betweenText,
+            operator:   'between'
+        },{
+            text:       me.notBetweenText,
+            operator:   'not between'
+        }];
+
+        labelItems = Ext.clone(commonItems);
+        Ext.Array.insert(labelItems, 3, [{
+            text:       me.beginsWithText,
+            operator:   'begins'
+        },{
+            text:       me.doesNotBeginWithText,
+            operator:   'not begins'
+        },{
+            text:       me.endsWithText,
+            operator:   'ends'
+        },{
+            text:       me.doesNotEndWithText,
+            operator:   'not ends'
+        },{
+            xtype:  'menuseparator'
+        },{
+            text:       me.containsText,
+            operator:   'contains'
+        },{
+            text:       me.doesNotContainText,
+            operator:   'not contains'
+        },{
+            xtype:  'menuseparator'
+        }]);
+
+        for(i = 0; i &lt; labelItems.length; i++){
+            labelItems[i]['checked'] = (filter &amp;&amp; filter.type == 'label' &amp;&amp; filter.operator == labelItems[i].operator);
+        }
+        
+        valueItems = Ext.clone(commonItems);
+        valueItems.push({
+            xtype:  'menuseparator'
+        },{
+            text:       me.top10Text,
+            operator:   'top10'
+        });
+
+        for(i = 0; i &lt; valueItems.length; i++){
+            valueItems[i]['checked'] = (filter &amp;&amp; filter.type == 'value' &amp;&amp; filter.operator == valueItems[i].operator);
+        }
+        
+        items.push({
+            text:       Ext.String.format(me.clearFilterText, me.header),
+            iconCls:    me.clearFilterIconCls,
+            disabled:   !filter,
+            handler:    me.onRemoveFilter
+        },{
+            text:   me.labelFiltersText,
+            menu: {
+                defaults: {
+                    handler:    me.onShowFilter,
+                    scope:      me,
+                    xtype:      'menucheckitem',
+                    group:      'filterlabel',
+                    type:       'label'
+                },
+                items: labelItems
+            }
+        },{
+            text:   me.valueFiltersText,
+            menu: {
+                defaults: {
+                    handler:    me.onShowFilter,
+                    scope:      me,
+                    xtype:      'menucheckitem',
+                    group:      'filtervalue',
+                    type:       'value'
+                },
+                items: valueItems
+            }
+        });
+        
+        me.menu = Ext.create('Ext.menu.Menu', {
+            floating:   true,
+            defaults: {
+                scope:      me
+            },
+            items: items
+        });
+        me.menu.showBy(me);
+    },
+    
+<span id='Ext-pivot-plugin-configurator-Column-method-sortMe'>    sortMe: function(btn){
+</span>        var me = this;
+            
+        if(Ext.isEmpty(btn.direction)){
+            //disable sorting
+            me.dimension.sortable = false;
+            me.removeSortCls(me.dimension.direction);
+        }else{
+            me.dimension.sortable = true;
+            me.addSortCls(btn.direction);
+            me.dimension.direction = btn.direction;
+        }
+        me.fireEvent('sortchange', me, btn.direction);
+    },
+    
+<span id='Ext-pivot-plugin-configurator-Column-method-onShowFilter'>    onShowFilter: function(btn){
+</span>        var me = this,
+            win, winClass, winCfg = {}, data, dataAgg,
+            filter = me.dimension.filter,
+            values = {
+                type:           btn.type,
+                operator:       btn.operator,
+                value:          (filter ? filter.value : ''),
+                from:           (filter ? (Ext.isArray(filter.value) ? filter.value[0] : '') : ''),
+                to:             (filter ? (Ext.isArray(filter.value) ? filter.value[1] : '') : ''),
+                caseSensitive:  (filter ? filter.caseSensitive : false),
+                topSort:        (filter ? filter.topSort : false)
+            };
+        
+        dataAgg = [];
+        Ext.each(me.ownerCt.aggregateDimensions, function(field){
+            dataAgg.push([field.header, field.id]);
+        });
+
+        if(btn.type == 'label' || (btn.type == 'value' &amp;&amp; btn.operator != 'top10')){
+            data = [
+                [me.equalsLText, '='],
+                [me.doesNotEqualLText, '!='],
+                [me.greaterThanLText, '&gt;'],
+                [me.greaterThanOrEqualToLText, '&gt;='],
+                [me.lessThanLText, '&lt;'],
+                [me.lessThanOrEqualToLText, '&lt;='],
+                [me.betweenLText, 'between'],
+                [me.notBetweenLText, 'not between']
+            ];
+            
+            if(btn.type == 'label'){
+                Ext.Array.insert(data, 3, [
+                    [me.beginsWithLText, 'begins'],
+                    [me.doesNotBeginWithLText, 'not begins'],
+                    [me.endsWithLText, 'ends'],
+                    [me.doesNotEndWithLText, 'not ends'],
+                    [me.containsLText, 'contains'],
+                    [me.doesNotContainLText, 'not contains']
+                ]);
+                winClass = 'Ext.pivot.plugin.configurator.FilterLabelWindow';
+            }else{
+                winClass = 'Ext.pivot.plugin.configurator.FilterValueWindow';
+                Ext.apply(values, {
+                    dimensionId:    (filter ? filter.dimensionId : '')
+                });
+                
+                winCfg.storeAgg = Ext.create('Ext.data.ArrayStore', {
+                    fields: ['text', 'value'],
+                    data:   dataAgg
+                });
+            }
+            
+            winCfg.store = Ext.create('Ext.data.ArrayStore', {
+                fields: ['text', 'value'],
+                data:   data
+            });
+        }else{
+            winClass = 'Ext.pivot.plugin.configurator.FilterTopWindow';
+            data = [];
+
+            Ext.apply(winCfg, {
+                storeTopOrder: Ext.create('Ext.data.ArrayStore', {
+                    fields: ['text', 'value'],
+                    data:[
+                        [me.topOrderTopText, 'top'],
+                        [me.topOrderBottomText, 'bottom']
+                    ]
+                }),
+                storeTopType: Ext.create('Ext.data.ArrayStore', {
+                    fields: ['text', 'value'],
+                    data:[
+                        [me.topTypeItemsText, 'items'],
+                        [me.topTypePercentText, 'percent'],
+                        [me.topTypeSumText, 'sum']
+                    ]
+                }),
+                storeAgg: Ext.create('Ext.data.ArrayStore', {
+                    fields: ['text', 'value'],
+                    data:   dataAgg
+                })
+            });
+
+            Ext.apply(values, {
+                operator:       'top10',
+                dimensionId:    (filter ? filter.dimensionId : ''),
+                topType:        (filter ? filter.topType : 'items'),
+                topOrder:       (filter ? filter.topOrder : 'top')
+            });
+        }
+        
+        win = Ext.create(winClass, Ext.apply(winCfg || {}, {
+            title:      me.header,
+            listeners: {
+                filter: me.onApplyFilter,
+                scope:  me
+            }
+        }));
+        
+        win.down('form').getForm().setValues(values);
+        win.show();
+    },
+    
+<span id='Ext-pivot-plugin-configurator-Column-method-onApplyFilter'>    onApplyFilter: function(win, filter){
+</span>        var me = this;
+        
+        filter.caseSensitive = (filter.caseSensitive === 'on');
+        filter.topSort = (filter.topSort === 'on');
+        win.close();
+        me.addFilterCls();
+        me.dimension.filter = filter;
+        me.fireEvent('filterchange', me, filter);
+    },
+    
+<span id='Ext-pivot-plugin-configurator-Column-method-onRemoveFilter'>    onRemoveFilter: function(){
+</span>        var me = this;
+        
+        me.removeFilterCls();
+        me.dimension.filter = null;
+        me.fireEvent('filterchange', me, null);
+    }
+    
+    
+});</pre>
+</body>
+</html>

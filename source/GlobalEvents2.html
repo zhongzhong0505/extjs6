@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>The source code</title>
+  <link href="../resources/prettify/prettify.css" type="text/css" rel="stylesheet" />
+  <script type="text/javascript" src="../resources/prettify/prettify.js"></script>
+  <style type="text/css">
+    .highlight { display: block; background-color: #ddd; }
+  </style>
+  <script type="text/javascript">
+    function highlight() {
+      document.getElementById(location.hash.replace(/#/, "")).className = "highlight";
+    }
+  </script>
+</head>
+<body onload="prettyPrint(); highlight();">
+  <pre class="prettyprint lang-js">// @tag core
+
+<span id='Ext-GlobalEvents'>/**
+</span> * @class Ext.GlobalEvents
+ */
+Ext.define('Ext.overrides.GlobalEvents', {
+    override: 'Ext.GlobalEvents',
+
+<span id='Ext-GlobalEvents-event-resumelayouts'>    /**
+</span>     * @event resumelayouts
+     * Fires after global layout processing has been resumed in {@link
+     * Ext.Component#resumeLayouts}.
+     */
+
+    deprecated: {
+        5: {
+            methods: {
+                addListener: function(ename, fn, scope, options, order, caller, eventOptions) {
+                    var name,
+                        readyFn;
+
+                    // The &quot;ready&quot; event was removed from Ext.globalEvents in 5.0 in favor of
+                    // Ext.onReady().  This function adds compatibility for the ready event
+
+                    if (ename === 'ready') {
+                        readyFn = fn;
+                    } else if (typeof ename !== 'string') {
+                        for (name in ename) {
+                            if (name === 'ready') {
+                                readyFn = ename[name];
+                            }
+                        }
+                    }
+
+                    if (readyFn) {
+                        //&lt;debug&gt;
+                        Ext.log.warn(&quot;Ext.on('ready', fn) is deprecated.  Please use Ext.onReady(fn) instead.&quot;);
+                        //&lt;/debug&gt;
+                        Ext.onReady(readyFn);
+                    }
+
+                    this.callParent([ename, fn, scope, options, order, caller, eventOptions]);
+                }
+            }
+        }
+    }
+});</pre>
+</body>
+</html>

@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>The source code</title>
+  <link href="../resources/prettify/prettify.css" type="text/css" rel="stylesheet" />
+  <script type="text/javascript" src="../resources/prettify/prettify.js"></script>
+  <style type="text/css">
+    .highlight { display: block; background-color: #ddd; }
+  </style>
+  <script type="text/javascript">
+    function highlight() {
+      document.getElementById(location.hash.replace(/#/, "")).className = "highlight";
+    }
+  </script>
+</head>
+<body onload="prettyPrint(); highlight();">
+  <pre class="prettyprint lang-js"><span id='Ext-draw-sprite-Cross'>/**
+</span> * A sprite that represents a cross.
+ *
+ *     @example
+ *     Ext.create({
+ *        xtype: 'draw', 
+ *        renderTo: document.body,
+ *        width: 600,
+ *        height: 400,
+ *        sprites: [{
+ *            type: 'cross',
+ *            translationX: 100,
+ *            translationY: 100,
+ *            size: 40,
+ *            fillStyle: '#1F6D91'
+ *        }]
+ *     });
+ */
+Ext.define('Ext.draw.sprite.Cross', {
+    extend: 'Ext.draw.sprite.Path',
+    alias: 'sprite.cross',
+
+    inheritableStatics: {
+<span id='Ext-draw-sprite-Cross-static-property-def'>        def: {
+</span>            processors: {
+                x: 'number',
+                y: 'number',
+<span id='Ext-draw-sprite-Cross-cfg-size'>                /**
+</span>                 * @cfg {Number} [size=4] The size of the sprite.
+                 * Meant to be comparable to the size of a circle sprite with the same radius.
+                 */
+                size: 'number'
+            },
+            defaults: {
+                x: 0,
+                y: 0,
+                size: 4
+            },
+            triggers: {
+                x: 'path',
+                y: 'path',
+                size: 'path'
+            }
+        }
+    },
+
+<span id='Ext-draw-sprite-Cross-method-updatePath'>    updatePath: function (path, attr) {
+</span>        var s = attr.size / 1.7,
+            x = attr.x - attr.lineWidth / 2,
+            y = attr.y;
+        path.fromSvgString('M'.concat(x - s, ',', y, 'l', [-s, -s, s, -s, s, s, s, -s, s, s, -s, s, s, s, -s, s, -s, -s, -s, s, -s, -s, 'z']));
+    }
+
+});</pre>
+</body>
+</html>

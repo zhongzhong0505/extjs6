@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>The source code</title>
+  <link href="../resources/prettify/prettify.css" type="text/css" rel="stylesheet" />
+  <script type="text/javascript" src="../resources/prettify/prettify.js"></script>
+  <style type="text/css">
+    .highlight { display: block; background-color: #ddd; }
+  </style>
+  <script type="text/javascript">
+    function highlight() {
+      document.getElementById(location.hash.replace(/#/, "")).className = "highlight";
+    }
+  </script>
+</head>
+<body onload="prettyPrint(); highlight();">
+  <pre class="prettyprint lang-js">.#{$prefix}ssm-row-numberer-hd {
+    // Needs important to defeat the s-resize rule on all column headers
+    cursor: se-resize!important;
+}
+
+.#{$prefix}ssm-row-numberer-cell {
+    cursor: e-resize;
+}
+
+.#{$prefix}ssm-column-select {
+    .#{$prefix}column-header {
+        cursor: s-resize;
+    }
+}
+
+.#{$prefix}ssm-extender-drag-handle {
+    height: $spreadsheet-extender-handle-height;
+    width: $spreadsheet-extender-handle-width;
+    background-color: $spreadsheet-extender-handle-color;
+}
+
+.#{$prefix}ssm-extender-mask {
+    border: $spreadsheet-extender-mask-border-width $spreadsheet-extender-mask-border-style $spreadsheet-extender-mask-border-color;
+}</pre>
+</body>
+</html>

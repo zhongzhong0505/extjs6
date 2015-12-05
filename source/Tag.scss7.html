@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>The source code</title>
+  <link href="../resources/prettify/prettify.css" type="text/css" rel="stylesheet" />
+  <script type="text/javascript" src="../resources/prettify/prettify.js"></script>
+  <style type="text/css">
+    .highlight { display: block; background-color: #ddd; }
+  </style>
+  <script type="text/javascript">
+    function highlight() {
+      document.getElementById(location.hash.replace(/#/, "")).className = "highlight";
+    }
+  </script>
+</head>
+<body onload="prettyPrint(); highlight();">
+  <pre class="prettyprint lang-js"><span id='Ext-form-field-Tag'>/**
+</span> * @class Ext.form.field.Tag
+ */
+
+<span id='Ext-form-field-Tag-css_var-S-tag-field-padding'>/**
+</span> * @var {number/list}
+ * Tag field padding
+ */
+$tag-field-padding: dynamic(2px 0 0 4px);
+
+<span id='Ext-form-field-Tag-css_var-S-tag-field-item-height'>/**
+</span> * @var {number}
+ * The height of tag field items
+ */
+$tag-field-item-height: dynamic(18px);
+
+<span id='Ext-form-field-Tag-css_var-S-tag-field-item-border-radius'>/**
+</span> * @var {number/list}
+ * The border-radius of tag field items
+ */
+$tag-field-item-border-radius: dynamic(3px);
+
+<span id='Ext-form-field-Tag-css_var-S-tag-field-item-color'>/**
+</span> * @var {color}
+ * The text color of tag field items
+ */
+$tag-field-item-color: dynamic($color);
+
+<span id='Ext-form-field-Tag-css_var-S-tag-field-item-over-color'>/**
+</span> * @var {color}
+ * The text color of tag field items when hovered
+ */
+$tag-field-item-over-color: dynamic($tag-field-item-color);
+
+<span id='Ext-form-field-Tag-css_var-S-tag-field-item-selected-color'>/**
+</span> * @var {color}
+ * The text color of tag field items when selected
+ */
+$tag-field-item-selected-color: dynamic(#fff);
+
+<span id='Ext-form-field-Tag-css_var-S-tag-field-item-background-color'>/**
+</span> * @var {color}
+ * The background-color of tag field items
+ */
+$tag-field-item-background-color: dynamic(mix(#fff, $neutral-color, 15%));
+
+<span id='Ext-form-field-Tag-css_var-S-tag-field-item-over-background-color'>/**
+</span> * @var {color}
+ * The background-color of tag field items when hovered
+ */
+$tag-field-item-over-background-color: dynamic(mix(#000, $tag-field-item-background-color, 5%));
+
+<span id='Ext-form-field-Tag-css_var-S-tag-field-item-selected-background-color'>/**
+</span> * @var {color}
+ * The background-color of tag field items when selected
+ */
+$tag-field-item-selected-background-color: dynamic($base-highlight-color);
+
+<span id='Ext-form-field-Tag-css_var-S-tag-field-item-border-width'>/**
+</span> * @var {color}
+ * The border-width of tag field items
+ */
+$tag-field-item-border-width: dynamic(1px);
+
+<span id='Ext-form-field-Tag-css_var-S-tag-field-item-border-style'>/**
+</span> * @var {color}
+ * The border-style of tag field items
+ */
+$tag-field-item-border-style: dynamic(solid);
+
+<span id='Ext-form-field-Tag-css_var-S-tag-field-item-border-color'>/**
+</span> * @var {color}
+ * The border-color of tag field items
+ */
+$tag-field-item-border-color: dynamic($tag-field-item-background-color);
+
+<span id='Ext-form-field-Tag-css_var-S-tag-field-item-over-border-color'>/**
+</span> * @var {color}
+ * The border-color of tag field items when hovered
+ */
+$tag-field-item-over-border-color: dynamic($tag-field-item-over-background-color);
+
+<span id='Ext-form-field-Tag-css_var-S-tag-field-item-selected-border-color'>/**
+</span> * @var {color}
+ * The border-color of tag field items when selected
+ */
+$tag-field-item-selected-border-color: dynamic($base-color);
+
+<span id='Ext-form-field-Tag-css_var-S-tag-field-item-padding'>/**
+</span> * @var {number/list}
+ * The padding of tag field items
+ */
+$tag-field-item-padding: dynamic(0 5px);
+
+<span id='Ext-form-field-Tag-css_var-S-tag-field-item-margin'>/**
+</span> * @var {number/list}
+ * The margin of tag field items
+ */
+$tag-field-item-margin: dynamic(0 4px 2px 0);
+
+<span id='Ext-form-field-Tag-css_var-S-tag-field-item-close-icon-size'>/**
+</span> * @var {number}
+ * The size of the close icon
+ */
+$tag-field-item-close-icon-size: dynamic(12px);
+
+<span id='Ext-form-field-Tag-css_var-S-tag-field-item-close-icon-top'>/**
+</span> * @var {number}
+ * Number of pixels to offset the close icon from the top of the item
+ */
+$tag-field-item-close-icon-top: dynamic(1px);
+
+<span id='Ext-form-field-Tag-css_var-S-tag-field-item-close-icon-right'>/**
+</span> * @var {number}
+ * Number of pixels to offset the close icon from the right of the item
+ */
+$tag-field-item-close-icon-right: dynamic(1px);
+
+<span id='Ext-form-field-Tag-css_var-S-tag-field-item-close-icon-spacing'>/**
+</span> * @var {number}
+ * Number of pixels of space between the tag field item text and close icon
+ */
+$tag-field-item-close-icon-spacing: dynamic(6px);
+
+<span id='Ext-form-field-Tag-css_var-S-tag-field-item-close-icon-glyph-color'>/**
+</span> * @var {color}
+ * The color to use for the &quot;close&quot; icon of items in a tag field when
+ * {@link Global_CSS#$enable-font-icons} is `true`.
+ */
+$tag-field-item-close-icon-glyph-color: dynamic($tag-field-item-color);
+
+<span id='Ext-form-field-Tag-css_var-S-tag-field-item-selected-close-icon-glyph-color'>/**
+</span> * @var {color}
+ * The color to use for the &quot;close&quot; icon of selected items in a tag field when
+ * {@link Global_CSS#$enable-font-icons} is `true`.
+ */
+$tag-field-item-selected-close-icon-glyph-color: dynamic($tag-field-item-selected-color);
+
+<span id='Ext-form-field-Tag-css_var-S-tag-field-item-over-close-icon-glyph-color'>/**
+</span> * @var {color}
+ * The color to use for the &quot;close&quot; icon of hovered items in a tag field when
+ * {@link Global_CSS#$enable-font-icons} is `true`.
+ */
+$tag-field-item-over-close-icon-glyph-color: dynamic($tag-field-item-over-color);
+
+<span id='Ext-form-field-Tag-css_var-S-tag-field-item-selected-over-close-icon-glyph-color'>/**
+</span> * @var {color}
+ * The color to use for the &quot;close&quot; icon of selected and hovered items in a tag field when
+ * {@link Global_CSS#$enable-font-icons} is `true`.
+ */
+$tag-field-item-selected-over-close-icon-glyph-color: dynamic($tag-field-item-selected-close-icon-glyph-color);
+
+<span id='Ext-form-field-Tag-css_var-S-tag-field-item-close-icon-glyph'>/**
+</span> * @var {string/list}
+ * Glyph for the &quot;close&quot; icon when {@link Global_CSS#$enable-font-icons} is `true`.
+ */
+$tag-field-item-close-icon-glyph: dynamic($fa-var-close 16px $font-icon-font-family);
+
+<span id='Ext-form-field-Tag-css_var-S-tag-field-item-close-icon-opacity'>/**
+</span> * @var {color}
+ * Opacity of the &quot;close&quot; icon
+ */
+$tag-field-item-close-icon-opacity: dynamic(null);
+
+<span id='Ext-form-field-Tag-css_var-S-tag-field-item-close-icon-opacity-over'>/**
+</span> * @var {color}
+ * Opacity of the &quot;close&quot; icon when hovered
+ */
+$tag-field-item-close-icon-opacity-over: dynamic($tag-field-item-close-icon-opacity);
+
+<span id='Ext-form-field-Tag-css_var-S-tag-field-item-close-icon-opacity-pressed'>/**
+</span> * @var {color}
+ * Opacity of the &quot;close&quot; icon when pressed
+ */
+$tag-field-item-close-icon-opacity-pressed: dynamic($tag-field-item-close-icon-opacity-over);
+
+<span id='Ext-form-field-Tag-css_var-S-include-tag-field-default-ui'>/**
+</span> * @var {boolean}
+ * True to include the &quot;default&quot; tag field UI
+ */
+$include-tag-field-default-ui: dynamic($include-text-field-default-ui);
+</pre>
+</body>
+</html>

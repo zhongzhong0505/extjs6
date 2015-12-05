@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>The source code</title>
+  <link href="../resources/prettify/prettify.css" type="text/css" rel="stylesheet" />
+  <script type="text/javascript" src="../resources/prettify/prettify.js"></script>
+  <style type="text/css">
+    .highlight { display: block; background-color: #ddd; }
+  </style>
+  <script type="text/javascript">
+    function highlight() {
+      document.getElementById(location.hash.replace(/#/, "")).className = "highlight";
+    }
+  </script>
+</head>
+<body onload="prettyPrint(); highlight();">
+  <pre class="prettyprint lang-js"><span id='Ext-tip-Tip'>/**
+</span> * @class Ext.tip.Tip
+ */
+
+<span id='Ext-tip-Tip-css_var-S-tip-background-color'>/**
+</span> * @var {color}
+ * The background-color of the Tip
+ */
+$tip-background-color: dynamic(#fff);
+
+<span id='Ext-tip-Tip-css_var-S-tip-background-gradient'>/**
+</span> * @var {string/list}
+ * The background-gradient of the Tip. Can be either the name of a predefined gradient or a
+ * list of color stops. Used as the `$type` parameter for {@link Global_CSS#background-gradient}.
+ */
+$tip-background-gradient: dynamic('none');
+
+<span id='Ext-tip-Tip-css_var-S-tip-body-color'>/**
+</span> * @var {color}
+ * The text color of the Tip body
+ */
+$tip-body-color: dynamic(#000);
+
+<span id='Ext-tip-Tip-css_var-S-tip-body-font-size'>/**
+</span> * @var {number}
+ * The font-size of the Tip body
+ */
+$tip-body-font-size: dynamic($font-size);
+
+<span id='Ext-tip-Tip-css_var-S-tip-body-font-weight'>/**
+</span> * @var {string}
+ * The font-weight of the Tip body
+ */
+$tip-body-font-weight: dynamic($font-weight);
+
+<span id='Ext-tip-Tip-css_var-S-tip-body-padding'>/**
+</span> * @var {number/list}
+ * The padding of the Tip body
+ */
+$tip-body-padding: dynamic(3px);
+
+<span id='Ext-tip-Tip-css_var-S-tip-body-link-color'>/**
+</span> * @var {color}
+ * The text color of any anchor tags inside the Tip body
+ */
+$tip-body-link-color: dynamic($tip-body-color);
+
+<span id='Ext-tip-Tip-css_var-S-tip-header-color'>/**
+</span> * @var {color}
+ * The text color of the Tip header
+ */
+$tip-header-color: dynamic($tip-body-color);
+
+<span id='Ext-tip-Tip-css_var-S-tip-header-font-size'>/**
+</span> * @var {number}
+ * The font-size of the Tip header
+ */
+$tip-header-font-size: dynamic($tip-body-font-size);
+
+<span id='Ext-tip-Tip-css_var-S-tip-header-font-weight'>/**
+</span> * @var {string}
+ * The font-weight of the Tip header
+ */
+$tip-header-font-weight: dynamic(bold);
+
+// private - for 4.x compat
+$tip-header-body-padding: dynamic(3px 3px 0 3px);
+
+<span id='Ext-tip-Tip-css_var-S-tip-header-padding'>/**
+</span> * @var {number/list}
+ * The padding of the Tip header's body element
+ */
+$tip-header-padding: dynamic($tip-header-body-padding);
+
+<span id='Ext-tip-Tip-css_var-S-tip-border-color'>/**
+</span> * @var {color}
+ * The border-color of the Tip
+ */
+$tip-border-color: dynamic($panel-border-color);
+
+<span id='Ext-tip-Tip-css_var-S-tip-border-width'>/**
+</span> * @var {number}
+ * The border-width of the Tip
+ */
+$tip-border-width: dynamic(1px);
+
+<span id='Ext-tip-Tip-css_var-S-tip-border-radius'>/**
+</span> * @var {number}
+ * The border-radius of the Tip
+ */
+$tip-border-radius: dynamic(3px);
+
+<span id='Ext-tip-Tip-css_var-S-tip-error-inner-border-color'>/**
+</span> * @var {color}
+ * The inner border-color of the form field error Tip
+ */
+$tip-error-inner-border-color: dynamic(#fff);
+
+<span id='Ext-tip-Tip-css_var-S-tip-error-inner-border-width'>/**
+</span> * @var {number}
+ * The inner border-width of the form field error Tip
+ */
+$tip-error-inner-border-width: dynamic(0);
+
+<span id='Ext-tip-Tip-css_var-S-tip-error-border-color'>/**
+</span> * @var {color}
+ * The border-color of the form field error Tip
+ */
+$tip-error-border-color: dynamic($tip-border-color);
+
+<span id='Ext-tip-Tip-css_var-S-tip-error-border-radius'>/**
+</span> * @var {number}
+ * The border-radius of the form field error Tip
+ */
+$tip-error-border-radius: dynamic($tip-border-radius);
+
+<span id='Ext-tip-Tip-css_var-S-tip-error-border-width'>/**
+</span> * @var {number}
+ * The border-width of the form field error Tip
+ */
+$tip-error-border-width: dynamic($tip-border-width);
+
+<span id='Ext-tip-Tip-css_var-S-tip-error-background-color'>/**
+</span> * @var {color}
+ * The background-color of the form field error Tip
+ */
+$tip-error-background-color: dynamic($tip-background-color);
+
+<span id='Ext-tip-Tip-css_var-S-tip-error-body-padding'>/**
+</span> * @var {number/list}
+ * The padding of the form field error Tip's body element
+ */
+$tip-error-body-padding: dynamic($tip-body-padding);
+
+<span id='Ext-tip-Tip-css_var-S-tip-error-body-color'>/**
+</span> * @var {color}
+ * The text color of the form field error Tip's body element
+ */
+$tip-error-body-color: dynamic($tip-body-color);
+
+<span id='Ext-tip-Tip-css_var-S-tip-error-body-font-size'>/**
+</span> * @var {number}
+ * The font-size of the form field error Tip's body element
+ */
+$tip-error-body-font-size: dynamic($tip-body-font-size);
+
+<span id='Ext-tip-Tip-css_var-S-tip-error-body-font-weight'>/**
+</span> * @var {string}
+ * The font-weight of the form field error Tip's body element
+ */
+$tip-error-body-font-weight: dynamic($tip-body-font-weight);
+
+<span id='Ext-tip-Tip-css_var-S-tip-error-body-link-color'>/**
+</span> * @var {color}
+ * The color of anchor tags in the form field error Tip's body element
+ */
+$tip-error-body-link-color: dynamic($tip-body-link-color);
+
+<span id='Ext-tip-Tip-css_var-S-tip-tool-spacing'>/**
+</span> * @var {number}
+ * The space between {@link Ext.panel.Tool Tools} in the header
+ */
+$tip-tool-spacing: dynamic(4px);
+
+<span id='Ext-tip-Tip-css_var-S-tip-tool-background-image'>/**
+</span> * @var {string}
+ * The sprite to use for the header {@link Ext.panel.Tool Tools}
+ */
+$tip-tool-background-image: dynamic('tools/tool-sprites');
+
+<span id='Ext-tip-Tip-css_var-S-include-tip-default-ui'>/**
+</span> * @var {boolean}
+ * True to include the &quot;default&quot; tip UI
+ */
+$include-tip-default-ui: dynamic($include-default-uis);
+
+<span id='Ext-tip-Tip-css_var-S-include-tip-form-invalid-ui'>/**
+</span> * @var {boolean}
+ * True to include the &quot;form-invalid&quot; tip UI
+ */
+$include-tip-form-invalid-ui: dynamic($include-default-uis);
+</pre>
+</body>
+</html>

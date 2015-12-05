@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>The source code</title>
+  <link href="../resources/prettify/prettify.css" type="text/css" rel="stylesheet" />
+  <script type="text/javascript" src="../resources/prettify/prettify.js"></script>
+  <style type="text/css">
+    .highlight { display: block; background-color: #ddd; }
+  </style>
+  <script type="text/javascript">
+    function highlight() {
+      document.getElementById(location.hash.replace(/#/, "")).className = "highlight";
+    }
+  </script>
+</head>
+<body onload="prettyPrint(); highlight();">
+  <pre class="prettyprint lang-js"><span id='Ext-chart-LegendBase'>/**
+</span> * @class Ext.chart.LegendBase
+ */
+Ext.define('Ext.chart.LegendBase', {
+    extend: 'Ext.view.View',
+    config: {
+<span id='Ext-chart-LegendBase-cfg-tpl'>        tpl: [
+</span>            '&lt;div class=&quot;', Ext.baseCSSPrefix, 'legend-container&quot;&gt;',
+                '&lt;tpl for=&quot;.&quot;&gt;',
+                    '&lt;div class=&quot;', Ext.baseCSSPrefix, 'legend-item&quot;&gt;',
+                        '&lt;span ',
+                            'class=&quot;', Ext.baseCSSPrefix, 'legend-item-marker {[ values.disabled ? Ext.baseCSSPrefix + \'legend-inactive\' : \'\' ]}&quot; ',
+                            'style=&quot;background:{mark};&quot;&gt;',
+                        '&lt;/span&gt;{name}',
+                    '&lt;/div&gt;',
+                '&lt;/tpl&gt;',
+            '&lt;/div&gt;'
+        ],
+<span id='Ext-chart-LegendBase-cfg-nodeContainerSelector'>        nodeContainerSelector: 'div.' + Ext.baseCSSPrefix + 'legend-container',
+</span><span id='Ext-chart-LegendBase-cfg-itemSelector'>        itemSelector: 'div.' + Ext.baseCSSPrefix + 'legend-item',
+</span><span id='Ext-chart-LegendBase-cfg-docked'>        docked: 'bottom'
+</span>    },
+
+<span id='Ext-chart-LegendBase-method-setDocked'>    setDocked: function (docked) {
+</span>        var me = this,
+            panel = me.ownerCt,
+            layout;
+
+        me.docked = docked;
+
+        switch (docked) {
+            case 'top':
+            case 'bottom':
+                me.addCls(Ext.baseCSSPrefix + 'horizontal');
+                layout = 'hbox';
+                break;
+            case 'left':
+            case 'right':
+                me.removeCls(Ext.baseCSSPrefix + 'horizontal');
+                layout = 'vbox';
+                break;
+        }
+
+        if (panel) {
+            panel.setDocked(docked);
+        }
+    },
+
+<span id='Ext-chart-LegendBase-method-setStore'>    setStore: function (store) {
+</span>        this.bindStore(store);
+    },
+
+<span id='Ext-chart-LegendBase-method-clearViewEl'>    clearViewEl: function () {
+</span>        this.callParent(arguments);
+        // The legend-container div is not removed automatically.
+        Ext.removeNode(this.getNodeContainer());
+    },
+
+<span id='Ext-chart-LegendBase-method-onItemClick'>    onItemClick: function (record, item, index, e) {
+</span>        this.callParent(arguments);
+        this.toggleItem(index);
+    }
+});
+</pre>
+</body>
+</html>

@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>The source code</title>
+  <link href="../resources/prettify/prettify.css" type="text/css" rel="stylesheet" />
+  <script type="text/javascript" src="../resources/prettify/prettify.js"></script>
+  <style type="text/css">
+    .highlight { display: block; background-color: #ddd; }
+  </style>
+  <script type="text/javascript">
+    function highlight() {
+      document.getElementById(location.hash.replace(/#/, "")).className = "highlight";
+    }
+  </script>
+</head>
+<body onload="prettyPrint(); highlight();">
+  <pre class="prettyprint lang-js"><span id='Ext-draw-SurfaceBase'>/**
+</span> * @private
+ * @class Ext.draw.SurfaceBase
+ */
+Ext.define('Ext.draw.SurfaceBase', {
+    extend: 'Ext.Widget',
+
+<span id='Ext-draw-SurfaceBase-method-getOwnerBody'>    getOwnerBody: function() {
+</span>        return this.ownerCt.body;
+    },
+
+<span id='Ext-draw-SurfaceBase-method-destroy'>    destroy: function () {
+</span>        var me = this;
+
+        if (me.hasListeners.destroy) {
+            me.fireEvent('destroy', me);
+        }
+        me.callParent();
+    }
+
+});
+</pre>
+</body>
+</html>
